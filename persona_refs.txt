@@ -1,0 +1,159 @@
+## ONE-SHOT (Contoh Acuan — jangan ditiru mentah, hanya sebagai format)
+
+1. Naratif
+
+---
+
+**Anna** adalah seorang wanita berusia 34 tahun yang tinggal di Jakarta Selatan. Ia sudah menikah dan memiliki dua anak. Saat ini, Anna bekerja sebagai Senior Project Manager di sebuah startup fintech dengan penghasilan berkisar antara 25 hingga 35 juta rupiah per bulan. Dengan pengalaman lebih dari enam tahun di industri teknologi, Anna memulai kariernya sebagai junior developer sebelum akhirnya beralih ke bidang manajemen proyek.
+
+
+Anna dikenal sebagai pribadi yang perfeksionis dan sangat teliti, dengan dorongan kuat untuk terus belajar dan mengembangkan diri. Meskipun berkepribadian introvert, ia merasa nyaman bekerja dalam tim kecil yang kolaboratif dan saling mendukung. Secara fisik, Anna tergolong sehat, tetapi sering mengalami ketegangan mata akibat bekerja di depan komputer selama lebih dari delapan jam setiap hari. Untuk menjaga kesehatannya, ia rutin melakukan yoga dua kali seminggu. Dari sisi mental, Anna cenderung terlalu banyak berpikir saat mengambil keputusan penting dan mudah merasa stres ketika menghadapi tenggat waktu besar, sehingga keseimbangan antara pekerjaan dan kehidupan pribadi menjadi kebutuhan utama baginya.
+
+
+Motivasi utama Anna adalah meningkatkan efisiensi kerja melalui otomatisasi dan mengurangi tugas-tugas manual yang berulang. Dalam dua tahun ke depan, ia menargetkan untuk memimpin penerapan transformasi digital di perusahaannya sekaligus meraih promosi menjadi Tech Lead. Namun, dalam kesehariannya, Anna masih menghadapi beberapa kendala, seperti antarmuka perangkat lunak yang rumit, dokumentasi yang kurang jelas, serta waktu pelatihan yang terbatas untuk memahami alat kerja baru.
+
+
+Dari segi kemampuan, Anna memiliki keahlian menengah dalam penggunaan Excel dan alat manajemen proyek, masih tergolong pemula dalam bidang komputasi awan, namun sudah sangat berpengalaman dalam komunikasi dan koordinasi tim. Ia bekerja dalam sistem hybrid, dengan tiga hari kerja di kantor dan dua hari bekerja dari rumah. Anna menjunjung tinggi efisiensi dan kolaborasi, lebih memprioritaskan hasil dibandingkan jumlah jam kerja, serta memiliki fleksibilitas tinggi dalam beradaptasi terhadap perubahan di lingkungan kerja yang dinamis.
+
+---
+
+2. Bullet-points
+
+
+## 🧩 **Profil Internal**
+
+**Ciri inti dan atribut pribadi**
+
+### 🏠 Informasi Demografis
+
+* Jenis kelamin: **Perempuan**
+* Usia: **34 tahun**
+* Lokasi: **Jakarta Selatan**
+* Status: **Menikah**, memiliki **2 anak**
+
+### 💡 Atribut Pribadi
+
+* **Perfeksionis**
+* **Teliti terhadap detail**
+* **Senang belajar hal baru secara berkelanjutan**
+* **Introvert**, merasa nyaman bekerja dalam **tim kecil**
+
+### 💪 Kondisi Fisik
+
+* Umumnya **sehat**
+* Sering mengalami **ketegangan mata** karena bekerja lebih dari **8 jam di depan komputer**
+* Menjaga kebugaran dengan **yoga dua kali seminggu**
+
+### 🧠 Kondisi Mental
+
+* **Mudah stres** saat menghadapi tenggat waktu besar
+* Membutuhkan **keseimbangan antara pekerjaan dan kehidupan pribadi**
+* Cenderung **terlalu banyak berpikir** dalam mengambil keputusan penting
+
+---
+
+## 🌍 **Profil Eksternal**
+
+**Konteks, lingkungan, dan interaksi**
+
+### 🎯 Motivasi
+
+* **Meningkatkan efisiensi kerja** melalui otomatisasi
+* **Mengurangi pekerjaan manual yang berulang**
+
+### 🏆 Tujuan
+
+* **Menerapkan transformasi digital** di perusahaannya
+* **Mendapat promosi menjadi Tech Lead** dalam 2 tahun ke depan
+
+### ⚠️ Tantangan (Pain Points)
+
+* **Antarmuka perangkat lunak yang kompleks**
+* **Kurangnya dokumentasi yang jelas**
+* **Waktu pelatihan terbatas** untuk penggunaan alat baru
+
+### 🧠 Keahlian & Pengalaman
+
+* **Menengah:** Excel dan alat manajemen proyek
+* **Pemula:** Komputasi awan (cloud computing)
+* **Ahli:** Komunikasi dan kolaborasi tim
+
+### 📖 Cerita Pribadi
+
+Anna telah bekerja sebagai **Project Manager** di **startup teknologi** selama **6 tahun**, memulai kariernya sebagai **junior developer** sebelum beralih ke manajemen proyek.
+
+### 🏢 Lokasi & Lingkungan Kerja
+
+* **Jakarta Selatan**
+* Skema kerja **hybrid** (3 hari di kantor, 2 hari remote)
+
+### 💼 Status Pekerjaan
+
+* **Senior Project Manager** di **startup fintech**
+* Penghasilan: **25–35 juta rupiah per bulan**
+
+### 🌱 Budaya & Nilai
+
+* Menghargai **efisiensi dan kolaborasi**
+* **Memprioritaskan hasil** dibanding jam kerja
+* **Fleksibel terhadap perubahan**
+
+---
+
+3. Mixed
+
+
+**Anna** adalah seorang wanita berusia **34 tahun** yang tinggal di **Jakarta Selatan**. Ia sudah menikah dan memiliki dua anak. Saat ini Anna bekerja sebagai **Senior Project Manager** di sebuah **startup fintech**, dengan penghasilan sekitar **25–35 juta rupiah per bulan**.
+Dengan pengalaman lebih dari **enam tahun di industri teknologi**, ia memulai kariernya sebagai **junior developer** sebelum akhirnya beralih ke bidang **manajemen proyek**.
+
+---
+
+### 📋 Detail Utama
+
+* **Demografi:** Perempuan, 34 tahun, menikah, 2 anak, tinggal di Jakarta Selatan
+* **Status Pekerjaan:** Senior Project Manager di startup fintech
+* **Gaji:** 25–35 juta IDR per bulan
+* **Lingkungan Kerja:** Hybrid (3 hari di kantor, 2 hari remote)
+* **Kepribadian:** Perfeksionis, teliti, introvert, pembelajar sepanjang hayat
+
+---
+
+### 💪 Kondisi Fisik & Mental
+
+Secara fisik, Anna cukup sehat, namun sering mengalami **ketegangan mata** karena bekerja di depan komputer lebih dari **8 jam per hari**.
+Untuk menjaga kesehatannya, ia rutin melakukan **yoga dua kali seminggu**.
+
+Secara mental, Anna membutuhkan **keseimbangan hidup**, karena ia cenderung **terlalu banyak berpikir** saat mengambil keputusan penting dan **mudah stres** menjelang tenggat waktu proyek.
+
+---
+
+### 🎯 Motivasi & Tujuan
+
+* Meningkatkan efisiensi kerja melalui **otomatisasi**
+* Mengurangi **pekerjaan manual yang berulang**
+* Memimpin **transformasi digital** di perusahaannya
+* Mencapai **promosi menjadi Tech Lead** dalam 2 tahun ke depan
+
+---
+
+### ⚠️ Tantangan (Pain Points)
+
+* Antarmuka perangkat lunak yang **kompleks**
+* **Dokumentasi tidak jelas**
+* Waktu pelatihan yang **terbatas** untuk alat baru
+
+---
+
+### 🧠 Keahlian & Pengalaman
+
+* **Menengah:** Excel dan alat manajemen proyek
+* **Pemula:** Komputasi awan (cloud computing)
+* **Ahli:** Komunikasi tim
+
+---
+
+### 🌱 Budaya & Nilai
+
+Anna menghargai **efisiensi dan kolaborasi**, menekankan **hasil kerja dibandingkan jam kerja**, serta **mudah beradaptasi terhadap perubahan**.
+
+---
