@@ -139,5 +139,5 @@ export {
   ResponsiveModalOverlay,
   ResponsiveModalPortal,
   ResponsiveModalTitle,
-  ResponsiveModalTrigger
+  ResponsiveModalTrigger,
 };

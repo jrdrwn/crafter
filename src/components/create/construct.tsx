@@ -60,7 +60,7 @@ export default function Design() {
 
   return (
     <section className="p-4 py-16">
-      <div className="grid grid-cols-3 gap-8">
+      <div className="container mx-auto grid grid-cols-3 gap-8">
         <Card className="col-span-1 w-full border border-primary p-2">
           <CardHeader className="p-2">
             <CardTitle className="flex items-center gap-2 text-xl text-primary">
@@ -418,6 +418,8 @@ export default function Design() {
                 name="amount"
                 id="amount"
                 type="number"
+                min={1}
+                max={3}
                 className="ml-2 w-16 border-primary"
               />
             </Label>
