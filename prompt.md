@@ -27,6 +27,7 @@ structure: - "<p>[PARAGRAF]</p>" - "<p>[PARAGRAF]</p>"
 bullet:
 type: html
 structure: - "<h2>Internal Layer</h2>" - "<div>Core characteristics and personal attributes</div>" - "<h4>[LAYER-TITLE]</h4>" - |
+
 <ul>
 <li>[BULLET-LIST 1]</li>
 <li>[BULLET-LIST 2]</li>
