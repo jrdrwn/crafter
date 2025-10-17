@@ -35,6 +35,14 @@ import {
 } from '../ui/item';
 import { Label } from '../ui/label';
 import { RadioGroup, RadioGroupItem } from '../ui/radio-group';
+import {
+  ResponsiveModal,
+  ResponsiveModalContent,
+  ResponsiveModalDescription,
+  ResponsiveModalHeader,
+  ResponsiveModalTitle,
+  ResponsiveModalTrigger,
+} from '../ui/responsive-modal';
 import { ScrollArea } from '../ui/scroll-area';
 import {
   Select,
@@ -123,7 +131,7 @@ export default function Design() {
         </Card>
         <Card className="col-span-2 w-full border border-primary p-2">
           <CardHeader className="relative p-2">
-            <CircleQuestionMark className="absolute top-0 right-0 size-5 text-gray-400 hover:text-gray-600" />
+            <HumanFactorsHelperModal />
             <CardTitle className="flex items-center gap-2 text-xl text-primary">
               <Brain size={20} className="text-foreground" />
               Human Factors
@@ -311,7 +319,7 @@ export default function Design() {
         </Card>
         <Card className="col-span-1 w-full border border-primary p-2">
           <CardHeader className="relative p-2">
-            <CircleQuestionMark className="absolute top-0 right-0 size-5 text-gray-400 hover:text-gray-600" />
+            <ContentLengthHelperModal />
             <CardTitle className="flex items-center gap-2 text-xl text-primary">
               <Text size={20} className="text-foreground" />
               Content Length Settings
@@ -442,5 +450,117 @@ export default function Design() {
         </Card>
       </div>
     </section>
+  );
+}
+
+function HumanFactorsHelperModal() {
+  return (
+    <ResponsiveModal>
+      <ResponsiveModalTrigger asChild>
+        <CircleQuestionMark className="absolute top-0 right-0 size-5 text-gray-400 hover:text-gray-600" />
+      </ResponsiveModalTrigger>
+      <ResponsiveModalContent>
+        <ResponsiveModalHeader>
+          <ResponsiveModalTitle className="text-2xl">
+            Helper: Human Factor
+          </ResponsiveModalTitle>
+          <ResponsiveModalDescription>
+            Human factors consist of general attributes (internal) and domain
+            context (external) to make the persona more realistic.
+          </ResponsiveModalDescription>
+        </ResponsiveModalHeader>
+        <div className="mt-4 space-y-4">
+          <ul className="space-y-2">
+            <li>
+              <span className="font-medium text-primary">Internal layer</span>
+              <br />
+              <span>Informasi demografis, atribut personal.</span>
+            </li>
+            <li>
+              <span className="font-medium text-primary">External layer</span>
+              <br />
+              <span>
+                Motivasi, tujuan, pain points, cerita personal, interaksi
+                teknologi, status pekerjaan, lingkungan keluarga, lokasi
+                geografis, hingga gaya komunikasi
+              </span>
+            </li>
+            <li>
+              <span className="font-semibold text-primary">Tips</span>
+              <br />
+              <span>
+                Mulai dari internal (wajib), lalu tambahkan eksternal sesuai
+                konteks proyek atau domain (misal kesehatan, pendidikan, lansia)
+              </span>
+            </li>
+            <li>
+              <span className="font-semibold text-primary">Tujuan</span>
+              <br />
+              <span>
+                Memberikan fleksibilitas yang mana internal untuk reuse,
+                eksternal untuk penyesuaian spesifik domain
+              </span>
+            </li>
+          </ul>
+        </div>
+      </ResponsiveModalContent>
+    </ResponsiveModal>
+  );
+}
+function ContentLengthHelperModal() {
+  return (
+    <ResponsiveModal>
+      <ResponsiveModalTrigger asChild>
+        <CircleQuestionMark className="absolute top-0 right-0 size-5 text-gray-400 hover:text-gray-600" />
+      </ResponsiveModalTrigger>
+      <ResponsiveModalContent>
+        <ResponsiveModalHeader>
+          <ResponsiveModalTitle className="text-2xl">
+            Helper: Content Length
+          </ResponsiveModalTitle>
+          <ResponsiveModalDescription>
+            The length of the persona determines the details shown: short for
+            quick ideas, medium for balance, long for in-depth analysis.
+          </ResponsiveModalDescription>
+        </ResponsiveModalHeader>
+        <div className="mt-4 space-y-4">
+          <ul className="space-y-2">
+            <li>
+              <span className="font-medium text-primary">
+                Short (±100–200 kata)
+              </span>
+              <br />
+              <span>
+                Cocok untuk brainstorming; berisi inti seperti demografi, tujuan
+                utama, dan 1–2 pain points
+              </span>
+            </li>
+            <li>
+              <span className="font-medium text-primary">
+                Medium (±200–400 kata)
+              </span>
+              <br />
+              <span>
+                Seimbang untuk workshop; memuat motivasi, beberapa tujuan, pain
+                points, dan interaksi dengan teknologi
+              </span>
+            </li>
+            <li>
+              <span className="font-medium text-primary">Long (≥400 kata)</span>
+              <br />
+              <span>
+                Mendalam; menambahkan cerita personal, konteks domain, serta
+                faktor manusia lebih lengkap
+              </span>
+            </li>
+            <li>
+              <span className="font-medium text-primary">Custom</span>
+              <br />
+              <span>Pengguna dapat mengatur jumlah kata sesuai kebutuhan</span>
+            </li>
+          </ul>
+        </div>
+      </ResponsiveModalContent>
+    </ResponsiveModal>
   );
 }
