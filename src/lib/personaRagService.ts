@@ -47,6 +47,7 @@ if (!API_KEY) throw new Error('Missing GOOGLE_API_KEY in environment');
 const llm = new ChatGoogleGenerativeAI({
   model: 'gemini-2.5-flash-lite',
   apiKey: API_KEY,
+  cache: true,
 });
 const embeddings = new GoogleGenerativeAIEmbeddings({
   apiKey: API_KEY,
@@ -83,13 +84,10 @@ function joinDocs(docs: Document[]) {
 export async function runPersonaRAG(topK = 8) {
   const vs = await ensureStore();
   const retriever = vs.asRetriever(topK);
-  const docs = await retriever.invoke('anna'); // TODO: nanti pake detail dari user
-  console.log('Retrieved docs:', docs);
-  const context = joinDocs(docs);
+  const docs = null; // await retriever.invoke('anna'); // TODO: nanti pake detail dari user
+  const context = null; // joinDocs(docs);
 
-  console.log('Retrieved docs:', context);
-
-  const promptMd = await fs.readFile('./prompt.md', 'utf-8');
+  const promptMd = await fs.readFile('./prompt.yaml', 'utf-8');
   const finalPrompt = context ? `${promptMd}` : promptMd;
 
   return llm.withStructuredOutput(PersonaOutputSchema).invoke(finalPrompt);
