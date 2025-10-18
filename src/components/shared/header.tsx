@@ -18,7 +18,6 @@ import { cn } from '@/lib/utils';
 import { Flower, Menu } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { toast } from 'sonner';
 
 export default function Header() {
   const menus = [
@@ -77,11 +76,8 @@ export default function Header() {
           </NavigationMenuList>
         </NavigationMenu>
         <div className="flex items-center gap-4">
-          <Button
-            className="shadow-md shadow-primary/35"
-            onClick={() => toast.info('Fitur ini masih dalam pengembangan')}
-          >
-            Login
+          <Button className="shadow-md shadow-primary/35" asChild>
+            <Link href="/login">Login</Link>
           </Button>
           <Sheet>
             <SheetTrigger asChild>
