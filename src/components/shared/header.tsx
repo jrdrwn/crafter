@@ -15,9 +15,10 @@ import {
   SheetTrigger,
 } from '@/components/ui/sheet';
 import { cn } from '@/lib/utils';
-import { Flower, Menu } from 'lucide-react';
+import { Menu } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import Brand from './brand';
 
 export default function Header() {
   const menus = [
@@ -51,7 +52,7 @@ export default function Header() {
           prefetch={false}
         >
           <Button variant={'ghost'} className="rounded-full">
-            <Flower className="text-muted-foreground" />
+            <Brand className="text-muted-foreground" />
             <span className="font-bold text-primary">CRAFTER 2.0</span>
           </Button>
         </Link>

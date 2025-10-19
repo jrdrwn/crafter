@@ -1,5 +1,6 @@
-import { Brain, Flower, Group, Target } from 'lucide-react';
+import { Brain, Group, Target } from 'lucide-react';
 
+import Brand from '../shared/brand';
 import { Card, CardContent } from '../ui/card';
 
 export default function FeatureWhy() {
@@ -7,8 +8,8 @@ export default function FeatureWhy() {
     <section className="relative border-b border-dashed border-primary py-14">
       <div className="container mx-auto">
         <div className="absolute inset-x-12 inset-y-0 border-x border-dashed border-primary">
-          <Flower className="absolute -right-4 -bottom-4 size-8 text-primary"></Flower>
-          <Flower className="absolute -bottom-4 -left-4 size-8 text-primary"></Flower>
+          <Brand className="absolute -right-4 -bottom-4 size-8 text-primary z-1 stroke-primary"></Brand>
+          <Brand className="absolute -bottom-4 -left-4 size-8 text-primary z-1 stroke-primary"></Brand>
         </div>
         <div className="text-center">
           <h2 className="mb-4 text-4xl font-bold tracking-wide text-primary">

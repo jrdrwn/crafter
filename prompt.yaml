@@ -4,7 +4,6 @@ description: Anda berperan sebagai peneliti persona yang menyusun persona menggu
 reference: "Karolita, D., Grundy, J., Kanij, T., Obie, H., & McIntosh, J. (2023). What's in a Persona? A Preliminary Taxonomy from Persona Use in Requirements Engineering. ENASE 2023, 39–51. https://doi.org/10.5220/0011708500003464"
 
 output_specifications:
-language: Bahasa Indonesia
 presentation_order:
   - 'Naratif (paragraf)'
   - 'Bullet-points'
@@ -102,6 +101,7 @@ task:
 
 expected_output_structure:
   json_schema:
+    language: indonesia
     result:
       narative: '...'
       bullet: '...'
