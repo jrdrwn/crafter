@@ -1,16 +1,11 @@
-import parse from 'html-react-parser';
 import {
-  Blend,
   ChevronLeft,
   ChevronRight,
   Edit,
   FileJson,
   FileText,
-  List,
   LockKeyhole,
-  Text,
   Trash,
-  User,
   Wifi,
 } from 'lucide-react';
 import Link from 'next/link';
@@ -26,7 +21,6 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from '../ui/alert-dialog';
-import { Badge } from '../ui/badge';
 import { Button } from '../ui/button';
 import {
   Card,
@@ -45,6 +39,7 @@ import {
   SelectValue,
 } from '../ui/select';
 import { Switch } from '../ui/switch';
+import Persona from './persona';
 
 export default async function PersonaDetail() {
   const res = await fetch('http://localhost:3000/api/chat');
@@ -81,63 +76,7 @@ export default async function PersonaDetail() {
           </div>
         </div>
         <div className="mt-4 grid grid-cols-3 gap-8">
-          <div className="col-span-2 space-y-4">
-            <Card className="w-full border-primary bg-primary/5">
-              <CardContent>
-                <div className="flex flex-col items-center justify-center gap-4">
-                  <span className="flex size-30 items-center justify-center rounded-full bg-primary text-primary-foreground">
-                    <User size={60} />
-                  </span>
-                  <p className="text-2xl font-bold text-primary">
-                    Sari Wulandari
-                  </p>
-                  <p className="text-lg text-gray-500 italic">
-                    “Saya butuh solusi yang efisien untuk mengautomasi proses
-                    bisnis tanpa mengorbankan kualitas.”
-                  </p>
-                  <div className="flex items-center justify-center gap-8">
-                    <Badge
-                      variant={'outline'}
-                      className="rounded-full border-primary text-primary"
-                    >
-                      Mobile Developer
-                    </Badge>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-            <Card className="w-full border-primary bg-primary/5 py-4">
-              <CardContent>
-                <div className="flex items-center justify-between">
-                  <h2 className="px-0 text-xl font-bold text-primary">
-                    Select Naration & Structure
-                  </h2>
-                  <div className="flex items-center justify-center gap-4">
-                    <Button
-                      variant={'outline'}
-                      className="border-primary text-primary"
-                    >
-                      <Text />
-                      Narrative
-                    </Button>
-                    <Button variant={'outline'} className="text-border">
-                      <List />
-                      Narrative
-                    </Button>
-                    <Button variant={'outline'} className="text-border">
-                      <Blend />
-                      Narrative
-                    </Button>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-            <Card className="w-full border-primary p-0">
-              <div className="prose prose-lg max-w-full p-4 dark:prose-invert prose-h2:mb-2 prose-h2:text-primary prose-h3:text-primary prose-h4:text-primary">
-                {parse(markdown.result.mixed)}
-              </div>
-            </Card>
-          </div>
+          <Persona markdown={markdown} />
           <div className="col-span-1 space-y-4">
             <Card className="w-full gap-2 border-foreground py-4">
               <CardHeader className="px-4">
