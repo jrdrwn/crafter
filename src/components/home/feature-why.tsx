@@ -8,8 +8,8 @@ export default function FeatureWhy() {
     <section className="relative border-b border-dashed border-primary py-14">
       <div className="container mx-auto">
         <div className="absolute inset-x-12 inset-y-0 border-x border-dashed border-primary">
-          <Brand className="absolute -right-4 -bottom-4 size-8 text-primary z-1 stroke-primary"></Brand>
-          <Brand className="absolute -bottom-4 -left-4 size-8 text-primary z-1 stroke-primary"></Brand>
+          <Brand className="absolute -right-4 -bottom-4 z-1 size-8 stroke-primary text-primary"></Brand>
+          <Brand className="absolute -bottom-4 -left-4 z-1 size-8 stroke-primary text-primary"></Brand>
         </div>
         <div className="text-center">
           <h2 className="mb-4 text-4xl font-bold tracking-wide text-primary">

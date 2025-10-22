@@ -1,6 +1,7 @@
 'use client';
 
 import { ChevronRight, Sparkles, Tags } from 'lucide-react';
+import Link from 'next/link';
 
 import { Badge } from '../ui/badge';
 import { Button } from '../ui/button';
@@ -50,14 +51,18 @@ export default function Hero() {
             uncover user goals, motivations, and frustrations in seconds.
           </p>
           <div className="mt-8 flex justify-center gap-8">
-            <Button>
-              <Sparkles />
-              Continue as Guest
-            </Button>
-            <Button variant="secondary">
-              Join now!
-              <ChevronRight />
-            </Button>
+            <Link href="/create">
+              <Button>
+                <Sparkles />
+                Continue as Guest
+              </Button>
+            </Link>
+            <Link href="/create-account">
+              <Button variant="secondary">
+                Join now!
+                <ChevronRight />
+              </Button>
+            </Link>
           </div>
           <div className="mt-8">
             <p className="text-sm">Trusted by Leading Teams</p>

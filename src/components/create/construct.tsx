@@ -5,15 +5,16 @@ import {
   Bot,
   Brain,
   CircleQuestionMark,
-  Heart,
   Plus,
   Sparkles,
   Target,
   Text,
   Users,
-  X,
 } from 'lucide-react';
-import { useState } from 'react';
+import { useRef, useState } from 'react';
+import { Controller, useForm } from 'react-hook-form';
+import { toast } from 'sonner';
+import z from 'zod';
 
 import { Button } from '../ui/button';
 import {
@@ -25,14 +26,9 @@ import {
   CardTitle,
 } from '../ui/card';
 import { Checkbox } from '../ui/checkbox';
+import { Field, FieldLabel } from '../ui/field';
 import { Input } from '../ui/input';
-import {
-  Item,
-  ItemActions,
-  ItemContent,
-  ItemDescription,
-  ItemTitle,
-} from '../ui/item';
+import { Item, ItemContent, ItemDescription, ItemTitle } from '../ui/item';
 import { Label } from '../ui/label';
 import { RadioGroup, RadioGroupItem } from '../ui/radio-group';
 import {
@@ -54,13 +50,97 @@ import {
 import { Slider } from '../ui/slider';
 import { Textarea } from '../ui/textarea';
 
+const formSchema = z.object({
+  domain: z.string().min(1, 'Please select a domain'),
+  internal: z.array(z.string()).min(1, 'Select at least one internal factor'),
+  external: z.array(z.string()).min(1, 'Select at least one external factor'),
+  contentLength: z
+    .number()
+    .min(50)
+    .max(2000, 'Content length must be between 50 and 2000 words'),
+  llmModel: z.string().nonempty('Please select an LLM model'),
+  language: z.string().nonempty('Please select a language'),
+  amount: z.coerce
+    .number()
+    .min(1, 'At least 1 persona')
+    .max(3, 'Maximum 3 personas'),
+  detail: z.string().optional(),
+});
+
 export default function Design() {
-  const [customSliderValue, setCustomSliderValue] = useState([200]);
-  const [customSliderDisable, setCustomSliderDisable] = useState(true);
+  const form = useForm<z.infer<typeof formSchema>>({
+    defaultValues: {
+      domain: '',
+      internal: [],
+      external: [],
+      contentLength: 200,
+      llmModel: '',
+      language: '',
+      amount: 1,
+      detail: '',
+    },
+  });
+  const [contentLengthSliderValue, setContentLengthSliderValue] = useState([
+    200,
+  ]);
+  const [contentLengthSliderDisable, setContentLengthSliderDisable] =
+    useState(true);
+
+  const [domains, setDomains] = useState([
+    'Health',
+    'Education',
+    'Software Development',
+    'E-commerce',
+    'Banking & Fintech',
+    'Travel & Tourism',
+  ]);
+  const [domainQuery, setDomainQuery] = useState('');
+  const domainInputRef = useRef<HTMLInputElement>(null);
+
+  const [internalFactors, setInternalFactors] = useState([
+    { label: 'Demographic Information', desc: 'Age, name, gender' },
+    { label: 'Personal Attributes', desc: 'Attitudes, behaviors, personality' },
+    { label: 'Physical Condition', desc: 'Health, physical limitations' },
+  ]);
+  const [internalQuery, setInternalQuery] = useState('');
+  const [internalDescCustom, setInternalDescCustom] = useState('');
+  const internalInputRef = useRef<HTMLInputElement>(null);
+  const internalDescInputRef = useRef<HTMLInputElement>(null);
+
+  const [externalFactors, setExternalFactors] = useState([
+    { label: 'Motivation', desc: 'Primary reasons for using the system' },
+    { label: 'Goals', desc: 'Objectives the user wants to achieve' },
+    { label: 'Pain Points', desc: 'Key challenges & frustrations' },
+  ]);
+  const [externalQuery, setExternalQuery] = useState('');
+  const [externalDescCustom, setExternalDescCustom] = useState('');
+  const externalInputRef = useRef<HTMLInputElement>(null);
+  const externalDescInputRef = useRef<HTMLInputElement>(null);
+
+  function onSubmit(data: z.infer<typeof formSchema>) {
+    toast('You submitted the following values:', {
+      description: (
+        <pre className="bg-code text-code-foreground mt-2 w-[320px] overflow-x-auto rounded-md p-4">
+          <code>{JSON.stringify(data, null, 2)}</code>
+        </pre>
+      ),
+      position: 'bottom-right',
+      classNames: {
+        content: 'flex flex-col gap-2',
+      },
+      style: {
+        '--border-radius': 'calc(var(--radius)  + 4px)',
+      } as React.CSSProperties,
+    });
+  }
 
   return (
     <section className="p-4 py-16">
-      <div className="container mx-auto grid grid-cols-3 gap-8">
+      <form
+        onSubmit={form.handleSubmit(onSubmit)}
+        className="container mx-auto grid grid-cols-3 gap-8"
+      >
+        {/* DOMAIN CARD */}
         <Card className="col-span-1 w-full border border-primary p-2">
           <CardHeader className="p-2">
             <CardTitle className="flex items-center gap-2 text-xl text-primary">
@@ -72,63 +152,87 @@ export default function Design() {
             </CardDescription>
           </CardHeader>
           <CardContent className="px-2">
-            <ScrollArea className="h-40">
-              <RadioGroup defaultValue="health">
-                <div className="flex items-center space-x-2">
-                  <RadioGroupItem value="health" id="health" />
-                  <Label htmlFor="health">Health</Label>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <RadioGroupItem value="education" id="education" />
-                  <Label htmlFor="education">Education</Label>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <RadioGroupItem
-                    value="software-development"
-                    id="software-development"
-                  />
-                  <Label htmlFor="software-development">
-                    Software Development
-                  </Label>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <RadioGroupItem value="e-commerce" id="e-commerce" />
-                  <Label htmlFor="e-commerce">E-commerce</Label>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <RadioGroupItem
-                    value="banking-fintech"
-                    id="banking-fintech"
-                  />
-                  <Label htmlFor="banking-fintech" className="w-full">
-                    Banking & Fintech
-                  </Label>
-
-                  <X className="mr-3 size-4 text-gray-400 hover:text-red-500" />
-                </div>
-                <div className="flex items-center space-x-2">
-                  <RadioGroupItem value="travel-tourism" id="travel-tourism" />
-                  <Label htmlFor="travel-tourism" className="w-full">
-                    Travel & Tourism
-                  </Label>
-                  <X className="mr-3 size-4 text-gray-400 hover:text-red-500" />
-                </div>
-              </RadioGroup>
-            </ScrollArea>
+            <Controller
+              name="domain"
+              control={form.control}
+              render={({ field, fieldState }) => (
+                <Field data-invalid={fieldState.invalid}>
+                  <ScrollArea className="h-40">
+                    <RadioGroup
+                      name={field.name}
+                      value={field.value}
+                      onValueChange={field.onChange}
+                      aria-invalid={fieldState.invalid}
+                      defaultValue="health"
+                    >
+                      {domains
+                        .filter((domain) =>
+                          domain
+                            .toLowerCase()
+                            .includes(domainQuery.toLowerCase()),
+                        )
+                        .map((domain) => (
+                          <FieldLabel
+                            key={domain}
+                            htmlFor={domain
+                              .toLowerCase()
+                              .replace(/ & /g, '-')
+                              .replace(/\s+/g, '-')}
+                            className="flex items-center space-x-2"
+                          >
+                            <RadioGroupItem
+                              value={domain
+                                .toLowerCase()
+                                .replace(/ & /g, '-')
+                                .replace(/\s+/g, '-')}
+                              id={domain
+                                .toLowerCase()
+                                .replace(/ & /g, '-')
+                                .replace(/\s+/g, '-')}
+                            />
+                            {domain}
+                          </FieldLabel>
+                        ))}
+                    </RadioGroup>
+                    {domainQuery && !domains.includes(domainQuery) && (
+                      <p className="mt-2 text-center text-xs text-gray-500">
+                        Add "{domainQuery}" as a new domain if not listed.
+                      </p>
+                    )}
+                  </ScrollArea>
+                </Field>
+              )}
+            />
           </CardContent>
           <CardFooter className="border-t border-dashed px-2 pb-2">
             <div className="flex w-full items-center gap-2">
               <Input
+                ref={domainInputRef}
                 type="search"
                 placeholder="Search or add items..."
                 className="border-primary"
+                onChange={(e) => setDomainQuery(e.target.value)}
               />
-              <Button type="button">
+              <Button
+                type="button"
+                disabled={!domainQuery}
+                onClick={() => {
+                  if (domainQuery && !domains.includes(domainQuery)) {
+                    setDomains((prev) => [domainQuery, ...prev]);
+                    setDomainQuery('');
+                    if (domainInputRef.current) {
+                      domainInputRef.current.value = '';
+                    }
+                  }
+                }}
+              >
                 <Plus />
               </Button>
             </div>
           </CardFooter>
         </Card>
+
+        {/* HUMAN FACTOR CARD */}
         <Card className="col-span-2 w-full border border-primary p-2">
           <CardHeader className="relative p-2">
             <HumanFactorsHelperModal />
@@ -146,139 +250,181 @@ export default function Design() {
                 <h3 className="mb-2 text-sm font-medium text-primary">
                   Internal Layer
                 </h3>
-                <ScrollArea className="col-span-1 h-33">
-                  <Label
-                    htmlFor="demographic-information"
-                    className="mb-2 w-full"
-                  >
-                    <Item
-                      variant={'outline'}
-                      className="mr-4 w-full border-primary p-2"
-                    >
-                      <ItemContent>
-                        <ItemTitle>
-                          <Checkbox
-                            value="demographic-information"
-                            id="demographic-information"
-                          />
-                          <Users className="size-4 text-primary" />
-                          Demographic Information
-                        </ItemTitle>
-                        <ItemDescription className="ml-6 text-xs">
-                          Age, name, gender
-                        </ItemDescription>
-                      </ItemContent>
-                    </Item>
-                  </Label>
-                  <Label htmlFor="personal-attributes" className="mb-2 w-full">
-                    <Item
-                      variant={'outline'}
-                      className="mr-4 w-full border-primary p-2"
-                    >
-                      <ItemContent>
-                        <ItemTitle>
-                          <Checkbox
-                            value="personal-attributes"
-                            id="personal-attributes"
-                          />
-                          <Users className="size-4 text-primary" />
-                          Personal Attributes
-                        </ItemTitle>
-                        <ItemDescription className="ml-6 text-xs">
-                          Attitudes, behaviors, personality, preferences
-                        </ItemDescription>
-                      </ItemContent>
-                    </Item>
-                  </Label>
-                  <Label htmlFor="physical-condition" className="mb-2 w-full">
-                    <Item
-                      variant={'outline'}
-                      className="mr-4 w-full border-primary p-2"
-                    >
-                      <ItemContent>
-                        <ItemTitle>
-                          <Checkbox
-                            value="physical-condition"
-                            id="physical-condition"
-                          />
-                          <Heart className="size-4 text-primary" />
-                          Physical Condition
-                        </ItemTitle>
-                        <ItemDescription className="ml-6 text-xs">
-                          Health, physical limitations
-                        </ItemDescription>
-                      </ItemContent>
-                      <ItemActions>
-                        <Button size={'icon'} variant={'ghost'}>
-                          <X />
-                        </Button>
-                      </ItemActions>
-                    </Item>
-                  </Label>
-                </ScrollArea>
+                <Controller
+                  name="internal"
+                  control={form.control}
+                  render={({ field, fieldState }) => (
+                    <Field data-invalid={fieldState.invalid}>
+                      <ScrollArea className="col-span-1 h-33">
+                        {internalFactors
+                          .filter((val) =>
+                            val.label
+                              .toLowerCase()
+                              .includes(internalQuery.toLowerCase()),
+                          )
+                          .map((val, idx) => (
+                            <FieldLabel
+                              key={idx}
+                              htmlFor={val.label
+                                .toLowerCase()
+                                .replace(/ & /g, '-')
+                                .replace(/\s+/g, '-')}
+                              className="mb-2 w-full"
+                            >
+                              <Item
+                                variant={'outline'}
+                                className="mr-4 w-full border-primary p-2"
+                              >
+                                <ItemContent>
+                                  <ItemTitle>
+                                    <Checkbox
+                                      onCheckedChange={(checked) => {
+                                        const value = val.label
+                                          .toLowerCase()
+                                          .replace(/ & /g, '-')
+                                          .replace(/\s+/g, '-');
+                                        if (checked) {
+                                          field.onChange([
+                                            ...field.value,
+                                            value,
+                                          ]);
+                                        } else {
+                                          field.onChange(
+                                            field.value.filter(
+                                              (item) => item !== value,
+                                            ),
+                                          );
+                                        }
+                                      }}
+                                      name={val.label
+                                        .toLowerCase()
+                                        .replace(/ & /g, '-')
+                                        .replace(/\s+/g, '-')}
+                                      aria-invalid={fieldState.invalid}
+                                      value={val.label
+                                        .toLowerCase()
+                                        .replace(/ & /g, '-')
+                                        .replace(/\s+/g, '-')}
+                                      id={val.label
+                                        .toLowerCase()
+                                        .replace(/ & /g, '-')
+                                        .replace(/\s+/g, '-')}
+                                    />
+                                    <Users className="size-4 text-primary" />
+                                    {val.label}
+                                  </ItemTitle>
+                                  <ItemDescription className="ml-6 text-xs">
+                                    {val.desc}
+                                  </ItemDescription>
+                                </ItemContent>
+                              </Item>
+                            </FieldLabel>
+                          ))}
+                        {internalQuery &&
+                          !internalFactors.some(
+                            (factor) =>
+                              factor.label.toLowerCase() ===
+                              internalQuery.toLowerCase(),
+                          ) && (
+                            <p className="mt-2 text-center text-xs text-gray-500">
+                              Add "{internalQuery}" as a new internal factor if
+                              not listed.
+                            </p>
+                          )}
+                      </ScrollArea>
+                    </Field>
+                  )}
+                />
               </div>
               <div>
                 <h3 className="mb-2 text-sm font-medium text-primary">
                   External Layer
                 </h3>
-                <ScrollArea className="col-span-1 h-33">
-                  <Label htmlFor="motivation" className="mb-2 w-full">
-                    <Item
-                      variant={'outline'}
-                      className="mr-4 w-full border-primary p-2"
-                    >
-                      <ItemContent>
-                        <ItemTitle>
-                          <Checkbox value="motivation" id="motivation" />
-                          <Users className="size-4 text-primary" />
-                          Motivation
-                        </ItemTitle>
-                        <ItemDescription className="ml-6 text-xs">
-                          Primary reasons for using the system
-                        </ItemDescription>
-                      </ItemContent>
-                    </Item>
-                  </Label>
-                  <Label htmlFor="goals" className="mb-2 w-full">
-                    <Item
-                      variant={'outline'}
-                      className="mr-4 w-full border-primary p-2"
-                    >
-                      <ItemContent>
-                        <ItemTitle>
-                          <Checkbox value="goals" id="goals" />
-                          <Users className="size-4 text-primary" />
-                          Goals
-                        </ItemTitle>
-                        <ItemDescription className="ml-6 text-xs">
-                          Objectives the user wants to achieve
-                        </ItemDescription>
-                      </ItemContent>
-                    </Item>
-                  </Label>
-                  <Label htmlFor="pain-points" className="mb-2 w-full">
-                    <Item
-                      variant={'outline'}
-                      className="mr-4 w-full border-primary p-2"
-                    >
-                      <ItemContent>
-                        <ItemTitle>
-                          <Checkbox value="pain-points" id="pain-points" />
-                          <Heart className="size-4 text-primary" />
-                          Pain Points
-                        </ItemTitle>
-                        <ItemDescription className="ml-6 text-xs">
-                          Key challenges & frustrations
-                        </ItemDescription>
-                      </ItemContent>
-                      <ItemActions>
-                        <Button size={'icon'} variant={'ghost'}>
-                          <X />
-                        </Button>
-                      </ItemActions>
-                    </Item>
-                  </Label>
-                </ScrollArea>
+                <Controller
+                  name="external"
+                  control={form.control}
+                  render={({ field, fieldState }) => (
+                    <Field data-invalid={fieldState.invalid}>
+                      <ScrollArea className="col-span-1 h-33">
+                        {externalFactors
+                          .filter((val) =>
+                            val.label
+                              .toLowerCase()
+                              .includes(externalQuery.toLowerCase()),
+                          )
+                          .map((val, idx) => (
+                            <FieldLabel
+                              key={idx}
+                              htmlFor={val.label
+                                .toLowerCase()
+                                .replace(/ & /g, '-')
+                                .replace(/\s+/g, '-')}
+                              className="mb-2 w-full"
+                            >
+                              <Item
+                                variant={'outline'}
+                                className="mr-4 w-full border-primary p-2"
+                              >
+                                <ItemContent>
+                                  <ItemTitle>
+                                    <Checkbox
+                                      onCheckedChange={(checked) => {
+                                        const value = val.label
+                                          .toLowerCase()
+                                          .replace(/ & /g, '-')
+                                          .replace(/\s+/g, '-');
+                                        if (checked) {
+                                          field.onChange([
+                                            ...field.value,
+                                            value,
+                                          ]);
+                                        } else {
+                                          field.onChange(
+                                            field.value.filter(
+                                              (item) => item !== value,
+                                            ),
+                                          );
+                                        }
+                                      }}
+                                      name={val.label
+                                        .toLowerCase()
+                                        .replace(/ & /g, '-')
+                                        .replace(/\s+/g, '-')}
+                                      aria-invalid={fieldState.invalid}
+                                      value={val.label
+                                        .toLowerCase()
+                                        .replace(/ & /g, '-')
+                                        .replace(/\s+/g, '-')}
+                                      id={val.label
+                                        .toLowerCase()
+                                        .replace(/ & /g, '-')
+                                        .replace(/\s+/g, '-')}
+                                    />
+                                    <Users className="size-4 text-primary" />
+                                    {val.label}
+                                  </ItemTitle>
+                                  <ItemDescription className="ml-6 text-xs">
+                                    {val.desc}
+                                  </ItemDescription>
+                                </ItemContent>
+                              </Item>
+                            </FieldLabel>
+                          ))}
+                        {externalQuery &&
+                          !externalFactors.some(
+                            (factor) =>
+                              factor.label.toLowerCase() ===
+                              externalQuery.toLowerCase(),
+                          ) && (
+                            <p className="mt-2 text-center text-xs text-gray-500">
+                              Add "{externalQuery}" as a new external factor if
+                              not listed.
+                            </p>
+                          )}
+                      </ScrollArea>
+                    </Field>
+                  )}
+                />
               </div>
             </div>
           </CardContent>
@@ -286,37 +432,85 @@ export default function Design() {
             <div className="grid w-full grid-cols-2 gap-8">
               <div className="col-span-1 flex w-full items-center gap-2">
                 <Input
+                  ref={internalInputRef}
                   type="search"
                   placeholder="Search or add item..."
                   className="border-primary"
+                  onChange={(e) => setInternalQuery(e.target.value)}
                 />
                 <Input
+                  ref={internalDescInputRef}
                   type="text"
                   placeholder="Item description..."
                   className="border-primary"
+                  onChange={(e) => setInternalDescCustom(e.target.value)}
                 />
-                <Button type="button">
+                <Button
+                  type="button"
+                  disabled={!internalQuery || !internalDescCustom}
+                  onClick={() => {
+                    if (internalQuery && internalDescCustom) {
+                      setInternalFactors((prev) => [
+                        { label: internalQuery, desc: internalDescCustom },
+                        ...prev,
+                      ]);
+                      setInternalQuery('');
+                      setInternalDescCustom('');
+                      if (internalInputRef.current) {
+                        internalInputRef.current.value = '';
+                      }
+                      if (internalDescInputRef.current) {
+                        internalDescInputRef.current.value = '';
+                      }
+                    }
+                  }}
+                >
                   <Plus />
                 </Button>
               </div>
               <div className="col-span-1 flex w-full items-center gap-2">
                 <Input
+                  ref={externalInputRef}
                   type="search"
                   placeholder="Search or add item..."
                   className="border-primary"
+                  onChange={(e) => setExternalQuery(e.target.value)}
                 />
                 <Input
+                  ref={externalDescInputRef}
                   type="text"
                   placeholder="Item description..."
                   className="border-primary"
+                  onChange={(e) => setExternalDescCustom(e.target.value)}
                 />
-                <Button type="button">
+                <Button
+                  type="button"
+                  disabled={!externalQuery || !externalDescCustom}
+                  onClick={() => {
+                    if (externalQuery && externalDescCustom) {
+                      setExternalFactors((prev) => [
+                        { label: externalQuery, desc: externalDescCustom },
+                        ...prev,
+                      ]);
+                      setExternalQuery('');
+                      setExternalDescCustom('');
+                      if (externalInputRef.current) {
+                        externalInputRef.current.value = '';
+                      }
+                      if (externalDescInputRef.current) {
+                        externalDescInputRef.current.value = '';
+                      }
+                    }
+                  }}
+                >
                   <Plus />
                 </Button>
               </div>
             </div>
           </CardFooter>
         </Card>
+
+        {/* CONTENT LENGTH CARD */}
         <Card className="col-span-1 w-full border border-primary p-2">
           <CardHeader className="relative p-2">
             <ContentLengthHelperModal />
@@ -330,36 +524,48 @@ export default function Design() {
           </CardHeader>
           <CardContent className="px-2">
             <div>
-              <RadioGroup
-                defaultValue="short"
-                onValueChange={(value) => {
-                  if (value === 'custom') {
-                    setCustomSliderDisable(false);
-                  } else {
-                    setCustomSliderDisable(true);
-                  }
-                }}
-              >
-                <div className="flex items-center space-x-2">
-                  <RadioGroupItem value="short" id="short" />
-                  <Label htmlFor="short">Short</Label>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <RadioGroupItem value="medium" id="medium" />
-                  <Label htmlFor="medium">Medium</Label>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <RadioGroupItem value="long" id="long" />
-                  <Label htmlFor="long">Long</Label>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <RadioGroupItem value="custom" id="custom" />
-                  <Label htmlFor="custom">
-                    Custom{' '}
-                    {!customSliderDisable && `(${customSliderValue} words)`}
-                  </Label>
-                </div>
-              </RadioGroup>
+              <Controller
+                name="contentLength"
+                control={form.control}
+                render={({ field, fieldState }) => (
+                  <Field data-invalid={fieldState.invalid}>
+                    <RadioGroup
+                      defaultValue="300"
+                      onValueChange={(value) => {
+                        if (value === 'custom') {
+                          setContentLengthSliderDisable(false);
+                        } else {
+                          const length = parseInt(value, 10);
+                          field.onChange(length);
+                          setContentLengthSliderValue([length]);
+                          setContentLengthSliderDisable(true);
+                        }
+                      }}
+                    >
+                      <div className="flex items-center space-x-2">
+                        <RadioGroupItem value="300" id="short" />
+                        <Label htmlFor="short">Short</Label>
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        <RadioGroupItem value="600" id="medium" />
+                        <Label htmlFor="medium">Medium</Label>
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        <RadioGroupItem value="1000" id="long" />
+                        <Label htmlFor="long">Long</Label>
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        <RadioGroupItem value="custom" id="custom" />
+                        <Label htmlFor="custom">
+                          Custom{' '}
+                          {!contentLengthSliderDisable &&
+                            `(${contentLengthSliderValue} words)`}
+                        </Label>
+                      </div>
+                    </RadioGroup>
+                  </Field>
+                )}
+              />
             </div>
           </CardContent>
           <CardFooter className="border-t border-dashed px-2 pb-2">
@@ -367,9 +573,12 @@ export default function Design() {
               <Slider
                 max={2000}
                 step={50}
-                disabled={customSliderDisable}
-                value={customSliderValue}
-                onValueChange={setCustomSliderValue}
+                disabled={contentLengthSliderDisable}
+                value={contentLengthSliderValue}
+                onValueChange={(value) => {
+                  form.setValue('contentLength', value[0]);
+                  setContentLengthSliderValue(value);
+                }}
               />
             </div>
           </CardFooter>
@@ -386,45 +595,87 @@ export default function Design() {
               </CardDescription>
             </CardHeader>
             <CardContent className="px-2 pb-2">
-              <Select>
-                <SelectTrigger className="w-full border-primary">
-                  <SelectValue placeholder="Select LLM Model" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="gemini-2.5-flash">
-                    Gemini 2.5 Flash
-                  </SelectItem>
-                  <SelectItem value="gemini-2.5-flash-lite">
-                    Gemini 2.5 Flash Lite
-                  </SelectItem>
-                  <SelectItem value="gemini-2.5-pro">Gemini 2.5 Pro</SelectItem>
-                </SelectContent>
-              </Select>
+              <Controller
+                name="llmModel"
+                control={form.control}
+                render={({ field, fieldState }) => (
+                  <Field data-invalid={fieldState.invalid}>
+                    <Select
+                      name={field.name}
+                      value={field.value}
+                      onValueChange={field.onChange}
+                    >
+                      <SelectTrigger
+                        className="w-full border-primary"
+                        aria-invalid={fieldState.invalid}
+                      >
+                        <SelectValue placeholder="Select LLM Model" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="gemini-2.5-flash">
+                          Gemini 2.5 Flash
+                        </SelectItem>
+                        <SelectItem value="gemini-2.5-flash-lite">
+                          Gemini 2.5 Flash Lite
+                        </SelectItem>
+                        <SelectItem value="gemini-2.5-pro">
+                          Gemini 2.5 Pro
+                        </SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </Field>
+                )}
+              />
             </CardContent>
           </Card>
           <div className="my-4 flex justify-between">
-            <Select>
-              <SelectTrigger className="w-42 border-primary">
-                <SelectValue placeholder="Select Language" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="en">English</SelectItem>
-                <SelectItem value="id">Indonesia</SelectItem>
-              </SelectContent>
-            </Select>
-            <Label htmlFor="amount" className="flex items-center">
-              Amount?
-              <Input
-                name="amount"
-                id="amount"
-                type="number"
-                min={1}
-                max={3}
-                className="ml-2 w-16 border-primary"
-              />
-            </Label>
+            <Controller
+              name="language"
+              control={form.control}
+              render={({ field, fieldState }) => (
+                <Field data-invalid={fieldState.invalid} className="w-42">
+                  <Select
+                    name={field.name}
+                    value={field.value}
+                    onValueChange={field.onChange}
+                  >
+                    <SelectTrigger className="w-42 border-primary">
+                      <SelectValue
+                        placeholder="Select Language"
+                        aria-invalid={fieldState.invalid}
+                      />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="en">English</SelectItem>
+                      <SelectItem value="id">Indonesia</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </Field>
+              )}
+            />
+            <Controller
+              name="amount"
+              control={form.control}
+              render={({ field, fieldState }) => (
+                <Field data-invalid={fieldState.invalid} className="w-fit">
+                  <Label htmlFor={field.name} className="flex items-center">
+                    Amount?
+                    <Input
+                      {...field}
+                      id={field.name}
+                      aria-invalid={fieldState.invalid}
+                      value={field.value.toString()}
+                      type="number"
+                      min={1}
+                      max={3}
+                      className="ml-2 w-16 border-primary"
+                    />
+                  </Label>
+                </Field>
+              )}
+            />
           </div>
-          <Button className="w-full">
+          <Button className="w-full" type="submit">
             <Sparkles />
             Create persona
           </Button>
@@ -444,13 +695,23 @@ export default function Design() {
             </CardDescription>
           </CardHeader>
           <CardContent className="px-2">
-            <Textarea
-              className="min-h-39 resize-none"
-              placeholder="Example: Focus on users with visual impairments, or users with minimal technology experience..."
+            <Controller
+              name="detail"
+              control={form.control}
+              render={({ field, fieldState }) => (
+                <Field data-invalid={fieldState.invalid}>
+                  <Textarea
+                    {...field}
+                    aria-invalid={fieldState.invalid}
+                    className="min-h-39 resize-none"
+                    placeholder="Example: Focus on users with visual impairments, or users with minimal technology experience..."
+                  />
+                </Field>
+              )}
             />
           </CardContent>
         </Card>
-      </div>
+      </form>
     </section>
   );
 }

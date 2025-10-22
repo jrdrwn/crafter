@@ -1,4 +1,5 @@
 import { BadgeCheck, User, Zap } from 'lucide-react';
+import Link from 'next/link';
 
 import { Button } from '../ui/button';
 import { Card, CardContent } from '../ui/card';
@@ -41,10 +42,12 @@ export default function FeatureRevolutionize() {
               Export in multiple formats
             </li>
           </ul>
-          <Button>
-            <Zap />
-            Start Creating Personas
-          </Button>
+          <Link href="/create">
+            <Button>
+              <Zap />
+              Start Creating Personas
+            </Button>
+          </Link>
         </div>
         <div className="absolute top-30 right-26">
           <Card className="w-full max-w-lg border-primary bg-primary/5">

@@ -102,6 +102,7 @@ task:
 expected_output_structure:
   json_schema:
     language: indonesia
+    persona_result_max_length: 3000
     result:
       narative: '...'
       bullet: '...'

@@ -78,7 +78,7 @@ export default function EndCTA() {
           high-quality personas.
         </p>
         <div className="flex justify-center gap-4">
-          <Link href="#" className="z-10">
+          <Link href="/create-account" className="z-10">
             <Button size={'lg'} variant={'secondary'}>
               Try for Free Now
             </Button>
