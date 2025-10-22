@@ -1,8 +1,17 @@
 'use client';
 
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Eye, EyeOff, LockKeyhole, MailIcon } from 'lucide-react';
+import { setCookie } from 'cookies-next/client';
+import {
+  BadgeAlert,
+  BadgeCheck,
+  Eye,
+  EyeOff,
+  LockKeyhole,
+  MailIcon,
+} from 'lucide-react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { toast } from 'sonner';
@@ -25,35 +34,47 @@ import {
 } from '../ui/input-group';
 
 const formSchema = z.object({
-  email: z.string().email('Invalid email address'),
+  identifier: z.string().email('Invalid email address'),
   password: z.string().min(8, 'Password must be at least 8 characters long'),
 });
 
 export default function LoginForm() {
+  const router = useRouter();
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      email: '',
+      identifier: '',
       password: '',
     },
   });
   const [passwordVisible, setPasswordVisible] = useState(false);
 
-  function onSubmit(data: z.infer<typeof formSchema>) {
-    toast('You submitted the following values:', {
-      description: (
-        <pre className="bg-code text-code-foreground mt-2 w-[320px] overflow-x-auto rounded-md p-4">
-          <code>{JSON.stringify(data, null, 2)}</code>
-        </pre>
-      ),
-      position: 'bottom-right',
-      classNames: {
-        content: 'flex flex-col gap-2',
+  async function onSubmit(data: z.infer<typeof formSchema>) {
+    const res = await fetch('/api/auth/login', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
       },
-      style: {
-        '--border-radius': 'calc(var(--radius)  + 4px)',
-      } as React.CSSProperties,
+      body: JSON.stringify(data),
     });
+    const json = (await res.json()) as {
+      status: boolean;
+      data: { token: string };
+      message: string;
+    };
+    if (res.status === 200) {
+      setCookie('token', json.data.token);
+      toast('Login Berhasil', {
+        icon: <BadgeCheck />,
+      });
+      router.push('/');
+      router.refresh();
+    } else {
+      toast('Login Gagal', {
+        description: json.message,
+        icon: <BadgeAlert />,
+      });
+    }
   }
 
   return (
@@ -71,7 +92,7 @@ export default function LoginForm() {
             </CardHeader>
             <CardContent>
               <Controller
-                name="email"
+                name="identifier"
                 control={form.control}
                 render={({ field, fieldState }) => (
                   <Field
