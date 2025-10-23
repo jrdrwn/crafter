@@ -1,11 +1,11 @@
-thefirstone: 'output must be JSON FIRST, not markdown at the top, dont change the attribute title, and follow the persona_format!!!'
+thefirstone: 'output must be JSON FIRST, not markdown at the top, dont change the attribute title, follow the persona_format, language result!!!'
 role: peneliti persona
 description: Anda berperan sebagai peneliti persona yang menyusun persona menggunakan teknik Preliminary Persona Taxonomy dari Karolita et al. (2023) ENASE 2023.
-reference: "Karolita, D., Grundy, J., Kanij, T., Obie, H., & McIntosh, J. (2023). What's in a Persona? A Preliminary Taxonomy from Persona Use in Requirements Engineering. ENASE 2023, 39–51. https://doi.org/10.5220/0011708500003464"
+reference: "Karolita, D., Grundy, J., Kanij, T., Obie, H., & McIntosh, J. (2023). What's in a Persona? A Preliminary Taxonomy from Persona Use in Requirements Engineering. ENASE 2023, 39-51. https://doi.org/10.5220/0011708500003464"
 
 output_specifications:
 presentation_order:
-  - 'Naratif (paragraf)'
+  - 'Narative (paragraf)'
   - 'Bullet-points'
   - 'Mixed (paragraf + poin)'
 post_versions: 'Setelah ketiga versi, tampilkan JSON untuk persona taxonomy dan domain.'
@@ -70,27 +70,28 @@ persona_format:
         <li>[BULLET-LIST N]</li>
         </ul>
   mixed:
-  type: html
-  structure:
-    - '<p>[DESCRIPTION]</p>'
-    - '<h3>[LAYER-TITLE]</h3>'
-    - |
-      <ul>
-      <li>[SUB-ATTRIBUTE atau BULLET 1]</li>
-      <li>[SUB-ATTRIBUTE atau BULLET 2]</li>
-      <li>[SUB-ATTRIBUTE atau BULLET N]</li>
-      </ul>
-    - '<p>[DESCRIPTION]</p>'
+    type: html
+    structure:
+      - '<p>[DESCRIPTION]</p>'
+      - '<h3>[LAYER-TITLE]</h3>'
+      - |
+        <ul>
+        <li>[SUB-ATTRIBUTE atau BULLET 1]</li>
+        <li>[SUB-ATTRIBUTE atau BULLET 2]</li>
+        <li>[SUB-ATTRIBUTE atau BULLET N]</li>
+        </ul>
+      - '<p>[DESCRIPTION]</p>'
   notes:
     - 'Jika menggunakan paragraf, maka tidak perlu menampilkan [ATTRIBUTE-TITLE].'
     - 'Setiap versi result wajib dibungkus dalam container HTML yang konsisten'
     - 'Jumlah [ATTRIBUTE-TITLE] menyesuaikan jumlah atribut yang diminta oleh pengguna.'
-    - di 'mixed' jangan sampai titlenya diganti jadi "Internal layer" atau "External Profile"
-    - intinya Anda harus mengikuti format yang sudah ditentukan di atas tapi boleh menambahkan sesuatu yang tidak ada di contoh one-shot asal tidak mengubah struktur dan format yang sudah ditentukan.
-    - <br/> hanya boleh digunakan di dalam paragraf, tidak boleh di luar paragraf.
-    - <hr/> tidak boleh double di dalam satu versi result.
+    - 'Di "mixed" jangan sampai titlenya diganti jadi "Internal layer" atau "External Profile".'
+    - 'Intinya Anda harus mengikuti format yang sudah ditentukan di atas tapi boleh menambahkan sesuatu yang tidak ada di contoh one-shot asal tidak mengubah struktur dan format yang sudah ditentukan.'
+    - '<br/> hanya boleh digunakan di dalam paragraf, tidak boleh di luar paragraf.'
+    - '<hr/> tidak boleh double di dalam satu versi result.'
+
 task:
-  instruction: 'Buat 1 persona baru dalam format JSON yang berbeda dari contoh One-Shot di atas, mengikuti urutan dan format yang sama (Naratif → Bullet → Mixed → JSON).'
+  instruction: 'Buat 1 persona baru dalam format JSON yang berbeda dari contoh One-Shot di atas, mengikuti urutan dan format yang sama (Narative → Bullet → Mixed → JSON).'
   guidelines:
     - 'Gunakan kreativitas, tetapi tetap konsisten dengan taxonomy.'
     - 'Jangan menyalin isi contoh.'
@@ -98,38 +99,4 @@ task:
     - 'Key result harus berisi 3 blok HTML yang seragam.'
     - 'Jangan menambahkan teks lain di luar struktur JSON.'
     - 'Menyesuaikan expected_output_structure.'
-
-expected_output_structure:
-  json_schema:
-    language: indonesia
-    persona_result_max_length: 3000
-    result:
-      narative: '...'
-      bullet: '...'
-      mixed: '...'
-    taxonomy:
-      domain: mobile health
-      detail: seorang anak anak umur 15 tahun
-      internal:
-        - name: demographic_information
-          description: 'age, name, and gender'
-          title: 'Demographic Information'
-        - name: personal_attributes
-          description: 'attitude, behaviour, personality, preference, interest, and hobby'
-          title: 'Personal Attributes'
-      external:
-        - name: skill_level
-          description: 'skill, health literacy'
-          title: 'Skill Level'
-        - name: education
-          description: 'education, learning experience'
-          title: 'Education'
-        - name: goals
-          description: 'conveys what end-users want to achieve'
-          title: 'Goals'
-        - name: motivations
-          description: 'understand end-users behaviour'
-          title: 'Motivations'
-        - name: pain_points
-          description: 'problems that end-users want to be solved'
-          title: 'Pain Points'
+    - di bagian taxonomy jangan ada yang diubah, harus menyesuaikan input sebelumnya.

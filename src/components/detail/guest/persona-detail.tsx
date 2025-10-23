@@ -1,3 +1,5 @@
+'use client';
+
 import {
   ChevronLeft,
   ChevronRight,
@@ -8,8 +10,8 @@ import {
   Trash,
   Wifi,
 } from 'lucide-react';
-import { cookies } from 'next/headers';
 import Link from 'next/link';
+import { useEffect, useState } from 'react';
 
 import {
   AlertDialog,
@@ -21,44 +23,39 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
   AlertDialogTrigger,
-} from '../ui/alert-dialog';
-import { Button } from '../ui/button';
+} from '../../ui/alert-dialog';
+import { Button } from '../../ui/button';
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from '../ui/card';
-import { Item, ItemActions, ItemContent, ItemMedia } from '../ui/item';
-import { Label } from '../ui/label';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '../ui/select';
-import { Switch } from '../ui/switch';
+} from '../../ui/card';
+import { Item, ItemActions, ItemContent, ItemMedia } from '../../ui/item';
+import { Label } from '../../ui/label';
+import { Switch } from '../../ui/switch';
 import Persona from './persona';
 
-export default async function PersonaDetail() {
-  const _cookies = await cookies();
-  let markdown = null;
-  if (!_cookies.get('token')) {
-    const res = await fetch('http://localhost:3000/api/chat');
-    markdown = await res.json();
-  }
+export default function PersonaDetail() {
+  const [persona, setPersona] = useState<any>(null);
+  useEffect(() => {
+    const STORAGE_KEY = 'crafter:personas';
+    const data = JSON.parse(localStorage.getItem(STORAGE_KEY) || 'null');
+    setPersona(data);
+  }, []);
   return (
     <section className="px-4 py-4">
       <div className="container mx-auto">
         <div className="flex items-center justify-between">
           <div className="flex items-center justify-center gap-4">
-            <Button variant={'outline'} className="border-primary">
-              <ChevronLeft />
-              Back to history
-            </Button>
-            <Select defaultValue="1">
+            <Link href={'/history/guest'}>
+              <Button variant={'outline'} className="border-primary">
+                <ChevronLeft />
+                Back to history
+              </Button>
+            </Link>
+            {/* <Select defaultValue="1">
               <SelectTrigger className="w-42 border-primary">
                 <SelectValue placeholder="Persona Batch" />
               </SelectTrigger>
@@ -66,22 +63,24 @@ export default async function PersonaDetail() {
                 <SelectItem value="1">Persona #1</SelectItem>
                 <SelectItem value="2">Persona #2</SelectItem>
               </SelectContent>
-            </Select>
+            </Select> */}
           </div>
           <div className="flex items-center justify-center gap-4">
             <Button variant={'ghost'} className="text-green-500">
               <Wifi />
               Online
             </Button>
-            <Button>
-              <Edit />
-              Edit
-            </Button>
+            <Link href={'/edit/guest'}>
+              <Button>
+                <Edit />
+                Edit
+              </Button>
+            </Link>
             <DeleteConfirmationDialog />
           </div>
         </div>
         <div className="mt-4 grid grid-cols-3 gap-8">
-          <Persona markdown={markdown} />
+          {persona && <Persona markdown={persona?.response} />}
           <div className="col-span-1 space-y-4">
             <Card className="w-full gap-2 border-foreground py-4">
               <CardHeader className="px-4">
@@ -92,15 +91,35 @@ export default async function PersonaDetail() {
               <CardContent className="px-4">
                 <div className="mb-4">
                   <h3 className="mb-2 font-medium">Created</h3>
-                  <p>Monday, January 15, 2024</p>
+                  <p>
+                    {new Date(persona?.created_at).toLocaleTimeString('EN-en', {
+                      weekday: 'long',
+                      year: 'numeric',
+                      month: 'long',
+                      day: 'numeric',
+                    })}
+                  </p>
                 </div>
                 <div>
                   <h3 className="mb-2 font-medium">Updated</h3>
-                  <p>Monday, January 15, 2024</p>
+                  <p>
+                    {new Date(persona?.updated_at).toLocaleTimeString('EN-en', {
+                      weekday: 'long',
+                      year: 'numeric',
+                      month: 'long',
+                      day: 'numeric',
+                    })}
+                  </p>
                 </div>
               </CardContent>
             </Card>
-            <Card className="w-full border-foreground py-4">
+            <Card className="relative w-full py-4">
+              <div className="absolute inset-0 z-1 flex items-center justify-center rounded-2xl backdrop-blur-xs">
+                <p className="p-4 text-center text-sm">
+                  You need to log in to access all Share Persona features.
+                </p>
+              </div>
+
               <CardHeader className="px-4">
                 <CardTitle className="text-2xl text-primary">
                   Share Persona
@@ -121,7 +140,12 @@ export default async function PersonaDetail() {
                 </Label>
               </CardContent>
             </Card>
-            <Card className="w-full border-foreground py-4">
+            <Card className="relative w-full py-4">
+              <div className="absolute inset-0 z-1 flex items-center justify-center rounded-2xl backdrop-blur-xs">
+                <p className="p-4 text-center text-sm">
+                  You need to log in to access all Share Persona features.
+                </p>
+              </div>
               <CardHeader className="px-4">
                 <CardTitle className="text-2xl text-primary">
                   Download Persona
@@ -191,7 +215,17 @@ function DeleteConfirmationDialog() {
         </AlertDialogHeader>
         <AlertDialogFooter>
           <AlertDialogCancel>Cancel</AlertDialogCancel>
-          <AlertDialogAction>Continue</AlertDialogAction>
+          <AlertDialogAction
+            onClick={() => {
+              // delete persona from local storage
+              const STORAGE_KEY = 'crafter:personas';
+              localStorage.removeItem(STORAGE_KEY);
+              // redirect to history page
+              window.location.href = '/history/guest';
+            }}
+          >
+            Continue
+          </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>
     </AlertDialog>

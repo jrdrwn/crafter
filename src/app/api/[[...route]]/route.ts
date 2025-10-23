@@ -7,6 +7,7 @@ import { env } from 'hono/adapter';
 import { except } from 'hono/combine';
 import { jwt, sign, type JwtVariables } from 'hono/jwt';
 import { handle } from 'hono/vercel';
+import YAML from 'yaml';
 import z from 'zod';
 
 import { JWTPayload } from './types';
@@ -19,7 +20,7 @@ app.get('/', (c) => c.json({ message: 'Hello' }));
 
 app.use(
   '/*',
-  except(['*/*/login', '*/*/register'], async (c, next) => {
+  except(['*/*/login', '*/*/register', '*/guest/chat'], async (c, next) => {
     const { JWT_SECRET } = env<{ JWT_SECRET: string }>(c);
     const jwtMiddleware = jwt({
       secret: JWT_SECRET,
@@ -132,9 +133,32 @@ app.get('/user/profile', async (c) => {
   return c.json({ status: true, data: user });
 });
 
-app.get('/chat', async (c) => {
-  const jwtPayload = c.get('jwtPayload') as JWTPayload;
-  const result = await runPersonaRAG(8);
+app.post('/guest/chat', async (c) => {
+  const json = await c.req.json();
+  const construct = YAML.stringify({
+    expected_output_structure: {
+      json_schema: {
+        language: json.language.label,
+        persona_result_max_length: json.contentLength,
+        result: {
+          narative: '...',
+          bullets: '...',
+          mixed: '...',
+          quote: '...',
+          full_name: '...',
+        },
+        taxonomy: {
+          domain: json.domain,
+          detail: json.detail,
+          internal: json.internal,
+          external: json.external,
+        },
+      },
+    },
+  });
+
+  // const jwtPayload = c.get('jwtPayload') as JWTPayload;
+  const result = await runPersonaRAG(json.llmModel, construct, 8);
   return c.json(result);
 });
 

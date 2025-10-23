@@ -14,6 +14,8 @@ const PersonaResultSchema = z.object({
   narative: z.string(),
   bullets: z.string(),
   mixed: z.string(),
+  quote: z.string(),
+  full_name: z.string(),
 });
 
 const InternalLayerSchema = z.object({
@@ -29,7 +31,12 @@ const ExternalLayerSchema = z.object({
 });
 
 const PersonaTaxonomySchema = z.object({
-  domain: z.string(),
+  domain: z
+    .object({
+      key: z.string(),
+      label: z.string(),
+    })
+    .required(),
   detail: z.string().default(''),
   internal: z.array(InternalLayerSchema),
   external: z.array(ExternalLayerSchema),
@@ -44,11 +51,6 @@ const PersonaOutputSchema = z.object({
 const API_KEY = process.env.GEMINI_API_KEY; // do not hardcode
 if (!API_KEY) throw new Error('Missing GOOGLE_API_KEY in environment');
 
-const llm = new ChatGoogleGenerativeAI({
-  model: 'gemini-2.5-flash-lite',
-  apiKey: API_KEY,
-  cache: true,
-});
 const embeddings = new GoogleGenerativeAIEmbeddings({
   apiKey: API_KEY,
   model: 'text-embedding-004',
@@ -81,18 +83,22 @@ function joinDocs(docs: Document[]) {
     .join('\n\n');
 }
 
-export async function runPersonaRAG(topK = 8) {
-  const vs = await ensureStore();
-  const retriever = vs.asRetriever(topK);
+export async function runPersonaRAG(
+  model: string,
+  construct: string,
+  topK = 8,
+) {
+  // const vs = await ensureStore();
+  const retriever = null; // vs.asRetriever(topK);
   const docs = null; // await retriever.invoke('anna'); // TODO: nanti pake detail dari user
   const context = null; // joinDocs(docs);
 
   const promptMd = await fs.readFile('./prompt.yaml', 'utf-8');
-  const finalPrompt = context ? `${promptMd}` : promptMd;
-
+  const finalPrompt = context ? `${promptMd}` : `${promptMd}\n\n${construct}`;
+  const llm = new ChatGoogleGenerativeAI({
+    model: model,
+    apiKey: API_KEY,
+    cache: true,
+  });
   return llm.withStructuredOutput(PersonaOutputSchema).invoke(finalPrompt);
-}
-
-export async function generatePersona() {
-  return runPersonaRAG(8);
 }

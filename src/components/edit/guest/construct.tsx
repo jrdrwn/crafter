@@ -1,6 +1,5 @@
 'use client';
 
-import { getCookie } from 'cookies-next/client';
 import {
   BadgeInfo,
   Bot,
@@ -13,12 +12,12 @@ import {
   Users,
 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
-import { useEffect, useRef, useState } from 'react';
+import { useRef, useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { toast } from 'sonner';
 import z from 'zod';
 
-import { Button } from '../ui/button';
+import { Button } from '../../ui/button';
 import {
   Card,
   CardContent,
@@ -26,19 +25,19 @@ import {
   CardFooter,
   CardHeader,
   CardTitle,
-} from '../ui/card';
-import { Checkbox } from '../ui/checkbox';
-import { Field, FieldLabel } from '../ui/field';
-import { Input } from '../ui/input';
+} from '../../ui/card';
+import { Checkbox } from '../../ui/checkbox';
+import { Field, FieldLabel } from '../../ui/field';
+import { Input } from '../../ui/input';
 import {
   InputGroup,
   InputGroupAddon,
   InputGroupText,
   InputGroupTextarea,
-} from '../ui/input-group';
-import { Item, ItemContent, ItemDescription, ItemTitle } from '../ui/item';
-import { Label } from '../ui/label';
-import { RadioGroup, RadioGroupItem } from '../ui/radio-group';
+} from '../../ui/input-group';
+import { Item, ItemContent, ItemDescription, ItemTitle } from '../../ui/item';
+import { Label } from '../../ui/label';
+import { RadioGroup, RadioGroupItem } from '../../ui/radio-group';
 import {
   ResponsiveModal,
   ResponsiveModalContent,
@@ -46,16 +45,16 @@ import {
   ResponsiveModalHeader,
   ResponsiveModalTitle,
   ResponsiveModalTrigger,
-} from '../ui/responsive-modal';
-import { ScrollArea } from '../ui/scroll-area';
+} from '../../ui/responsive-modal';
+import { ScrollArea } from '../../ui/scroll-area';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '../ui/select';
-import { Slider } from '../ui/slider';
+} from '../../ui/select';
+import { Slider } from '../../ui/slider';
 
 const formSchema = z.object({
   domain: z
@@ -100,44 +99,17 @@ const formSchema = z.object({
   detail: z.string().optional(),
 });
 
-export default function Design() {
-  const _cookies = getCookie('token');
-  useEffect(() => {
-    console.log('Cookies:', _cookies);
-    if (!_cookies) {
-      toast.info('You are creating personas as a guest user.');
-    }
-  }, []);
-
+export default function Design({ persona }) {
   const form = useForm<z.infer<typeof formSchema>>({
     defaultValues: {
-      domain: { key: 'health', label: 'Health' },
-      internal: [],
-      external: [
-        {
-          name: 'motivation',
-          title: 'Motivation',
-          description: 'Primary reasons for using the system',
-        },
-        {
-          name: 'goals',
-          title: 'Goals',
-          description: 'Objectives the user wants to achieve',
-        },
-        {
-          name: 'pain-points',
-          title: 'Pain Points',
-          description: 'Key challenges & frustrations',
-        },
-      ],
-      contentLength: 1000,
-      llmModel: 'gemini-2.5-flash-lite',
-      language: {
-        key: 'en',
-        label: 'English',
-      },
-      amount: 1,
-      detail: '',
+      domain: persona?.request?.domain || { key: 'health', label: 'Health' },
+      internal: persona?.request?.internal || [],
+      external: persona?.request?.external || [],
+      contentLength: persona?.request?.contentLength || 200,
+      llmModel: persona?.request?.llmModel || 'gpt-4',
+      language: persona?.request?.language || { key: 'en', label: 'English' },
+      amount: persona?.request?.amount || 1,
+      detail: persona?.request?.detail || '',
     },
   });
   const [contentLengthSliderValue, setContentLengthSliderValue] = useState([
@@ -214,35 +186,33 @@ export default function Design() {
   const router = useRouter();
 
   async function onSubmit(data: z.infer<typeof formSchema>) {
-    if (!_cookies) {
-      const res = await fetch('/api/guest/chat', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(data),
-      });
-      const json = await res.json();
-      if (!res.ok) {
-        toast.error(
-          `Failed to create persona(s): ${json.message || 'Unknown error'}`,
-        );
-        return;
-      }
-      toast.success('Persona(s) created successfully!');
-      try {
-        const STORAGE_KEY = 'crafter:personas';
-        const entry = {
-          created_at: new Date().toISOString(),
-          updated_at: new Date().toISOString(),
-          request: data,
-          response: json,
-        };
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(entry));
-        router.push(`/detail/guest`);
-      } catch (err) {
-        console.error('Failed to save personas to localStorage:', err);
-      }
+    const res = await fetch('/api/guest/chat', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(data),
+    });
+    const json = await res.json();
+    if (!res.ok) {
+      toast.error(
+        `Failed to create persona(s): ${json.message || 'Unknown error'}`,
+      );
+      return;
+    }
+    toast.success('Persona(s) created successfully!');
+    try {
+      const STORAGE_KEY = 'crafter:personas';
+      const entry = {
+        created_at: persona.created_at,
+        updated_at: new Date().toISOString(),
+        request: data,
+        response: json,
+      };
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(entry));
+      router.push(`/detail/guest`);
+    } catch (err) {
+      console.error('Failed to save personas to localStorage:', err);
     }
   }
 
@@ -280,7 +250,7 @@ export default function Design() {
                         });
                       }}
                       aria-invalid={fieldState.invalid}
-                      defaultValue={domains[0].key}
+                      defaultValue={field.value.key}
                     >
                       {domains
                         .filter((domain) =>

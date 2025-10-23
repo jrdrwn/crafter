@@ -1,6 +1,5 @@
 'use client';
 
-import { getCookie } from 'cookies-next/client';
 import {
   BadgeInfo,
   Bot,
@@ -13,7 +12,7 @@ import {
   Users,
 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
-import { useEffect, useRef, useState } from 'react';
+import { useRef, useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { toast } from 'sonner';
 import z from 'zod';
@@ -101,14 +100,6 @@ const formSchema = z.object({
 });
 
 export default function Design() {
-  const _cookies = getCookie('token');
-  useEffect(() => {
-    console.log('Cookies:', _cookies);
-    if (!_cookies) {
-      toast.info('You are creating personas as a guest user.');
-    }
-  }, []);
-
   const form = useForm<z.infer<typeof formSchema>>({
     defaultValues: {
       domain: { key: 'health', label: 'Health' },
@@ -214,35 +205,33 @@ export default function Design() {
   const router = useRouter();
 
   async function onSubmit(data: z.infer<typeof formSchema>) {
-    if (!_cookies) {
-      const res = await fetch('/api/guest/chat', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(data),
-      });
-      const json = await res.json();
-      if (!res.ok) {
-        toast.error(
-          `Failed to create persona(s): ${json.message || 'Unknown error'}`,
-        );
-        return;
-      }
-      toast.success('Persona(s) created successfully!');
-      try {
-        const STORAGE_KEY = 'crafter:personas';
-        const entry = {
-          created_at: new Date().toISOString(),
-          updated_at: new Date().toISOString(),
-          request: data,
-          response: json,
-        };
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(entry));
-        router.push(`/detail/guest`);
-      } catch (err) {
-        console.error('Failed to save personas to localStorage:', err);
-      }
+    const res = await fetch('/api/guest/chat', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(data),
+    });
+    const json = await res.json();
+    if (!res.ok) {
+      toast.error(
+        `Failed to create persona(s): ${json.message || 'Unknown error'}`,
+      );
+      return;
+    }
+    toast.success('Persona(s) created successfully!');
+    try {
+      const STORAGE_KEY = 'crafter:personas';
+      const entry = {
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+        request: data,
+        response: json,
+      };
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(entry));
+      router.push(`/detail/guest`);
+    } catch (err) {
+      console.error('Failed to save personas to localStorage:', err);
     }
   }
 
