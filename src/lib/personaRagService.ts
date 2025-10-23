@@ -57,7 +57,7 @@ const embeddings = new GoogleGenerativeAIEmbeddings({
 });
 
 // Single-file corpus (plaintext). Place it at project root.
-const CORPUS_FILE = path.resolve(process.cwd(), '/app/public/persona_refs.txt');
+const CORPUS_FILE = path.join(process.cwd(), 'persona_refs.txt');
 let store: MemoryVectorStore | null = null;
 
 async function ensureStore() {
