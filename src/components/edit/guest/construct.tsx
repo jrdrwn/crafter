@@ -1,5 +1,7 @@
 'use client';
 
+import { Spinner } from '@/components/ui/spinner';
+import { cn } from '@/lib/utils';
 import {
   BadgeInfo,
   Bot,
@@ -105,8 +107,7 @@ interface DesignProps {
     updated_at: string;
     request: z.infer<typeof formSchema>;
     response: any;
-  } | null
-
+  } | null;
 }
 
 export default function Design({ persona }: DesignProps) {
@@ -195,7 +196,11 @@ export default function Design({ persona }: DesignProps) {
 
   const router = useRouter();
 
+  const [loading, setLoading] = useState(false);
+
   async function onSubmit(data: z.infer<typeof formSchema>) {
+    if (loading) return;
+    setLoading(true);
     const res = await fetch('/api/guest/chat', {
       method: 'POST',
       headers: {
@@ -224,6 +229,7 @@ export default function Design({ persona }: DesignProps) {
     } catch (err) {
       console.error('Failed to save personas to localStorage:', err);
     }
+    setLoading(false);
   }
 
   return (
@@ -777,12 +783,24 @@ export default function Design({ persona }: DesignProps) {
               )}
             />
           </div>
-          <Button className="w-full" type="submit">
-            <Sparkles />
-            Create persona
+          <Button
+            className={cn('w-full', loading && 'cursor-not-allowed')}
+            type="submit"
+            disabled={loading}
+          >
+            {loading ? (
+              <>
+                <Spinner /> Editing...{' '}
+              </>
+            ) : (
+              <>
+                <Sparkles />
+                Edit Persona
+              </>
+            )}
           </Button>
           <p className="mt-2 text-center text-xs text-gray-500">
-            By clicking <span className="text-primary">"Create persona"</span>,
+            By clicking <span className="text-primary">"Edit Persona"</span>,
             you agree to our Terms of Service and Privacy Policy.
           </p>
         </div>

@@ -1,5 +1,6 @@
 'use client';
 
+import { cn } from '@/lib/utils';
 import { getCookie } from 'cookies-next/client';
 import {
   BadgeInfo,
@@ -56,6 +57,7 @@ import {
   SelectValue,
 } from '../ui/select';
 import { Slider } from '../ui/slider';
+import { Spinner } from '../ui/spinner';
 
 const formSchema = z.object({
   domain: z
@@ -101,14 +103,6 @@ const formSchema = z.object({
 });
 
 export default function Design() {
-  const _cookies = getCookie('token');
-  useEffect(() => {
-    console.log('Cookies:', _cookies);
-    if (!_cookies) {
-      toast.info('You are creating personas as a guest user.');
-    }
-  }, []);
-
   const form = useForm<z.infer<typeof formSchema>>({
     defaultValues: {
       domain: { key: 'health', label: 'Health' },
@@ -140,6 +134,14 @@ export default function Design() {
       detail: '',
     },
   });
+  const _cookies = getCookie('token');
+  useEffect(() => {
+    console.log('Cookies:', _cookies);
+    if (!_cookies) {
+      toast.info('You are creating personas as a guest user.');
+    }
+  }, []);
+
   const [contentLengthSliderValue, setContentLengthSliderValue] = useState([
     200,
   ]);
@@ -213,7 +215,11 @@ export default function Design() {
 
   const router = useRouter();
 
+  const [loading, setLoading] = useState(false);
+
   async function onSubmit(data: z.infer<typeof formSchema>) {
+    if (loading) return;
+    setLoading(true);
     if (!_cookies) {
       const res = await fetch('/api/guest/chat', {
         method: 'POST',
@@ -243,6 +249,7 @@ export default function Design() {
       } catch (err) {
         console.error('Failed to save personas to localStorage:', err);
       }
+      setLoading(false);
     }
   }
 
@@ -797,9 +804,21 @@ export default function Design() {
               )}
             />
           </div>
-          <Button className="w-full" type="submit">
-            <Sparkles />
-            Create persona
+          <Button
+            className={cn('w-full', loading && 'cursor-not-allowed')}
+            type="submit"
+            disabled={loading}
+          >
+            {loading ? (
+              <>
+                <Spinner /> Creating...{' '}
+              </>
+            ) : (
+              <>
+                <Sparkles />
+                Create persona
+              </>
+            )}
           </Button>
           <p className="mt-2 text-center text-xs text-gray-500">
             By clicking <span className="text-primary">"Create persona"</span>,

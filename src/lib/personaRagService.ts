@@ -57,7 +57,11 @@ const embeddings = new GoogleGenerativeAIEmbeddings({
 });
 
 // Single-file corpus (plaintext). Place it at project root.
-const CORPUS_FILE = path.resolve(process.cwd(), 'persona_refs.txt');
+const CORPUS_FILE = path.resolve(
+  process.cwd(),
+  '/src/app/',
+  'persona_refs.txt',
+);
 let store: MemoryVectorStore | null = null;
 
 async function ensureStore() {
@@ -93,7 +97,10 @@ export async function runPersonaRAG(
   const docs = null; // await retriever.invoke('anna'); // TODO: nanti pake detail dari user
   const context = null; // joinDocs(docs);
 
-  const promptMd = await fs.readFile('./prompt.yaml', 'utf-8');
+  const promptMd = await fs.readFile(
+    process.cwd() + '/src/app/prompt.yaml',
+    'utf-8',
+  );
   const finalPrompt = context ? `${promptMd}` : `${promptMd}\n\n${construct}`;
   const llm = new ChatGoogleGenerativeAI({
     model: model,

@@ -41,7 +41,7 @@ export default function Hero() {
               WebkitTextFillColor: 'transparent',
             }}
           >
-            Create Your Persona with AI
+            Edit Your Persona with AI
           </h1>
           <p className="mx-auto max-w-3xl text-xl text-muted-foreground">
             Select a domain or industry, choose{' '}
