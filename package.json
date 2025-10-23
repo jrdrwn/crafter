@@ -37,6 +37,7 @@
     "clsx": "^2.1.1",
     "cmdk": "^1.1.1",
     "cookies-next": "^6.1.1",
+    "eslint-config-prettier": "^10.1.8",
     "hono": "^4.9.7",
     "html-react-parser": "^5.2.7",
     "langchain": "^0.3.36",
