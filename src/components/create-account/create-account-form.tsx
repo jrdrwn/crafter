@@ -25,6 +25,7 @@ import {
   InputGroupButton,
   InputGroupInput,
 } from '../ui/input-group';
+import { Spinner } from '../ui/spinner';
 
 const formSchema = z.object({
   name: z.string().min(1, 'Name must be at least 1 characters long'),
@@ -52,7 +53,11 @@ export default function CreateAccountForm() {
   });
   const [passwordVisible, setPasswordVisible] = useState(false);
 
+  const [loading, setLoading] = useState(false);
+
   async function onSubmit(data: z.infer<typeof formSchema>) {
+    if (loading) return;
+    setLoading(true);
     if (data.password !== data.confirmPassword) {
       form.setError('confirmPassword', {
         type: 'manual',
@@ -73,6 +78,7 @@ export default function CreateAccountForm() {
     });
 
     const json = await res.json();
+    setLoading(false);
     if (!res.ok) {
       toast.error(json.message || 'Something went wrong. Please try again.');
       return;
@@ -264,7 +270,8 @@ export default function CreateAccountForm() {
                   </Field>
                 )}
               />
-              <Button className="w-full" type="submit">
+              <Button className="w-full" type="submit" disabled={loading}>
+                {loading && <Spinner />}
                 Create Account
               </Button>
               <p className="mt-4 text-center text-sm text-muted-foreground">

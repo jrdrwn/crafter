@@ -32,6 +32,7 @@ import {
   InputGroupButton,
   InputGroupInput,
 } from '../ui/input-group';
+import { Spinner } from '../ui/spinner';
 
 const formSchema = z.object({
   identifier: z.string().email('Invalid email address'),
@@ -49,7 +50,11 @@ export default function LoginForm() {
   });
   const [passwordVisible, setPasswordVisible] = useState(false);
 
+  const [loading, setLoading] = useState(false);
+
   async function onSubmit(data: z.infer<typeof formSchema>) {
+    if (loading) return;
+    setLoading(true);
     const res = await fetch('/api/auth/login', {
       method: 'POST',
       headers: {
@@ -75,6 +80,7 @@ export default function LoginForm() {
         icon: <BadgeAlert />,
       });
     }
+    setLoading(false);
   }
 
   return (
@@ -160,7 +166,10 @@ export default function LoginForm() {
                   </Field>
                 )}
               />
-              <Button className="w-full">Login</Button>
+              <Button className="w-full" type="submit" disabled={loading}>
+                {loading && <Spinner />}
+                Login
+              </Button>
               <p className="mt-4 text-center text-sm text-muted-foreground">
                 Don't have an account?{' '}
                 <Link
