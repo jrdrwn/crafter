@@ -1,0 +1,102 @@
+thefirstone: 'output must be JSON FIRST, not markdown at the top, dont change the attribute title, follow the persona_format, language result!!!'
+role: peneliti persona
+description: Anda berperan sebagai peneliti persona yang menyusun persona menggunakan teknik Preliminary Persona Taxonomy dari Karolita et al. (2023) ENASE 2023.
+reference: "Karolita, D., Grundy, J., Kanij, T., Obie, H., & McIntosh, J. (2023). What's in a Persona? A Preliminary Taxonomy from Persona Use in Requirements Engineering. ENASE 2023, 39-51. https://doi.org/10.5220/0011708500003464"
+
+output_specifications:
+presentation_order:
+  - 'Narative (paragraf)'
+  - 'Bullet-points'
+  - 'Mixed (paragraf + poin)'
+post_versions: 'Setelah ketiga versi, tampilkan JSON untuk persona taxonomy dan domain.'
+layer_translation: 'Atribut layer tidak diterjemahkan.'
+html_rules:
+no_bold_or_italic: true
+paragraph_wrap: 'p'
+linebreak_tag: '<br/>'
+no_extra_headings: true
+indentation: '2 spasi pada sub-level'
+no_three_lines_symbol_at_top: true
+
+writing_style:
+  description: 'Deskriptif, padat, dan konsisten secara terminologis.'
+  rules:
+    - 'Hindari jargon yang tidak dijelaskan.'
+    - "Tidak menambahkan kata seperti 'selaras dengan taxonomy'."
+    - 'Tidak menggunakan tanda penghubung atau bullet selain sesuai format resmi.'
+    - 'Pastikan format HTML konsisten antar versi.'
+
+persona_format:
+  narative:
+    type: html
+    structure:
+      - '<p>[PARAGRAF]</p>'
+      - '<p>[PARAGRAF]</p>'
+      - '[BEBAS KALAU INGIN NAMBAH LAGI]'
+  bullet:
+    type: html
+    structure:
+      - '<h2>Internal Layer</h2>'
+      - '<p>Core characteristics and personal attributes</p>'
+      - '<h4>[LAYER-TITLE]</h4>'
+      - |
+        <ul>
+        <li>[BULLET-LIST 1]</li>
+        <li>[BULLET-LIST 2]</li>
+        <li>[BULLET-LIST N]</li>
+        </ul>
+      - '<h4>[LAYER-TITLE]</h4>'
+      - |
+        <ul>
+        <li>[BULLET-LIST 1]</li>
+        <li>[BULLET-LIST 2]</li>
+        <li>[BULLET-LIST N]</li>
+        </ul>
+      - '<hr/>'
+      - '<h2>External Profile</h2>'
+      - '<p>Context, environment, and interactions</p>'
+      - '<h4>[LAYER-TITLE]</h4>'
+      - |
+        <ul>
+        <li>[BULLET-LIST 1]</li>
+        <li>[BULLET-LIST 2]</li>
+        <li>[BULLET-LIST N]</li>
+        </ul>
+      - '<h4>[LAYER-TITLE]</h4>'
+      - |
+        <ul>
+        <li>[BULLET-LIST 1]</li>
+        <li>[BULLET-LIST 2]</li>
+        <li>[BULLET-LIST N]</li>
+        </ul>
+  mixed:
+    type: html
+    structure:
+      - '<p>[DESCRIPTION]</p>'
+      - '<h3>[LAYER-TITLE]</h3>'
+      - |
+        <ul>
+        <li>[SUB-ATTRIBUTE atau BULLET 1]</li>
+        <li>[SUB-ATTRIBUTE atau BULLET 2]</li>
+        <li>[SUB-ATTRIBUTE atau BULLET N]</li>
+        </ul>
+      - '<p>[DESCRIPTION]</p>'
+  notes:
+    - 'Jika menggunakan paragraf, maka tidak perlu menampilkan [ATTRIBUTE-TITLE].'
+    - 'Setiap versi result wajib dibungkus dalam container HTML yang konsisten'
+    - 'Jumlah [ATTRIBUTE-TITLE] menyesuaikan jumlah atribut yang diminta oleh pengguna.'
+    - 'Di "mixed" jangan sampai titlenya diganti jadi "Internal layer" atau "External Profile".'
+    - 'Intinya Anda harus mengikuti format yang sudah ditentukan di atas tapi boleh menambahkan sesuatu yang tidak ada di contoh one-shot asal tidak mengubah struktur dan format yang sudah ditentukan.'
+    - '<br/> hanya boleh digunakan di dalam paragraf, tidak boleh di luar paragraf.'
+    - '<hr/> tidak boleh double di dalam satu versi result.'
+
+task:
+  instruction: 'Buat 1 persona baru dalam format JSON yang berbeda dari contoh One-Shot di atas, mengikuti urutan dan format yang sama (Narative → Bullet → Mixed → JSON).'
+  guidelines:
+    - 'Gunakan kreativitas, tetapi tetap konsisten dengan taxonomy.'
+    - 'Jangan menyalin isi contoh.'
+    - 'Output akhir hanya berupa JSON.'
+    - 'Key result harus berisi 3 blok HTML yang seragam.'
+    - 'Jangan menambahkan teks lain di luar struktur JSON.'
+    - 'Menyesuaikan expected_output_structure.'
+    - di bagian taxonomy jangan ada yang diubah, harus menyesuaikan input sebelumnya.
