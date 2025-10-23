@@ -59,7 +59,7 @@ const embeddings = new GoogleGenerativeAIEmbeddings({
 // Single-file corpus (plaintext). Place it at project root.
 const CORPUS_FILE = path.resolve(
   process.cwd(),
-  '/public/persona_refs.txt',
+  '/app/public/persona_refs.txt',
 );
 let store: MemoryVectorStore | null = null;
 
@@ -98,7 +98,7 @@ export async function runPersonaRAG(
 
   const promptMd = await fs.readFile(
     process.cwd() +
-    '/public/prompt.yaml',
+    '/app/public/prompt.yaml',
     'utf-8',
   );
   const finalPrompt = context ? `${promptMd}` : `${promptMd}\n\n${construct}`;
