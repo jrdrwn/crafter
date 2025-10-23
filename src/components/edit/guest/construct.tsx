@@ -99,7 +99,17 @@ const formSchema = z.object({
   detail: z.string().optional(),
 });
 
-export default function Design({ persona }) {
+interface DesignProps {
+  persona: {
+    created_at: string;
+    updated_at: string;
+    request: z.infer<typeof formSchema>;
+    response: any;
+  } | null
+
+}
+
+export default function Design({ persona }: DesignProps) {
   const form = useForm<z.infer<typeof formSchema>>({
     defaultValues: {
       domain: persona?.request?.domain || { key: 'health', label: 'Health' },
@@ -204,7 +214,7 @@ export default function Design({ persona }) {
     try {
       const STORAGE_KEY = 'crafter:personas';
       const entry = {
-        created_at: persona.created_at,
+        created_at: persona?.created_at,
         updated_at: new Date().toISOString(),
         request: data,
         response: json,
