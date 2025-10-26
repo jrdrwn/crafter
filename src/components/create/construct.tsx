@@ -1,6 +1,6 @@
 'use client';
 
-import { cn } from '@/lib/utils';
+import { cn, slugify } from '@/lib/utils';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { getCookie } from 'cookies-next/client';
 import {
@@ -142,7 +142,7 @@ export default function Design() {
     if (!_cookies) {
       toast.info('You are creating personas as a guest user.');
     }
-  }, []);
+  }, [_cookies]);
 
   const [contentLengthSliderValue, setContentLengthSliderValue] = useState([
     200,
@@ -293,7 +293,7 @@ export default function Design() {
                     >
                       {domains
                         .filter((domain) =>
-                          domain.key
+                          domain.label
                             .toLowerCase()
                             .includes(domainQuery.toLowerCase()),
                         )
@@ -312,8 +312,10 @@ export default function Design() {
                         ))}
                     </RadioGroup>
                     {domainQuery &&
-                      !domains.filter((d) => d.label === domainQuery)
-                        .length && (
+                      !domains.some(
+                        (d) =>
+                          d.label.toLowerCase() === domainQuery.toLowerCase(),
+                      ) && (
                         <p className="mt-2 text-center text-xs text-gray-500">
                           Add &quot;{domainQuery}&quot; as a new domain if not
                           listed.
@@ -339,14 +341,14 @@ export default function Design() {
                 onClick={() => {
                   if (
                     domainQuery &&
-                    !domains.filter((d) => d.label === domainQuery).length
+                    !domains.some(
+                      (d) =>
+                        d.label.toLowerCase() === domainQuery.toLowerCase(),
+                    )
                   ) {
                     setDomains((prev) => [
                       {
-                        key: domainQuery
-                          .toLowerCase()
-                          .replace(/ & /g, '-')
-                          .replace(/\s+/g, '-'),
+                        key: slugify(domainQuery),
                         label: domainQuery,
                       },
                       ...prev,
@@ -563,10 +565,7 @@ export default function Design() {
                     if (internalQuery && internalDescCustom) {
                       setInternalFactors((prev) => [
                         {
-                          name: internalQuery
-                            .toLowerCase()
-                            .replace(/ & /g, '-')
-                            .replace(/\s+/g, '-'),
+                          name: slugify(internalQuery),
                           title: internalQuery,
                           description: internalDescCustom,
                         },
@@ -608,10 +607,7 @@ export default function Design() {
                     if (externalQuery && externalDescCustom) {
                       setExternalFactors((prev) => [
                         {
-                          name: externalQuery
-                            .toLowerCase()
-                            .replace(/ & /g, '-')
-                            .replace(/\s+/g, '-'),
+                          name: slugify(externalQuery),
                           title: externalQuery,
                           description: externalDescCustom,
                           disabled: false,
