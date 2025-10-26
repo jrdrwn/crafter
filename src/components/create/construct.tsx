@@ -1,6 +1,7 @@
 'use client';
 
 import { cn } from '@/lib/utils';
+import { zodResolver } from '@hookform/resolvers/zod';
 import { getCookie } from 'cookies-next/client';
 import {
   BadgeInfo,
@@ -104,6 +105,7 @@ const formSchema = z.object({
 
 export default function Design() {
   const form = useForm<z.infer<typeof formSchema>>({
+    resolver: zodResolver(formSchema),
     defaultValues: {
       domain: { key: 'health', label: 'Health' },
       internal: [],
@@ -135,8 +137,8 @@ export default function Design() {
     },
   });
   const _cookies = getCookie('token');
+
   useEffect(() => {
-    console.log('Cookies:', _cookies);
     if (!_cookies) {
       toast.info('You are creating personas as a guest user.');
     }
@@ -313,7 +315,8 @@ export default function Design() {
                       !domains.filter((d) => d.label === domainQuery)
                         .length && (
                         <p className="mt-2 text-center text-xs text-gray-500">
-                          Add "{domainQuery}" as a new domain if not listed.
+                          Add &quot;{domainQuery}&quot; as a new domain if not
+                          listed.
                         </p>
                       )}
                   </ScrollArea>
@@ -440,8 +443,8 @@ export default function Design() {
                               internalQuery.toLowerCase(),
                           ) && (
                             <p className="mt-2 text-center text-xs text-gray-500">
-                              Add "{internalQuery}" as a new internal factor if
-                              not listed.
+                              Add &quot;{internalQuery}&quot; as a new internal
+                              factor if not listed.
                             </p>
                           )}
                       </ScrollArea>
@@ -525,8 +528,8 @@ export default function Design() {
                               externalQuery.toLowerCase(),
                           ) && (
                             <p className="mt-2 text-center text-xs text-gray-500">
-                              Add "{externalQuery}" as a new external factor if
-                              not listed.
+                              Add &quot;{externalQuery}&quot; as a new external
+                              factor if not listed.
                             </p>
                           )}
                       </ScrollArea>
@@ -821,7 +824,8 @@ export default function Design() {
             )}
           </Button>
           <p className="mt-2 text-center text-xs text-gray-500">
-            By clicking <span className="text-primary">"Create persona"</span>,
+            By clicking{' '}
+            <span className="text-primary">&quot;Create persona&quot;</span>,
             you agree to our Terms of Service and Privacy Policy.
           </p>
         </div>
