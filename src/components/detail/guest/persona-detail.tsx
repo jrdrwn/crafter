@@ -35,160 +35,192 @@ import {
 import { Item, ItemActions, ItemContent, ItemMedia } from '../../ui/item';
 import { Label } from '../../ui/label';
 import { Switch } from '../../ui/switch';
-import Persona from './persona';
+import Persona, { PersonaResponse } from './persona';
+
+// Types
+type StoredPersona = {
+  response?: PersonaResponse;
+  created_at?: string | number | Date;
+  updated_at?: string | number | Date;
+};
+
+// Subcomponents
+function BackToHistory() {
+  return (
+    <Link href={'/history/guest'}>
+      <Button variant={'outline'} className="border-primary">
+        <ChevronLeft />
+        Back to history
+      </Button>
+    </Link>
+  );
+}
+
+function TopActions() {
+  return (
+    <div className="flex items-center justify-center gap-4">
+      <Button variant={'ghost'} className="text-green-500">
+        <Wifi />
+        Online
+      </Button>
+      <Link href={'/edit/guest'}>
+        <Button>
+          <Edit />
+          Edit
+        </Button>
+      </Link>
+      <DeleteConfirmationDialog />
+    </div>
+  );
+}
+
+function QuickInfoCard({
+  createdAt,
+  updatedAt,
+}: {
+  createdAt?: Date;
+  updatedAt?: Date;
+}) {
+  const created = createdAt
+    ? new Date(createdAt).toLocaleString('EN-en', {
+        weekday: 'long',
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
+      })
+    : '-';
+  const updated = updatedAt
+    ? new Date(updatedAt).toLocaleString('EN-en', {
+        weekday: 'long',
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
+      })
+    : '-';
+  return (
+    <Card className="w-full gap-2 border-foreground py-4">
+      <CardHeader className="px-4">
+        <CardTitle className="text-2xl text-primary">Quick Info</CardTitle>
+      </CardHeader>
+      <CardContent className="px-4">
+        <div className="mb-4">
+          <h3 className="mb-2 font-medium">Created</h3>
+          <p>{created}</p>
+        </div>
+        <div>
+          <h3 className="mb-2 font-medium">Updated</h3>
+          <p>{updated}</p>
+        </div>
+      </CardContent>
+    </Card>
+  );
+}
+
+function SharePersonaCard() {
+  return (
+    <Card className="relative w-full py-4">
+      <div className="absolute inset-0 z-1 flex items-center justify-center rounded-2xl backdrop-blur-xs">
+        <p className="p-4 text-center text-sm">
+          You need to log in to access all Share Persona features.
+        </p>
+      </div>
+      <CardHeader className="px-4">
+        <CardTitle className="text-2xl text-primary">Share Persona</CardTitle>
+        <CardDescription>Make this persona publicly accessible</CardDescription>
+      </CardHeader>
+      <CardContent className="px-4">
+        <Label htmlFor="private" className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <LockKeyhole className="text-primary" /> Private
+          </div>
+          <Switch id="private" />
+        </Label>
+      </CardContent>
+    </Card>
+  );
+}
+
+function DownloadPersonaCard() {
+  return (
+    <Card className="relative w-full py-4">
+      <div className="absolute inset-0 z-1 flex items-center justify-center rounded-2xl backdrop-blur-xs">
+        <p className="p-4 text-center text-sm">
+          You need to log in to access all Share Persona features.
+        </p>
+      </div>
+      <CardHeader className="px-4">
+        <CardTitle className="text-2xl text-primary">
+          Download Persona
+        </CardTitle>
+        <CardDescription>Save persona in multiple formats</CardDescription>
+      </CardHeader>
+      <CardContent className="space-y-2 px-4">
+        <Item
+          size={'sm'}
+          variant={'outline'}
+          className="border-foreground"
+          asChild
+        >
+          <Link href={'#'}>
+            <ItemMedia>
+              <FileText className="text-primary" />
+            </ItemMedia>
+            <ItemContent>Download as PDF</ItemContent>
+            <ItemActions>
+              <ChevronRight className="size-4" />
+            </ItemActions>
+          </Link>
+        </Item>
+        <Item
+          size={'sm'}
+          variant={'outline'}
+          className="border-foreground"
+          asChild
+        >
+          <Link href={'#'}>
+            <ItemMedia>
+              <FileJson className="text-primary" />
+            </ItemMedia>
+            <ItemContent>Download as JSON</ItemContent>
+            <ItemActions>
+              <ChevronRight className="size-4" />
+            </ItemActions>
+          </Link>
+        </Item>
+      </CardContent>
+    </Card>
+  );
+}
 
 export default function PersonaDetail() {
-  const [persona, setPersona] = useState<any>(null);
+  const [persona, setPersona] = useState<StoredPersona | null>(null);
   useEffect(() => {
     const STORAGE_KEY = 'crafter:personas';
-    const data = JSON.parse(localStorage.getItem(STORAGE_KEY) || 'null');
-    setPersona(data);
+    const data = JSON.parse(
+      localStorage.getItem(STORAGE_KEY) || 'null',
+    ) as StoredPersona | null;
+    setPersona(data ?? null);
   }, []);
   return (
     <section className="px-4 py-4">
       <div className="container mx-auto">
         <div className="flex items-center justify-between">
-          <div className="flex items-center justify-center gap-4">
-            <Link href={'/history/guest'}>
-              <Button variant={'outline'} className="border-primary">
-                <ChevronLeft />
-                Back to history
-              </Button>
-            </Link>
-            {/* <Select defaultValue="1">
-              <SelectTrigger className="w-42 border-primary">
-                <SelectValue placeholder="Persona Batch" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="1">Persona #1</SelectItem>
-                <SelectItem value="2">Persona #2</SelectItem>
-              </SelectContent>
-            </Select> */}
-          </div>
-          <div className="flex items-center justify-center gap-4">
-            <Button variant={'ghost'} className="text-green-500">
-              <Wifi />
-              Online
-            </Button>
-            <Link href={'/edit/guest'}>
-              <Button>
-                <Edit />
-                Edit
-              </Button>
-            </Link>
-            <DeleteConfirmationDialog />
-          </div>
+          <BackToHistory />
+          <TopActions />
         </div>
         <div className="mt-4 grid grid-cols-3 gap-8">
           {persona && <Persona markdown={persona?.response} />}
           <div className="col-span-1 space-y-4">
-            <Card className="w-full gap-2 border-foreground py-4">
-              <CardHeader className="px-4">
-                <CardTitle className="text-2xl text-primary">
-                  Quick Info
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="px-4">
-                <div className="mb-4">
-                  <h3 className="mb-2 font-medium">Created</h3>
-                  <p>
-                    {new Date(persona?.created_at).toLocaleTimeString('EN-en', {
-                      weekday: 'long',
-                      year: 'numeric',
-                      month: 'long',
-                      day: 'numeric',
-                    })}
-                  </p>
-                </div>
-                <div>
-                  <h3 className="mb-2 font-medium">Updated</h3>
-                  <p>
-                    {new Date(persona?.updated_at).toLocaleTimeString('EN-en', {
-                      weekday: 'long',
-                      year: 'numeric',
-                      month: 'long',
-                      day: 'numeric',
-                    })}
-                  </p>
-                </div>
-              </CardContent>
-            </Card>
-            <Card className="relative w-full py-4">
-              <div className="absolute inset-0 z-1 flex items-center justify-center rounded-2xl backdrop-blur-xs">
-                <p className="p-4 text-center text-sm">
-                  You need to log in to access all Share Persona features.
-                </p>
-              </div>
-
-              <CardHeader className="px-4">
-                <CardTitle className="text-2xl text-primary">
-                  Share Persona
-                </CardTitle>
-                <CardDescription>
-                  Make this persona publicly accessible
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="px-4">
-                <Label
-                  htmlFor="private"
-                  className="flex items-center justify-between"
-                >
-                  <div className="flex items-center gap-2">
-                    <LockKeyhole className="text-primary" /> Private
-                  </div>
-                  <Switch id="private" />
-                </Label>
-              </CardContent>
-            </Card>
-            <Card className="relative w-full py-4">
-              <div className="absolute inset-0 z-1 flex items-center justify-center rounded-2xl backdrop-blur-xs">
-                <p className="p-4 text-center text-sm">
-                  You need to log in to access all Share Persona features.
-                </p>
-              </div>
-              <CardHeader className="px-4">
-                <CardTitle className="text-2xl text-primary">
-                  Download Persona
-                </CardTitle>
-                <CardDescription>
-                  Save persona in multiple formats
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-2 px-4">
-                <Item
-                  size={'sm'}
-                  variant={'outline'}
-                  className="border-foreground"
-                  asChild
-                >
-                  <Link href={'#'}>
-                    <ItemMedia>
-                      <FileText className="text-primary" />
-                    </ItemMedia>
-                    <ItemContent>Download as PDF</ItemContent>
-                    <ItemActions>
-                      <ChevronRight className="size-4" />
-                    </ItemActions>
-                  </Link>
-                </Item>
-                <Item
-                  size={'sm'}
-                  variant={'outline'}
-                  className="border-foreground"
-                  asChild
-                >
-                  <Link href={'#'}>
-                    <ItemMedia>
-                      <FileJson className="text-primary" />
-                    </ItemMedia>
-                    <ItemContent>Download as JSON</ItemContent>
-                    <ItemActions>
-                      <ChevronRight className="size-4" />
-                    </ItemActions>
-                  </Link>
-                </Item>
-              </CardContent>
-            </Card>
+            <QuickInfoCard
+              createdAt={
+                persona?.created_at ? new Date(persona.created_at) : undefined
+              }
+              updatedAt={
+                persona?.updated_at ? new Date(persona.updated_at) : undefined
+              }
+            />
+            <SharePersonaCard />
+            <DownloadPersonaCard />
           </div>
         </div>
       </div>
