@@ -40,7 +40,7 @@ export default function LLMConfigCard({ control }: Props) {
           </CardDescription>
         </CardHeader>
         <CardContent className="px-2 pb-2">
-          <Controller<CreateFormValues>
+          <Controller
             name="llmModel"
             control={control}
             render={({ field, fieldState }) => (

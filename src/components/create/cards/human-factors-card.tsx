@@ -92,7 +92,7 @@ export default function HumanFactorsCard({ control }: Props) {
             <h3 className="mb-2 text-sm font-medium text-primary">
               Internal Layer
             </h3>
-            <Controller<CreateFormValues>
+            <Controller
               name="internal"
               control={control}
               render={({ field, fieldState }) => (

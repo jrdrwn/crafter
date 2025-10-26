@@ -36,7 +36,7 @@ export default function AdditionalDetailsCard({ control }: Props) {
         </CardDescription>
       </CardHeader>
       <CardContent className="px-2">
-        <Controller<CreateFormValues>
+        <Controller
           name="detail"
           control={control}
           render={({ field, fieldState }) => {

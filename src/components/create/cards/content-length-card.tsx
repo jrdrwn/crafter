@@ -38,7 +38,7 @@ export default function ContentLengthCard({ control }: Props) {
         </CardDescription>
       </CardHeader>
       <CardContent className="px-2">
-        <Controller<CreateFormValues>
+        <Controller
           name="contentLength"
           control={control}
           render={({ field, fieldState }) => (

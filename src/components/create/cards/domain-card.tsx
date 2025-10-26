@@ -48,7 +48,7 @@ export default function DomainCard({ control }: Props) {
         </CardDescription>
       </CardHeader>
       <CardContent className="px-2">
-        <Controller<CreateFormValues>
+        <Controller
           name="domain"
           control={control}
           render={({ field, fieldState }) => (
@@ -63,7 +63,7 @@ export default function DomainCard({ control }: Props) {
                     });
                   }}
                   aria-invalid={fieldState.invalid}
-                  defaultValue={domains[0].key}
+                  defaultValue={field.value.key}
                 >
                   {domains
                     .filter((domain) =>
