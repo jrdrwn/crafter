@@ -177,10 +177,7 @@ app.post(
       language: z
         .object({ key: z.enum(['en', 'id']), label: z.string() })
         .required(),
-      amount: z.coerce
-        .number()
-        .min(1, 'At least 1 persona')
-        .max(3, 'Maximum 3 personas'),
+      useRAG: z.boolean(),
       detail: z.string().optional(),
     }),
   ),
