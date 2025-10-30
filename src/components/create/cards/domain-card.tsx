@@ -2,7 +2,7 @@
 
 import { slugify } from '@/lib/utils';
 import { Plus, Target } from 'lucide-react';
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Control, Controller } from 'react-hook-form';
 
 import { Button } from '../../ui/button';
@@ -25,16 +25,19 @@ type Props = {
 };
 
 export default function DomainCard({ control }: Props) {
-  const [domains, setDomains] = useState<{ key: string; label: string }[]>([
-    { key: 'health', label: 'Health' },
-    { key: 'education', label: 'Education' },
-    { key: 'software-development', label: 'Software Development' },
-    { key: 'e-commerce', label: 'E-commerce' },
-    { key: 'banking-fintech', label: 'Banking & Fintech' },
-    { key: 'travel-tourism', label: 'Travel & Tourism' },
-  ]);
+  const [domains, setDomains] = useState<{ key: string; label: string }[]>([]);
   const [domainQuery, setDomainQuery] = useState('');
   const domainInputRef = useRef<HTMLInputElement>(null);
+
+  async function fetchDomains() {
+    const res = await fetch('/api/domain');
+    const json = await res.json();
+    setDomains(json.data);
+  }
+
+  useEffect(() => {
+    fetchDomains();
+  }, []);
 
   return (
     <Card className="col-span-1 w-full border border-primary p-2">

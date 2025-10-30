@@ -48,17 +48,19 @@ const formSchema = z.object({
     .number()
     .min(50)
     .max(2000, 'Content length must be between 50 and 2000 words'),
-  llmModel: z.string().nonempty('Please select an LLM model'),
-  language: z
+  llmModel: z
     .object({
-      key: z.enum(['en', 'id']),
+      key: z.string(),
       label: z.string(),
     })
     .required(),
-  amount: z.coerce
-    .number()
-    .min(1, 'At least 1 persona')
-    .max(3, 'Maximum 3 personas'),
+  language: z
+    .object({
+      key: z.string(),
+      label: z.string(),
+    })
+    .required(),
+  useRAG: z.boolean(),
   detail: z.string().optional(),
 });
 
@@ -86,12 +88,15 @@ export default function Design() {
         },
       ],
       contentLength: 1000,
-      llmModel: 'gemini-2.5-flash-lite',
+      llmModel: {
+        key: 'gemini-2.5-flash-lite',
+        label: 'Gemini 2.5 Flash Lite',
+      },
       language: {
         key: 'en',
         label: 'English',
       },
-      amount: 1,
+      useRAG: false,
       detail: '',
     },
   });
@@ -139,8 +144,25 @@ export default function Design() {
       } catch (err) {
         console.error('Failed to save personas to localStorage:', err);
       }
-      setLoading(false);
+    } else {
+      const res = await fetch('/api/chat', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${_cookies}`,
+        },
+        body: JSON.stringify(data),
+      });
+      const json = await res.json();
+      if (!res.ok) {
+        toast.error(
+          `Failed to create persona(s): ${json.message || 'Unknown error'}`,
+        );
+      }
+      toast.success('Persona(s) created successfully!');
+      router.push(`/detail/${json.personaId}`);
     }
+    setLoading(false);
   }
 
   return (

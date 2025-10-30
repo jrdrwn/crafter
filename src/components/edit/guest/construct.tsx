@@ -47,17 +47,14 @@ const formSchema = z.object({
     .number()
     .min(50)
     .max(2000, 'Content length must be between 50 and 2000 words'),
-  llmModel: z.string().nonempty('Please select an LLM model'),
+  llmModel: z.object({ key: z.string(), label: z.string() }).required(),
   language: z
     .object({
-      key: z.enum(['en', 'id']),
+      key: z.string(),
       label: z.string(),
     })
     .required(),
-  amount: z.coerce
-    .number()
-    .min(1, 'At least 1 persona')
-    .max(3, 'Maximum 3 personas'),
+  useRAG: z.boolean(),
   detail: z.string().optional(),
 });
 
@@ -97,11 +94,14 @@ export default function Design({ persona }: DesignProps) {
         },
       ],
       contentLength: persona?.request?.contentLength ?? 1000,
-      llmModel: persona?.request?.llmModel ?? 'gemini-2.5-flash-lite',
+      llmModel: persona?.request?.llmModel ?? {
+        key: 'gemini-2.5-flash-lite',
+        label: 'Gemini 2.5 Flash Lite',
+      },
       language:
         persona?.request?.language ??
         ({ key: 'en', label: 'English' } as const),
-      amount: persona?.request?.amount ?? 1,
+      useRAG: persona?.request?.useRAG ?? false,
       detail: persona?.request?.detail ?? '',
     },
   });

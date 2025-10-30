@@ -38,7 +38,10 @@ export function PersonaCard({
 
   return (
     <Card
-      className={cn('w-full gap-4 border-primary bg-primary/5 py-4', className)}
+      className={cn(
+        'h-full w-full gap-4 border-primary bg-primary/5 py-4',
+        className,
+      )}
     >
       <CardHeader className="relative gap-0 px-4">
         {createdByMe && (

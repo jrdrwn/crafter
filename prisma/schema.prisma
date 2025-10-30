@@ -9,55 +9,77 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model languages {
-  id       Int        @id @default(autoincrement())
-  name     String     @unique
-  code     String?    @unique @db.VarChar(10)
-  personas personas[]
-}
-
-model persona_attributes {
-  id                Int       @id @default(autoincrement())
-  created_by_system Boolean   @default(false)
-  persona_id        Int
+model attribute {
+  id                Int                 @id @default(autoincrement())
+  created_by_system Boolean             @default(false)
   layer             layer
-  name              String    @db.VarChar(120)
-  human_name        String    @db.VarChar(120)
+  name              String              @unique(map: "attribute_key_uindex") @db.VarChar(120)
+  title             String              @db.VarChar(120)
   description       String?
-  created_at        DateTime? @default(now()) @db.Timestamp(6)
-  updated_at        DateTime? @default(now()) @db.Timestamp(6)
-  personas          personas  @relation(fields: [persona_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
-
-  @@index([persona_id, layer])
+  created_at        DateTime?           @default(now()) @db.Timestamp(6)
+  updated_at        DateTime?           @default(now()) @db.Timestamp(6)
+  disabled          Boolean             @default(false)
+  persona_attribute persona_attribute[]
 }
 
-model personas {
-  id                 Int                  @id @default(autoincrement())
-  owner_id           Int
-  result             Json?
-  max_length         Int?
-  detail             String?
-  domain             String?              @db.VarChar(120)
-  visibility         visibility
-  language           Int
-  is_archived        Boolean?             @default(false)
-  created_at         DateTime?            @default(now()) @db.Timestamp(6)
-  updated_at         DateTime?            @default(now()) @db.Timestamp(6)
-  persona_attributes persona_attributes[]
-  languages          languages            @relation(fields: [language], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  users              users                @relation(fields: [owner_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
-
-  @@index([owner_id, visibility])
+model domain {
+  id                Int       @id @default(autoincrement())
+  key               String    @unique @db.VarChar(120)
+  label             String    @unique(map: "domain_value_key") @db.VarChar(120)
+  created_by_system Boolean?  @default(false)
+  persona           persona[]
 }
 
-model users {
-  id         Int        @id @default(autoincrement())
-  email      String     @unique @db.VarChar(120)
-  password   String     @db.VarChar(255)
-  name       String?    @db.VarChar(120)
-  created_at DateTime?  @default(now()) @db.Timestamp(6)
-  updated_at DateTime?  @default(now()) @db.Timestamp(6)
-  personas   personas[]
+model language {
+  id      Int       @id @default(autoincrement())
+  label   String    @unique(map: "language_name_key")
+  key     String    @unique(map: "language_code_key") @db.VarChar(20)
+  persona persona[]
+}
+
+model persona {
+  id                Int                 @id @default(autoincrement())
+  owner_id          Int
+  result            Json?
+  max_length        Int?
+  detail            String?
+  domain_id         Int
+  visibility        visibility
+  language_id       Int
+  is_archived       Boolean?            @default(false)
+  created_at        DateTime?           @default(now()) @db.Timestamp(6)
+  updated_at        DateTime?           @default(now()) @db.Timestamp(6)
+  llm_id            Int?
+  domain            domain              @relation(fields: [domain_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  language          language            @relation(fields: [language_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  llm               llm?                @relation(fields: [llm_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  user              user                @relation(fields: [owner_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  persona_attribute persona_attribute[]
+}
+
+model persona_attribute {
+  id           Int        @id @default(autoincrement())
+  persona_id   Int?
+  attribute_id Int?
+  attribute    attribute? @relation(fields: [attribute_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  persona      persona?   @relation(fields: [persona_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model user {
+  id         Int       @id @default(autoincrement())
+  email      String    @unique @db.VarChar(120)
+  password   String    @db.VarChar(255)
+  name       String?   @db.VarChar(120)
+  created_at DateTime? @default(now()) @db.Timestamp(6)
+  updated_at DateTime? @default(now()) @db.Timestamp(6)
+  persona    persona[]
+}
+
+model llm {
+  id      Int       @id @default(autoincrement())
+  label   String    @db.VarChar(120)
+  key     String    @unique(map: "llm_key_uindex") @db.VarChar(120)
+  persona persona[]
 }
 
 enum layer {

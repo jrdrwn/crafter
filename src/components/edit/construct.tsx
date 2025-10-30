@@ -8,6 +8,7 @@ import LLMConfigCard from '@/components/create/cards/llm-config-card';
 import type { CreateFormValues } from '@/components/create/types';
 import { cn } from '@/lib/utils';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { getCookie } from 'cookies-next/client';
 import { Sparkles } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
@@ -42,81 +43,99 @@ const formSchema = z.object({
     .number()
     .min(50)
     .max(2000, 'Content length must be between 50 and 2000 words'),
-  llmModel: z.string().nonempty('Please select an LLM model'),
-  language: z
-    .object({ key: z.enum(['en', 'id']), label: z.string() })
-    .required(),
-  amount: z.coerce
-    .number()
-    .min(1, 'At least 1 persona')
-    .max(3, 'Maximum 3 personas'),
+  llmModel: z.object({ key: z.string(), label: z.string() }).required(),
+  language: z.object({ key: z.string(), label: z.string() }).required(),
+  useRAG: z.boolean(),
   detail: z.string().optional(),
 });
 
-export default function Design() {
+export interface PersonaData {
+  id: number;
+  detail: string;
+  domain: { key: string; label: string };
+  max_length: number;
+  persona_attribute: {
+    attribute: {
+      id: number;
+      layer: 'internal' | 'external';
+      name: string;
+      title: string;
+      description: string;
+    };
+  }[];
+  result: {
+    full_name: string;
+    quote: string;
+    mixed: string;
+    bullets: string;
+    narative: string;
+  };
+  llm: { key: string; label: string };
+  visibility: 'private' | 'public';
+  created_at: string;
+  updated_at: string;
+  useRAG: boolean;
+  language: { key: string; label: string };
+}
+
+export default function Design({
+  personaId,
+  persona,
+}: {
+  personaId: string;
+  persona: PersonaData;
+}) {
+  const _cookies = getCookie('token');
   const router = useRouter();
   const [loading, setLoading] = useState(false);
 
   const form = useForm<CreateFormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      domain: { key: 'health', label: 'Health' },
-      internal: [],
-      external: [
-        {
-          name: 'motivation',
-          title: 'Motivation',
-          description: 'Primary reasons for using the system',
-        },
-        {
-          name: 'goals',
-          title: 'Goals',
-          description: 'Objectives the user wants to achieve',
-        },
-        {
-          name: 'pain-points',
-          title: 'Pain Points',
-          description: 'Key challenges & frustrations',
-        },
-      ],
-      contentLength: 1000,
-      llmModel: 'gemini-2.5-flash-lite',
-      language: { key: 'en', label: 'English' },
-      amount: 1,
-      detail: '',
+      domain: persona?.domain ?? { key: 'health', label: 'Health' },
+      internal: persona?.persona_attribute
+        .filter((attr) => attr.attribute.layer === 'internal')
+        .map((attr) => ({
+          name: attr.attribute.name,
+          title: attr.attribute.title,
+          description: attr.attribute.description,
+        })),
+      external: persona?.persona_attribute
+        .filter((attr) => attr.attribute.layer === 'external')
+        .map((attr) => ({
+          name: attr.attribute.name,
+          title: attr.attribute.title,
+          description: attr.attribute.description,
+        })),
+      contentLength: persona?.max_length,
+      llmModel: persona?.llm,
+      language: persona?.language,
+      useRAG: persona?.useRAG ?? false,
+      detail: persona?.detail,
     },
   });
 
   async function onSubmit(data: CreateFormValues) {
     if (loading) return;
     setLoading(true);
-    const res = await fetch('/api/guest/chat', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+    const res = await fetch(`/api/persona/${personaId}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${_cookies}`,
+      },
       body: JSON.stringify(data),
     });
     const json = await res.json();
     if (!res.ok) {
       toast.error(
-        `Failed to create persona(s): ${json.message || 'Unknown error'}`,
+        `Failed to edit persona(s): ${json.message || 'Unknown error'}`,
       );
       setLoading(false);
       return;
     }
-    toast.success('Persona(s) created successfully!');
-    try {
-      const STORAGE_KEY = 'crafter:personas';
-      const entry = {
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString(),
-        request: data,
-        response: json as unknown,
-      };
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(entry));
-      router.push(`/detail/guest`);
-    } catch (err) {
-      console.error('Failed to save personas to localStorage:', err);
-    }
+    toast.success('Persona(s) edited successfully!');
+    router.push(`/detail/${personaId}`);
     setLoading(false);
   }
 

@@ -2,7 +2,7 @@
 
 import { slugify } from '@/lib/utils';
 import { Brain, Plus, Users } from 'lucide-react';
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Control, Controller } from 'react-hook-form';
 
 import { Button } from '../../ui/button';
@@ -26,23 +26,7 @@ type Props = {
 };
 
 export default function HumanFactorsCard({ control }: Props) {
-  const [internalFactors, setInternalFactors] = useState<Factor[]>([
-    {
-      name: 'demographic-information',
-      title: 'Demographic Information',
-      description: 'Age, name, gender',
-    },
-    {
-      name: 'personal-attributes',
-      title: 'Personal Attributes',
-      description: 'Attitudes, behaviors, personality',
-    },
-    {
-      name: 'physical-condition',
-      title: 'Physical Condition',
-      description: 'Health, physical limitations',
-    },
-  ]);
+  const [internalFactors, setInternalFactors] = useState<Factor[]>([]);
   const [internalQuery, setInternalQuery] = useState('');
   const [internalDescCustom, setInternalDescCustom] = useState('');
   const internalInputRef = useRef<HTMLInputElement>(null);
@@ -50,30 +34,32 @@ export default function HumanFactorsCard({ control }: Props) {
 
   const [externalFactors, setExternalFactors] = useState<
     (Factor & { disabled?: boolean })[]
-  >([
-    {
-      name: 'motivation',
-      title: 'Motivation',
-      description: 'Primary reasons for using the system',
-      disabled: true,
-    },
-    {
-      name: 'goals',
-      title: 'Goals',
-      description: 'Objectives the user wants to achieve',
-      disabled: true,
-    },
-    {
-      name: 'pain-points',
-      title: 'Pain Points',
-      description: 'Key challenges & frustrations',
-      disabled: true,
-    },
-  ]);
+  >([]);
   const [externalQuery, setExternalQuery] = useState('');
   const [externalDescCustom, setExternalDescCustom] = useState('');
   const externalInputRef = useRef<HTMLInputElement>(null);
   const externalDescInputRef = useRef<HTMLInputElement>(null);
+
+  async function fetchAttributes() {
+    const res = await fetch('/api/attribute');
+    const json = await res.json();
+    setInternalFactors(json.data.internal);
+    setExternalFactors(json.data.external);
+  }
+
+  useEffect(() => {
+    fetchAttributes();
+  }, []);
+
+  if (!internalFactors.length || !externalFactors.length) {
+    return (
+      <Card className="col-span-2 w-full border border-primary p-2">
+        <CardContent className="flex h-32 w-full items-center justify-center">
+          <p className="text-sm text-gray-500">Loading factors...</p>
+        </CardContent>
+      </Card>
+    );
+  }
 
   return (
     <Card className="col-span-2 w-full border border-primary p-2">

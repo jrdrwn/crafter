@@ -4,7 +4,7 @@ import EndCTA from '@/components/shared/end-cta';
 import Footer from '@/components/shared/footer';
 import Header from '@/components/shared/header';
 
-export default function Page() {
+export default async function Page() {
   return (
     <>
       <Header />

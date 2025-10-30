@@ -1,20 +1,9 @@
 'use client';
 
-import { SearchIcon } from 'lucide-react';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
 
-import {
-  DomainFilterCombobox,
-  OrderFilterCombobox,
-} from '../../shared/domain-order-filters';
 import { PersonaCard } from '../../shared/persona-card';
-import { Card, CardContent } from '../../ui/card';
-import {
-  InputGroup,
-  InputGroupAddon,
-  InputGroupInput,
-} from '../../ui/input-group';
 
 export default function PersonaItems() {
   type GuestPersonaStorage = {
@@ -43,28 +32,6 @@ export default function PersonaItems() {
   return (
     <section className="p-4 py-8">
       <div className="container mx-auto">
-        <Card className="w-full border-primary py-4">
-          <CardContent className="px-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <InputGroup className="min-w-xs border-primary">
-                  <InputGroupInput
-                    type="search"
-                    placeholder="Search persona or tag..."
-                  />
-                  <InputGroupAddon>
-                    <SearchIcon />
-                  </InputGroupAddon>
-                </InputGroup>
-              </div>
-              <div className="flex items-center justify-center gap-4">
-                <DomainFilterCombobox />
-                <OrderFilterCombobox />
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-        <div className="mt-4 flex items-center justify-between"></div>
         {!persona && (
           <p className="text-center text-muted-foreground">
             No personas found. Create your first persona!

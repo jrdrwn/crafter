@@ -1,6 +1,7 @@
 'use client';
 
 import { Plus } from 'lucide-react';
+import Link from 'next/link';
 
 import { Button } from '../ui/button';
 
@@ -40,10 +41,12 @@ export default function Hero() {
             </p>
           </div>
           <div>
-            <Button size={'lg'}>
-              <Plus />
-              Create New Persona
-            </Button>
+            <Link href="/create">
+              <Button size={'lg'}>
+                <Plus />
+                Create New Persona
+              </Button>
+            </Link>
           </div>
         </div>
       </div>

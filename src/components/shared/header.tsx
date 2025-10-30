@@ -39,24 +39,17 @@ export interface UserProfile {
 }
 
 export default function Header() {
-  const menus = [
+  const _menus = [
     {
       title: 'Home',
       href: '/',
     },
     {
-      title: 'Explore',
-      href: '/explore',
-    },
-    {
       title: 'Create',
       href: '/create',
     },
-    {
-      title: 'History',
-      href: '/history/guest',
-    },
   ];
+  const [menus, setMenus] = useState(_menus);
 
   const pathname = usePathname();
 
@@ -65,7 +58,6 @@ export default function Header() {
 
   async function fetchUserProfile(token: string) {
     const res = await fetch('/api/user/profile', {
-      cache: 'default',
       method: 'GET',
       headers: {
         Authorization: `Bearer ${token}`,
@@ -74,6 +66,19 @@ export default function Header() {
     if (res.ok) {
       const json = await res.json();
       setUserProfile(json.data);
+      setMenus([
+        ..._menus,
+        {
+          title: 'Explore',
+          href: '/explore',
+        },
+        {
+          title: 'History',
+          href: '/history',
+        },
+      ]);
+    } else {
+      console.log('Failed to fetch user profile');
     }
   }
 

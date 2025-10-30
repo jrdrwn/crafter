@@ -1,6 +1,8 @@
 'use client';
 
+import { Checkbox } from '@/components/ui/checkbox';
 import { Bot } from 'lucide-react';
+import { useEffect, useState } from 'react';
 import { Control, Controller } from 'react-hook-form';
 
 import {
@@ -10,9 +12,7 @@ import {
   CardHeader,
   CardTitle,
 } from '../../ui/card';
-import { Field } from '../../ui/field';
-import { Input } from '../../ui/input';
-import { Label } from '../../ui/label';
+import { Field, FieldLabel } from '../../ui/field';
 import {
   Select,
   SelectContent,
@@ -27,6 +27,42 @@ type Props = {
 };
 
 export default function LLMConfigCard({ control }: Props) {
+  const [languages, setLanguages] = useState<CreateFormValues['language'][]>(
+    [],
+  );
+  const [llmModels, setLlmModels] = useState<CreateFormValues['llmModel'][]>(
+    [],
+  );
+
+  async function fetchLlmModels() {
+    try {
+      const response = await fetch('/api/llm');
+      const data = await response.json();
+      if (data.status) {
+        setLlmModels(data.data);
+      }
+    } catch (error) {
+      console.error('Failed to fetch LLM models:', error);
+    }
+  }
+
+  async function fetchLanguages() {
+    try {
+      const response = await fetch('/api/language');
+      const data = await response.json();
+      if (data.status) {
+        setLanguages(data.data);
+      }
+    } catch (error) {
+      console.error('Failed to fetch languages:', error);
+    }
+  }
+
+  useEffect(() => {
+    fetchLanguages();
+    fetchLlmModels();
+  }, []);
+
   return (
     <div className="space-y-4">
       <Card className="col-span-1 w-full gap-2 border border-primary p-2">
@@ -47,8 +83,15 @@ export default function LLMConfigCard({ control }: Props) {
               <Field data-invalid={fieldState.invalid}>
                 <Select
                   name={field.name}
-                  value={(field.value as string) ?? 'gemini-2.5-flash-lite'}
-                  onValueChange={(val) => field.onChange(val)}
+                  value={(field.value.key as string) ?? 'gemini-2.5-flash-lite'}
+                  onValueChange={(val) =>
+                    field.onChange({
+                      key: val,
+                      label:
+                        llmModels.find((model) => model.key === val)?.label ||
+                        val,
+                    })
+                  }
                 >
                   <SelectTrigger
                     className="w-full border-primary"
@@ -57,15 +100,11 @@ export default function LLMConfigCard({ control }: Props) {
                     <SelectValue placeholder="Select LLM Model" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="gemini-2.5-flash-lite">
-                      Gemini 2.5 Flash Lite
-                    </SelectItem>
-                    <SelectItem value="gemini-2.5-flash">
-                      Gemini 2.5 Flash
-                    </SelectItem>
-                    <SelectItem value="gemini-2.5-pro">
-                      Gemini 2.5 Pro
-                    </SelectItem>
+                    {llmModels.map((model) => (
+                      <SelectItem key={model.key} value={model.key}>
+                        {model.label}
+                      </SelectItem>
+                    ))}
                   </SelectContent>
                 </Select>
               </Field>
@@ -74,23 +113,41 @@ export default function LLMConfigCard({ control }: Props) {
         </CardContent>
       </Card>
 
-      <div className="my-4 flex justify-between">
-        <Controller<CreateFormValues>
+      <div className="my-4 flex items-center justify-between">
+        <Controller
+          name="useRAG"
+          control={control}
+          render={({ field, fieldState }) => (
+            <Field data-invalid={fieldState.invalid}>
+              <FieldLabel className="flex items-center">
+                <Checkbox
+                  id={field.name}
+                  checked={field.value}
+                  aria-invalid={fieldState.invalid}
+                  onCheckedChange={(checked) => field.onChange(checked)}
+                />
+                <span className="text-xs text-muted-foreground">
+                  Use RAG (Retrieval-Augmented Generation)
+                </span>
+              </FieldLabel>
+            </Field>
+          )}
+        />
+        <Controller
           name="language"
           control={control}
           render={({ field, fieldState }) => {
-            const lang = field.value as
-              | CreateFormValues['language']
-              | undefined;
             return (
               <Field data-invalid={fieldState.invalid} className="w-42">
                 <Select
                   name={field.name}
-                  value={(lang?.key ?? 'en') as 'en' | 'id'}
+                  value={field.value.key}
                   onValueChange={(value) =>
                     field.onChange({
-                      key: value as 'en' | 'id',
-                      label: value === 'en' ? 'English' : 'Indonesia',
+                      key: value,
+                      label:
+                        languages.find((lang) => lang.key === value)?.label ||
+                        value,
                     })
                   }
                 >
@@ -101,34 +158,16 @@ export default function LLMConfigCard({ control }: Props) {
                     />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="en">English</SelectItem>
-                    <SelectItem value="id">Indonesia</SelectItem>
+                    {languages.map((language) => (
+                      <SelectItem key={language.key} value={language.key}>
+                        {language.label}
+                      </SelectItem>
+                    ))}
                   </SelectContent>
                 </Select>
               </Field>
             );
           }}
-        />
-        <Controller<CreateFormValues>
-          name="amount"
-          control={control}
-          render={({ field, fieldState }) => (
-            <Field data-invalid={fieldState.invalid} className="w-fit">
-              <Label htmlFor={field.name} className="flex items-center">
-                Amount?
-                <Input
-                  id={field.name}
-                  aria-invalid={fieldState.invalid}
-                  value={String(field.value ?? 1)}
-                  onChange={(e) => field.onChange(Number(e.target.value))}
-                  type="number"
-                  min={1}
-                  max={3}
-                  className="ml-2 w-16 border-primary"
-                />
-              </Label>
-            </Field>
-          )}
         />
       </div>
     </div>

@@ -23,8 +23,12 @@ type Props = {
 };
 
 export default function ContentLengthCard({ control }: Props) {
-  const [sliderValue, setSliderValue] = useState([1000]);
-  const [sliderDisabled, setSliderDisabled] = useState(true);
+  const [sliderValue, setSliderValue] = useState([
+    control._formValues.contentLength || 300,
+  ]);
+  const [sliderDisabled, setSliderDisabled] = useState(
+    control._formValues.contentLength <= 1000,
+  );
 
   return (
     <Card className="col-span-1 w-full border border-primary p-2">
@@ -44,7 +48,9 @@ export default function ContentLengthCard({ control }: Props) {
           render={({ field, fieldState }) => (
             <Field data-invalid={fieldState.invalid}>
               <RadioGroup
-                defaultValue={String(field.value ?? 1000)}
+                defaultValue={
+                  +field.value > 1000 ? 'custom' : String(field.value)
+                }
                 onValueChange={(value) => {
                   if (value === 'custom') {
                     setSliderDisabled(false);
@@ -81,7 +87,7 @@ export default function ContentLengthCard({ control }: Props) {
       </CardContent>
       <CardFooter className="border-t border-dashed px-2 pb-2">
         <div className="flex w-full items-center gap-2">
-          <Controller<CreateFormValues>
+          <Controller
             name="contentLength"
             control={control}
             render={({ field }) => (

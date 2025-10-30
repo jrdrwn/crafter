@@ -1,13 +1,18 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 'use client';
 
 import { cn } from '@/lib/utils';
+import { getCookie } from 'cookies-next/client';
 import parse from 'html-react-parser';
 import { Blend, List, Text, User } from 'lucide-react';
-import { useState } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
+import { useEffect, useState } from 'react';
+import { toast } from 'sonner';
 
 import { Badge } from '../ui/badge';
 import { Button } from '../ui/button';
 import { Card, CardContent } from '../ui/card';
+import { MinimalTiptap } from '../ui/shadcn-io/minimal-tiptap';
 
 // Extracted type for reuse across smaller components
 export type PersonaStyle = 'mixed' | 'bullets' | 'narative';
@@ -28,7 +33,7 @@ interface PersonaMarkdown {
 }
 
 // Smaller component: Header/Profile card
-function PersonaHeader({ markdown }: { markdown?: PersonaMarkdown }) {
+function PersonaHeader({ markdown }: { markdown?: any }) {
   return (
     <Card className="w-full border-primary bg-primary/5">
       <CardContent>
@@ -39,7 +44,7 @@ function PersonaHeader({ markdown }: { markdown?: PersonaMarkdown }) {
           <p className="text-2xl font-bold text-primary">
             {markdown?.result?.full_name ?? 'Persona Name'}
           </p>
-          <p className="text-lg text-gray-500 italic">
+          <p className="text-center text-lg text-gray-500 italic">
             {markdown?.result?.quote ?? '—'}
           </p>
           <div className="flex items-center justify-center gap-8">
@@ -47,7 +52,7 @@ function PersonaHeader({ markdown }: { markdown?: PersonaMarkdown }) {
               variant={'outline'}
               className="rounded-full border-primary text-primary"
             >
-              {markdown?.taxonomy?.domain?.label ?? '—'}
+              {markdown?.domain?.label ?? '—'}
             </Badge>
           </div>
         </div>
@@ -134,18 +139,94 @@ function PersonaContent({
     </Card>
   );
 }
+function PersonaContentEdit({
+  personaStyle,
+  markdown,
+}: {
+  personaStyle: PersonaStyle;
+  markdown?: any;
+}) {
+  const token = getCookie('token');
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const [mixedContent, setMixedContent] = useState<string>(
+    markdown?.result?.mixed || '',
+  );
+  const [bulletsContent, setBulletsContent] = useState<string>(
+    markdown?.result?.bullets || '',
+  );
+  const [narativeContent, setNarativeContent] = useState<string>(
+    markdown?.result?.narative || '',
+  );
 
-export default function Persona({ markdown }: { markdown?: PersonaMarkdown }) {
+  async function updatePersonaContent() {
+    const res = await fetch(`/api/persona/${markdown?.id}/content`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`,
+      },
+      body: JSON.stringify({
+        ...markdown?.result,
+        mixed: mixedContent,
+        bullets: bulletsContent,
+        narative: narativeContent,
+      }),
+    });
+
+    if (res.ok) {
+      toast.success('Persona content updated successfully!');
+    } else {
+      toast.error('Failed to update persona content.');
+    }
+    router.push(`?free_edit=true`);
+  }
+
+  useEffect(() => {
+    if (searchParams.get('save_edit')) {
+      updatePersonaContent();
+    }
+  }, [searchParams]);
+  if (!markdown) return null;
+  return (
+    <Card className="w-full border-primary p-0">
+      <div className="prose prose-lg max-w-full p-0 dark:prose-invert prose-headings:text-primary prose-h2:mb-2">
+        {personaStyle === 'mixed' && (
+          <MinimalTiptap content={mixedContent} onChange={setMixedContent} />
+        )}
+        {personaStyle === 'bullets' && (
+          <MinimalTiptap
+            content={bulletsContent}
+            onChange={setBulletsContent}
+          />
+        )}
+        {personaStyle === 'narative' && (
+          <MinimalTiptap
+            content={narativeContent}
+            onChange={setNarativeContent}
+          />
+        )}
+      </div>
+    </Card>
+  );
+}
+
+export default function Persona({ persona }: { persona?: any }) {
+  const searchParams = useSearchParams();
   const [personaStyle, setPersonaStyle] = useState<PersonaStyle>('mixed');
   return (
     <>
       <div className="col-span-2 space-y-4">
-        <PersonaHeader markdown={markdown} />
+        <PersonaHeader markdown={persona} />
         <PersonaStyleSelector
           personaStyle={personaStyle}
           setPersonaStyle={setPersonaStyle}
         />
-        <PersonaContent personaStyle={personaStyle} markdown={markdown} />
+        {searchParams.get('free_edit') ? (
+          <PersonaContentEdit personaStyle={personaStyle} markdown={persona} />
+        ) : (
+          <PersonaContent personaStyle={personaStyle} markdown={persona} />
+        )}
       </div>
     </>
   );
