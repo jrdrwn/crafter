@@ -14,12 +14,11 @@ import {
   SheetTitle,
   SheetTrigger,
 } from '@/components/ui/sheet';
+import { useUser } from '@/contexts/user-context';
 import { cn } from '@/lib/utils';
-import { deleteCookie, getCookie } from 'cookies-next/client';
 import { LogOut, Menu } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { useEffect, useState } from 'react';
 
 import {
   DropdownMenu,
@@ -31,62 +30,26 @@ import {
 } from '../ui/dropdown-menu';
 import Brand from './brand';
 
-export interface UserProfile {
-  id: string;
-  name: string;
-  email: string;
-  created_at: string;
-}
-
 export default function Header() {
-  const _menus = [
-    {
-      title: 'Home',
-      href: '/',
-    },
-    {
-      title: 'Create',
-      href: '/create',
-    },
+  const baseMenus = [
+    { title: 'Home', href: '/' },
+    { title: 'Create', href: '/create' },
   ];
-  const [menus, setMenus] = useState(_menus);
 
   const pathname = usePathname();
+  const { user, logout } = useUser();
 
-  const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
-  const jwtToken = getCookie('token');
+  const menus = user
+    ? [
+        ...baseMenus,
+        { title: 'Explore', href: '/explore' },
+        { title: 'History', href: '/history' },
+      ]
+    : baseMenus;
 
-  async function fetchUserProfile(token: string) {
-    const res = await fetch('/api/user/profile', {
-      method: 'GET',
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
-    if (res.ok) {
-      const json = await res.json();
-      setUserProfile(json.data);
-      setMenus([
-        ..._menus,
-        {
-          title: 'Explore',
-          href: '/explore',
-        },
-        {
-          title: 'History',
-          href: '/history',
-        },
-      ]);
-    } else {
-      console.log('Failed to fetch user profile');
-    }
-  }
-
-  useEffect(() => {
-    if (jwtToken) {
-      fetchUserProfile(jwtToken.toString());
-    }
-  }, [jwtToken]);
+  const userInitial = (user?.name ?? user?.email ?? '?')
+    .charAt(0)
+    .toUpperCase();
 
   return (
     <header className="w-full border-b border-dashed border-primary">
@@ -123,28 +86,23 @@ export default function Header() {
           </NavigationMenuList>
         </NavigationMenu>
         <div className="flex items-center gap-4">
-          {userProfile ? (
+          {user ? (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant="outline" size="icon" className="rounded-full">
-                  {userProfile.name.charAt(0).toUpperCase()}
+                  {userInitial}
                   <span className="sr-only">User menu</span>
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent>
                 <DropdownMenuLabel>My Profile</DropdownMenuLabel>
-                <DropdownMenuItem>{userProfile.name}</DropdownMenuItem>
-                <DropdownMenuItem>{userProfile.email}</DropdownMenuItem>
+                {user.name && <DropdownMenuItem>{user.name}</DropdownMenuItem>}
+                <DropdownMenuItem>{user.email}</DropdownMenuItem>
                 <DropdownMenuItem>
-                  {`Member since: ${new Date(userProfile.created_at).toLocaleDateString()}`}
+                  {`Member since: ${new Date(user.created_at).toLocaleDateString()}`}
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem
-                  onClick={() => {
-                    deleteCookie('token');
-                    location.reload();
-                  }}
-                >
+                <DropdownMenuItem onClick={logout}>
                   <LogOut />
                   Log out
                 </DropdownMenuItem>

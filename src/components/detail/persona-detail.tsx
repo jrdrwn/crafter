@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 'use client';
 
+import { useUser } from '@/contexts/user-context';
 import { getCookie } from 'cookies-next/client';
 import {
   ChevronLeft,
@@ -83,13 +84,12 @@ function BackToHistory() {
 
 function TopActions({
   persona,
-  profile,
   fetchPersona,
 }: {
   persona: any;
-  profile?: any;
   fetchPersona: (id: string) => void;
 }) {
+  const { user } = useUser();
   const searchParams = useSearchParams();
 
   const router = useRouter();
@@ -118,7 +118,7 @@ function TopActions({
         <Wifi />
         Online
       </Button>
-      {profile && persona.user.id === profile.id && (
+      {user && persona.user.id === user.id && (
         <>
           {!searchParams.get('free_edit') ? (
             <Link href={`?free_edit=true`}>
@@ -163,7 +163,7 @@ function TopActions({
           )}
         </>
       )}
-      {profile && persona.user.id !== profile.id && (
+      {user && persona.user.id !== user.id && (
         <Button onClick={copyThisPersona}>
           <Copy />
           Copy this Persona
@@ -343,28 +343,12 @@ function DownloadPersonaCard() {
   );
 }
 
-interface Profile {
-  id: number;
-  name: string;
-  email: string;
-}
-
 export default function PersonaDetail({ personaId }: { personaId: string }) {
-  const [profile, setProfile] = useState<Profile>();
+  const { user } = useUser();
   const _cookies = getCookie('token');
   const [persona, setPersona] = useState<PersonaAPIResponse['data'] | null>(
     null,
   );
-
-  async function fetchProfile() {
-    const res = await fetch('/api/user/profile', {
-      headers: {
-        Authorization: `Bearer ${_cookies}`,
-      },
-    });
-    const data = await res.json();
-    setProfile(data.data);
-  }
 
   async function fetchPersona(id: string) {
     try {
@@ -384,7 +368,6 @@ export default function PersonaDetail({ personaId }: { personaId: string }) {
 
   useEffect(() => {
     fetchPersona(personaId);
-    fetchProfile();
   }, []);
 
   if (!persona) {
@@ -396,11 +379,7 @@ export default function PersonaDetail({ personaId }: { personaId: string }) {
       <div className="container mx-auto">
         <div className="flex items-center justify-between">
           <BackToHistory />
-          <TopActions
-            persona={persona}
-            profile={profile}
-            fetchPersona={fetchPersona}
-          />
+          <TopActions persona={persona} fetchPersona={fetchPersona} />
         </div>
         <div className="mt-4 grid grid-cols-3 gap-8">
           {/* Left: Persona content */}
@@ -418,7 +397,7 @@ export default function PersonaDetail({ personaId }: { personaId: string }) {
                 persona?.updated_at ? new Date(persona.updated_at) : undefined
               }
             />
-            {profile && persona.user.id === profile.id && (
+            {user && persona.user.id === user.id && (
               <SharePersonaCard
                 persona={persona}
                 _visibility={persona.visibility}

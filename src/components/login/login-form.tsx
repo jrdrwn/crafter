@@ -1,5 +1,6 @@
 'use client';
 
+import { useUser } from '@/contexts/user-context';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { setCookie } from 'cookies-next/client';
 import {
@@ -40,6 +41,7 @@ const formSchema = z.object({
 });
 
 export default function LoginForm() {
+  const { refresh } = useUser();
   const router = useRouter();
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -72,8 +74,8 @@ export default function LoginForm() {
       toast('Login Berhasil', {
         icon: <BadgeCheck />,
       });
+      refresh();
       router.push('/');
-      router.refresh();
     } else {
       toast('Login Gagal', {
         description: json.message,

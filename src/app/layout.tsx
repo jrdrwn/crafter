@@ -1,4 +1,5 @@
 import { Toaster } from '@/components/ui/sonner';
+import { UserProvider } from '@/contexts/user-context';
 import type { Metadata } from 'next';
 import { Geist_Mono, Plus_Jakarta_Sans } from 'next/font/google';
 
@@ -29,7 +30,7 @@ export default function RootLayout({
       <body
         className={`${jakartaSans.variable} ${geistMono.variable} antialiased`}
       >
-        {children}
+        <UserProvider>{children}</UserProvider>
         <Toaster />
       </body>
     </html>

@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 'use client';
 
+import { useUser } from '@/contexts/user-context';
 import { getCookie } from 'cookies-next/client';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
@@ -11,30 +12,15 @@ import { Card, CardContent } from '../ui/card';
 import { Label } from '../ui/label';
 import { Switch } from '../ui/switch';
 
-interface Profile {
-  id: number;
-  name: string;
-  email: string;
-}
 export default function PersonaItems() {
   const token = getCookie('token');
   const [personas, setPersonas] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [profile, setProfile] = useState<Profile>();
+  const { user } = useUser();
   const [myPersonasOnly, setMyPersonasOnly] = useState(false);
 
   function toggleMyPersonasOnly() {
     setMyPersonasOnly(!myPersonasOnly);
-  }
-
-  async function fetchProfile() {
-    const res = await fetch('/api/user/profile', {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
-    const data = await res.json();
-    setProfile(data.data);
   }
 
   async function fetchPersonas() {
@@ -50,7 +36,6 @@ export default function PersonaItems() {
   }
 
   useEffect(() => {
-    fetchProfile();
     fetchPersonas();
   }, []);
   return (
@@ -94,7 +79,7 @@ export default function PersonaItems() {
             personas
               .filter(
                 (persona: any) =>
-                  !myPersonasOnly || persona.user.id == profile?.id,
+                  !myPersonasOnly || persona.user.id == user?.id,
               )
               .map((persona: any) => (
                 <Link key={persona.id} href={`/detail/${persona.id}`}>
@@ -112,7 +97,7 @@ export default function PersonaItems() {
                         year: 'numeric',
                       },
                     )}
-                    createdByMe={persona.user.id == profile?.id}
+                    createdByMe={persona.user.id == user?.id}
                   />
                 </Link>
               ))}
