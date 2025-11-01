@@ -30,7 +30,7 @@ export default function DomainCard({ control }: Props) {
   const domainInputRef = useRef<HTMLInputElement>(null);
 
   async function fetchDomains() {
-    const res = await fetch('/api/domain');
+    const res = await fetch('/api/persona/helper/domain');
     const json = await res.json();
     setDomains(json.data);
   }

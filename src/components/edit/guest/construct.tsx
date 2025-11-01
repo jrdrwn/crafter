@@ -109,7 +109,7 @@ export default function Design({ persona }: DesignProps) {
   async function onSubmit(data: CreateFormValues) {
     if (loading) return;
     setLoading(true);
-    const res = await fetch('/api/guest/chat', {
+    const res = await fetch('/api/persona/generate/guest', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(data),

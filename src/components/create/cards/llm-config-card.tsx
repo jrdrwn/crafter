@@ -36,7 +36,7 @@ export default function LLMConfigCard({ control }: Props) {
 
   async function fetchLlmModels() {
     try {
-      const response = await fetch('/api/llm');
+      const response = await fetch('/api/persona/helper/llm');
       const data = await response.json();
       if (data.status) {
         setLlmModels(data.data);
@@ -48,7 +48,7 @@ export default function LLMConfigCard({ control }: Props) {
 
   async function fetchLanguages() {
     try {
-      const response = await fetch('/api/language');
+      const response = await fetch('/api/persona/helper/language');
       const data = await response.json();
       if (data.status) {
         setLanguages(data.data);

@@ -41,7 +41,7 @@ export default function HumanFactorsCard({ control }: Props) {
   const externalDescInputRef = useRef<HTMLInputElement>(null);
 
   async function fetchAttributes() {
-    const res = await fetch('/api/attribute');
+    const res = await fetch('/api/persona/helper/attribute');
     const json = await res.json();
     setInternalFactors(json.data.internal);
     setExternalFactors(json.data.external);

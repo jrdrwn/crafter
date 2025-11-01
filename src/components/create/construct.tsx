@@ -115,7 +115,7 @@ export default function Design() {
     if (loading) return;
     setLoading(true);
     if (!_cookies) {
-      const res = await fetch('/api/guest/chat', {
+      const res = await fetch('/api/persona/generate/guest', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -145,7 +145,7 @@ export default function Design() {
         console.error('Failed to save personas to localStorage:', err);
       }
     } else {
-      const res = await fetch('/api/chat', {
+      const res = await fetch('/api/persona/generate', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
