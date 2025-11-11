@@ -1,4 +1,4 @@
-import { runPersonaRAG } from '@/lib/personaRagService';
+import { runPersonaRAG } from '@/lib/rag.service';
 import prisma from '@db';
 import { zValidator } from '@hono/zod-validator';
 import { layer, visibility } from '@prisma/client';
@@ -71,7 +71,23 @@ persona.post(
       },
     });
 
-    const result = await runPersonaRAG(json.llmModel.key, construct, 8);
+    const queryTerms = [
+      json.detail ?? '',
+      json.domain.key,
+      json.domain.label,
+      ...json.internal.map((f) => `${f.name} ${f.title} ${f.description}`),
+      ...json.external.map((f) => `${f.name} ${f.title} ${f.description}`),
+    ].filter(Boolean);
+
+    const result = await runPersonaRAG(json.llmModel.key, construct, {
+      topK: json.useRAG ? 8 : 0,
+      skipRAG: !json.useRAG,
+      filters: {
+        domain_key: json.domain.key,
+        language_key: json.language.key,
+      },
+      queryTerms,
+    });
 
     return c.json(result);
   },
@@ -139,15 +155,31 @@ persona.post(
       },
     });
 
-    // const jwtPayload = c.get('jwtPayload') as JWTPayload;
-    const result = await runPersonaRAG(json.llmModel.key, construct, 8);
+    const queryTerms = [
+      json.detail ?? '',
+      json.domain.key,
+      json.domain.label,
+      ...json.internal.map((f) => `${f.name} ${f.title} ${f.description}`),
+      ...json.external.map((f) => `${f.name} ${f.title} ${f.description}`),
+    ].filter(Boolean);
 
-    const domain = await prisma.domain.findUnique({
+    const result = await runPersonaRAG(json.llmModel.key, construct, {
+      topK: json.useRAG ? 8 : 0,
+      skipRAG: !json.useRAG,
+      filters: {
+        domain_key: json.domain.key,
+        language_key: json.language.key,
+        author_id: jwtPayload.sub,
+      },
+      queryTerms,
+    });
+
+    let domain = await prisma.domain.findUnique({
       where: { key: json.domain.key },
     });
 
     if (!domain) {
-      await prisma.domain.create({
+      domain = await prisma.domain.create({
         data: {
           key: json.domain.key,
           label: json.domain.label,
@@ -169,7 +201,7 @@ persona.post(
         result: result.result,
         max_length: json.contentLength,
         detail: json.detail,
-        domain_id: domain!.id,
+        domain_id: domain.id,
         visibility: visibility.private,
         llm_id: llmModel!.id,
         language_id: language!.id,
@@ -292,7 +324,24 @@ persona.put(
       where: { id: Number(id) },
     });
 
-    const result = await runPersonaRAG(json.llmModel.key, construct, 8);
+    const queryTerms = [
+      json.detail ?? '',
+      json.domain.key,
+      json.domain.label,
+      ...json.internal.map((f) => `${f.name} ${f.title} ${f.description}`),
+      ...json.external.map((f) => `${f.name} ${f.title} ${f.description}`),
+    ].filter(Boolean);
+
+    const result = await runPersonaRAG(json.llmModel.key, construct, {
+      topK: json.useRAG ? 8 : 0,
+      skipRAG: !json.useRAG,
+      filters: {
+        domain_key: json.domain.key,
+        language_key: json.language.key,
+        author_id: jwtPayload.sub,
+      },
+      queryTerms,
+    });
 
     const domain = await prisma.domain.findUnique({
       where: { key: json.domain.key },
@@ -328,19 +377,6 @@ persona.put(
         language_id: language!.id,
       },
     });
-
-    // const newPersona = await prisma.persona.create({
-    //   data: {
-    //     owner_id: jwtPayload.sub,
-    //     result: result.result,
-    //     max_length: json.contentLength,
-    //     detail: json.detail,
-    //     domain_id: domain!.id,
-    //     visibility: visibility.private,
-    //     llm_id: llmModel!.id,
-    //     language_id: language!.id,
-    //   },
-    // });
 
     // clean persona_attribute first
     await prisma.persona_attribute.deleteMany({
@@ -434,7 +470,7 @@ persona.delete('/:id', async (c) => {
   return c.json({ status: true, message: 'Persona deleted successfully' });
 });
 
-persona.get('', async (c) => {
+persona.get('/', async (c) => {
   const personas = await prisma.persona.findMany({
     where: { visibility: visibility.public },
     select: {

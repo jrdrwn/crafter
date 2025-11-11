@@ -44,6 +44,7 @@ export default function Header() {
         ...baseMenus,
         { title: 'Explore', href: '/explore' },
         { title: 'History', href: '/history' },
+        { title: 'Contribution', href: '/contribution' },
       ]
     : baseMenus;
 

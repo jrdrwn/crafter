@@ -6,6 +6,7 @@ import { handle } from 'hono/vercel';
 
 import { auth } from './auth';
 import { persona } from './persona';
+import { rag } from './rag';
 import { user } from './user';
 
 export type Variables = JwtVariables;
@@ -39,6 +40,7 @@ app.use(
 app.route('/', auth);
 app.route('/', persona);
 app.route('/', user);
+app.route('/', rag);
 
 export const GET = handle(app);
 export const POST = handle(app);
