@@ -1,5 +1,6 @@
 'use client';
 
+import { useUser } from '@/contexts/user-context';
 import { ChevronRight, Sparkles, Tags } from 'lucide-react';
 import Link from 'next/link';
 
@@ -7,6 +8,7 @@ import { Badge } from '../ui/badge';
 import { Button } from '../ui/button';
 
 export default function Hero() {
+  const { user } = useUser();
   return (
     <section className="relative border-b border-dashed border-primary px-2 py-16">
       <div className="container mx-auto flex flex-col justify-center lg:flex-row lg:justify-between">
@@ -35,7 +37,7 @@ export default function Hero() {
             New in CRAFTER 2.0: Persona Taxonomy
           </Badge>
           <h1
-            className="mb-6 max-w-4xl text-4xl leading-tight font-bold tracking-wide md:text-5xl"
+            className="mb-6 max-w-5xl text-4xl leading-tight font-bold tracking-wide md:text-5xl"
             style={{
               background: 'linear-gradient(180deg, #3A81F6 0%, #404040 100%)',
               backgroundClip: 'text',
@@ -43,26 +45,36 @@ export default function Hero() {
               WebkitTextFillColor: 'transparent',
             }}
           >
-            The AI-Powered Platform to Create User Personas Effortlessly
+            Crafting Recommendations and Advice for Tailored, Effective Personas
           </h1>
           <p className="mx-auto max-w-2xl text-xl text-muted-foreground">
-            Stop guessing. Let{' '}
-            <span className="font-medium">AI generate personas</span> that
+            Stop guessing. Let <span className="font-medium">CRAFTER</span> that
             uncover user goals, motivations, and frustrations in seconds.
           </p>
           <div className="mt-8 flex justify-center gap-8">
-            <Link href="/create">
-              <Button>
-                <Sparkles />
-                Continue as Guest
-              </Button>
-            </Link>
-            <Link href="/create-account">
-              <Button variant="secondary">
-                Join now!
-                <ChevronRight />
-              </Button>
-            </Link>
+            {user ? (
+              <Link href="/history">
+                <Button>
+                  <Sparkles />
+                  Go to History
+                </Button>
+              </Link>
+            ) : (
+              <>
+                <Link href="/create">
+                  <Button>
+                    <Sparkles />
+                    Continue as Guest
+                  </Button>
+                </Link>
+                <Link href="/create-account">
+                  <Button variant="secondary">
+                    Join now!
+                    <ChevronRight />
+                  </Button>
+                </Link>
+              </>
+            )}
           </div>
           <div className="mt-8">
             <p className="text-sm">Trusted by Leading Teams</p>
