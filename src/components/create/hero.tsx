@@ -35,7 +35,7 @@ export default function Hero() {
           <h1
             className="mb-6 max-w-4xl text-4xl leading-tight font-bold tracking-wide md:text-5xl"
             style={{
-              background: 'linear-gradient(180deg, #3A81F6 0%, #404040 100%)',
+              background: 'linear-gradient(180deg, #418945 0%, #404040 100%)',
               backgroundClip: 'text',
               WebkitBackgroundClip: 'text',
               WebkitTextFillColor: 'transparent',

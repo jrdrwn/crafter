@@ -36,8 +36,6 @@ persona_format:
   bullet:
     type: html
     structure:
-      - '<h2>Internal Layer</h2>'
-      - '<p>Core characteristics and personal attributes</p>'
       - '<h4>[LAYER-TITLE]</h4>'
       - |
         <ul>
@@ -53,8 +51,6 @@ persona_format:
         <li>[BULLET-LIST N]</li>
         </ul>
       - '<hr/>'
-      - '<h2>External Profile</h2>'
-      - '<p>Context, environment, and interactions</p>'
       - '<h4>[LAYER-TITLE]</h4>'
       - |
         <ul>
@@ -89,6 +85,7 @@ persona_format:
     - 'Intinya Anda harus mengikuti format yang sudah ditentukan di atas tapi boleh menambahkan sesuatu yang tidak ada di contoh one-shot asal tidak mengubah struktur dan format yang sudah ditentukan.'
     - '<br/> hanya boleh digunakan di dalam paragraf, tidak boleh di luar paragraf.'
     - '<hr/> tidak boleh double di dalam satu versi result.'
+    - 'jangan ada atribut yang tidak terisi meskipun memakai RAG'
 
 task:
   instruction: 'Buat 1 persona baru dalam format JSON yang berbeda dari contoh One-Shot di atas, mengikuti urutan dan format yang sama (Narative → Bullet → Mixed → JSON).'

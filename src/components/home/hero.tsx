@@ -11,6 +11,10 @@ export default function Hero() {
   const { user } = useUser();
   return (
     <section className="relative border-b border-dashed border-primary px-2 py-16">
+      <div className="">
+        <div className="absolute inset-x-12 top-0 bottom-0 bg-[radial-gradient(#41894533_1px,#f8f5f0_1px)] bg-[size:18px_18px]"></div>
+        <div className="absolute inset-x-12 top-0 bottom-0 bg-[radial-gradient(125%_125%_at_50%_10%,rgba(248,245,240,0)_55%,rgba(212,255,215,1)_100%)]"></div>
+      </div>
       <div className="container mx-auto flex flex-col justify-center lg:flex-row lg:justify-between">
         <div className="absolute inset-x-12 inset-y-0 border-x border-dashed border-primary">
           <span
@@ -39,7 +43,7 @@ export default function Hero() {
           <h1
             className="mb-6 max-w-5xl text-4xl leading-tight font-bold tracking-wide md:text-5xl"
             style={{
-              background: 'linear-gradient(180deg, #3A81F6 0%, #404040 100%)',
+              background: 'linear-gradient(180deg, #418945 0%, #404040 100%)',
               backgroundClip: 'text',
               WebkitBackgroundClip: 'text',
               WebkitTextFillColor: 'transparent',

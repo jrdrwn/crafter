@@ -30,6 +30,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import { Switch } from '@/components/ui/switch';
 import { Textarea } from '@/components/ui/textarea';
 import { useUser } from '@/contexts/user-context';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -47,13 +48,13 @@ import {
   Upload,
   X,
 } from 'lucide-react';
-import { useMemo, useState } from 'react';
+import { useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { toast } from 'sonner';
 import { z } from 'zod';
 
 const ContributionSchema = z.object({
-  text: z.string().min(1, 'Teks tidak boleh kosong'),
+  text: z.string().optional().default(''),
   type: z.enum(['survey', 'interview', 'review', 'doc'], {
     required_error: 'Jenis wajib dipilih',
   }),
@@ -192,7 +193,9 @@ function DomainCombobox({
                   }}
                 >
                   <Check
-                    className={`mr-2 size-4 ${d.key === value ? 'opacity-100' : 'opacity-0'}`}
+                    className={`mr-2 size-4 ${
+                      d.key === value ? 'opacity-100' : 'opacity-0'
+                    }`}
                   />
                   <div className="flex flex-col">
                     <span className="text-sm">{d.label}</span>
@@ -227,13 +230,24 @@ function DomainCombobox({
 export default function Contrib() {
   const { user, loading } = useUser();
   const [submitting, setSubmitting] = useState(false);
+  const [file, setFile] = useState<File | null>(null);
+
+  // section toggles
+  const [showText, setShowText] = useState(true);
+  const [showFile, setShowFile] = useState(false);
+  const [showMeta, setShowMeta] = useState(false);
+
+  // metadata builder state
+  const [metaKey, setMetaKey] = useState('');
+  const [metaValue, setMetaValue] = useState('');
+  const [metaObj, setMetaObj] = useState<Record<string, string>>({});
 
   const {
     register,
     control,
     handleSubmit,
     reset,
-    formState: { errors, isDirty },
+    formState: { errors },
     watch,
     setValue,
   } = useForm<ContributionForm>({
@@ -249,11 +263,33 @@ export default function Contrib() {
   });
 
   const textValue = watch('text');
-  const charCount = textValue?.length ?? 0;
-  const approxTokens = useMemo(
-    () => Math.ceil((charCount || 0) / 4),
-    [charCount],
-  );
+  const TOKEN_LIMIT = Number(process.env.NEXT_PUBLIC_RAG_TOKEN_LIMIT ?? 10000);
+
+  const rawText = (textValue ?? '').trim();
+  const textTokens = Math.ceil((rawText.length || 0) / 4);
+  const fileTokens = file ? Math.ceil(file.size / 4) : 0;
+  const activeTokens =
+    showFile && file ? fileTokens : showText ? textTokens : 0;
+
+  const hasText = rawText.length > 0;
+  const canSubmit =
+    ((showText && hasText) || (showFile && !!file)) &&
+    activeTokens <= TOKEN_LIMIT;
+
+  function addMetaPair() {
+    const k = metaKey.trim();
+    if (!k) return;
+    setMetaObj((prev) => ({ ...prev, [k]: metaValue }));
+    setMetaKey('');
+    setMetaValue('');
+  }
+  function removeMetaKey(k: string) {
+    setMetaObj((prev) => {
+      const next = { ...prev };
+      delete next[k];
+      return next;
+    });
+  }
 
   async function onSubmit(values: ContributionForm) {
     if (!user) {
@@ -266,56 +302,130 @@ export default function Contrib() {
       return;
     }
 
-    setSubmitting(true);
-    try {
-      const res = await fetch('/api/rag/contributions', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`,
-        },
-        body: JSON.stringify({
-          text: values.text,
-          type: values.type,
-          domain_key: values.domain_key || undefined,
-          language_key: values.language_key,
-          source: values.source || undefined,
-          extra: values.extra ? JSON.parse(values.extra) : undefined,
-        }),
-      });
+    if (!showText && !showFile) {
+      toast.error('Pilih minimal satu opsi: isi teks atau unggah file');
+      return;
+    }
 
-      if (!res.ok) {
-        const payload = await res.json().catch(() => ({}));
-        throw new Error(
-          (payload as { message?: string })?.message ||
-            'Gagal menyimpan kontribusi',
-        );
+    if (activeTokens > TOKEN_LIMIT) {
+      toast.error('Melebihi batas token', {
+        description: `Perkiraan token ${activeTokens} > limit ${TOKEN_LIMIT}. Kurangi ukuran input.`,
+      });
+      return;
+    }
+
+    // Jika ada file dan toggle file aktif, pakai alur upload file
+    if (showFile && file) {
+      const name = file.name.toLowerCase();
+      if (!/[.](txt|docx|xlsx)$/i.test(name)) {
+        toast.error('Format tidak didukung', {
+          description: 'Hanya .txt, .docx, atau .xlsx',
+        });
+        return;
       }
 
-      const json = (await res.json()) as {
-        status: boolean;
-        result?: { chunks: number };
-      };
-      toast.success('Kontribusi berhasil diunggah', {
-        description: `${json?.result?.chunks ?? 0} potongan disimpan ke RAG`,
-        icon: <CheckCircle2 className="size-4 text-green-600" />,
-      });
-      reset({
-        type: undefined,
-        language_key: 'en',
-        domain_key: '',
-        source: '',
-        text: '',
-        extra: '',
-      });
-    } catch (e) {
-      const message = e instanceof Error ? e.message : 'Terjadi kesalahan';
-      toast.error('Gagal', {
-        description: message,
-        icon: <AlertCircle className="size-4 text-red-600" />,
-      });
-    } finally {
-      setSubmitting(false);
+      setSubmitting(true);
+      try {
+        const type = watch('type') || 'doc';
+        const domain_key = watch('domain_key') || '';
+        const language_key = watch('language_key') || 'en';
+        const source = watch('source') || '';
+
+        const fd = new FormData();
+        fd.append('file', file);
+        fd.append('type', type);
+        if (domain_key) fd.append('domain_key', domain_key);
+        if (language_key) fd.append('language_key', language_key);
+        if (source) fd.append('source', source);
+        if (Object.keys(metaObj).length)
+          fd.append('extra', JSON.stringify(metaObj));
+
+        const res = await fetch('/api/rag/contributions/upload', {
+          method: 'POST',
+          headers: { Authorization: `Bearer ${token}` },
+          body: fd,
+        });
+        if (!res.ok) {
+          const payload = (await res.json().catch(() => ({}))) as {
+            message?: string;
+          };
+          throw new Error(payload?.message || 'Gagal mengunggah file');
+        }
+        const json = (await res.json()) as {
+          status: boolean;
+          result?: { chunks: number };
+        };
+        toast.success('File terunggah', {
+          description: `${json?.result?.chunks ?? 0} potongan disimpan ke RAG`,
+          icon: <CheckCircle2 className="size-4 text-green-600" />,
+        });
+        setFile(null);
+        return;
+      } catch (e) {
+        toast.error('Gagal', {
+          description: e instanceof Error ? e.message : 'Terjadi kesalahan',
+          icon: <AlertCircle className="size-4 text-red-600" />,
+        });
+        return;
+      } finally {
+        setSubmitting(false);
+      }
+    }
+
+    // Jika tidak ada file, gunakan alur teks
+    if (showText) {
+      setSubmitting(true);
+      try {
+        const res = await fetch('/api/rag/contributions', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`,
+          },
+          body: JSON.stringify({
+            text: values.text,
+            type: values.type,
+            domain_key: values.domain_key || undefined,
+            language_key: values.language_key,
+            source: values.source || undefined,
+            extra: Object.keys(metaObj).length ? metaObj : undefined,
+          }),
+        });
+
+        if (!res.ok) {
+          const payload = await res.json().catch(() => ({}));
+          throw new Error(
+            (payload as { message?: string })?.message ||
+              'Gagal menyimpan kontribusi',
+          );
+        }
+
+        const json = (await res.json()) as {
+          status: boolean;
+          result?: { chunks: number };
+        };
+        toast.success('Kontribusi berhasil diunggah', {
+          description: `${json?.result?.chunks ?? 0} potongan disimpan ke RAG`,
+          icon: <CheckCircle2 className="size-4 text-green-600" />,
+        });
+        reset({
+          type: undefined,
+          language_key: 'en',
+          domain_key: '',
+          source: '',
+          text: '',
+          extra: '',
+        });
+        setMetaObj({});
+      } catch (e) {
+        const message = e instanceof Error ? e.message : 'Terjadi kesalahan';
+        toast.error('Gagal', {
+          description: message,
+          icon: <AlertCircle className="size-4 text-red-600" />,
+        });
+      } finally {
+        setSubmitting(false);
+      }
     }
   }
 
@@ -346,10 +456,6 @@ export default function Contrib() {
                 diindeks ke vektor store.
               </CardDescription>
             </div>
-            <div className="hidden items-center gap-2 text-xs text-muted-foreground sm:flex">
-              <Database className="size-4" />
-              <span>{approxTokens} ~tokens</span>
-            </div>
           </div>
         </CardHeader>
         <CardContent>
@@ -361,6 +467,35 @@ export default function Contrib() {
               </p>
             </div>
           ) : null}
+
+          {/* Toggles */}
+          <div className="mt-4 grid gap-3 sm:grid-cols-3">
+            <div className="flex items-center justify-between rounded-md border p-3">
+              <div className="text-sm">
+                <p className="font-medium">Isi teks</p>
+                <p className="text-xs text-muted-foreground">
+                  Tulis/Tempel konten manual
+                </p>
+              </div>
+              <Switch checked={showText} onCheckedChange={setShowText} />
+            </div>
+            <div className="flex items-center justify-between rounded-md border p-3">
+              <div className="text-sm">
+                <p className="font-medium">Unggah file</p>
+                <p className="text-xs text-muted-foreground">TXT/DOCX/XLSX</p>
+              </div>
+              <Switch checked={showFile} onCheckedChange={setShowFile} />
+            </div>
+            <div className="flex items-center justify-between rounded-md border p-3">
+              <div className="text-sm">
+                <p className="font-medium">Tambahkan metadata</p>
+                <p className="text-xs text-muted-foreground">
+                  Key-Value untuk konteks
+                </p>
+              </div>
+              <Switch checked={showMeta} onCheckedChange={setShowMeta} />
+            </div>
+          </div>
 
           <form onSubmit={handleSubmit(onSubmit)} className="mt-6 space-y-6">
             <div className="grid gap-6 sm:grid-cols-2">
@@ -447,65 +582,130 @@ export default function Contrib() {
               </div>
             </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="text" className="flex items-center gap-2">
-                <FileText className="size-4" /> Isi Kontribusi
-              </Label>
-              <Textarea
-                id="text"
-                rows={10}
-                placeholder="Tempel teks mentah dari survey/interview/review/dokumen di sini..."
-                aria-invalid={!!errors.text}
-                {...register('text')}
-              />
-              <div className="flex items-center justify-between text-xs text-muted-foreground">
-                <span>
-                  {charCount} karakter • ~{approxTokens} token
-                </span>
-                <div className="flex items-center gap-2">
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="sm"
-                    onClick={fillExample}
-                  >
-                    Contoh
+            {showText ? (
+              <div className="space-y-2">
+                <Label htmlFor="text" className="flex items-center gap-2">
+                  <FileText className="size-4" /> Isi Kontribusi
+                </Label>
+                <Textarea
+                  id="text"
+                  rows={10}
+                  placeholder="Tempel teks mentah dari survey/interview/review/dokumen di sini..."
+                  aria-invalid={!!errors.text}
+                  {...register('text')}
+                />
+                <div className="flex items-center justify-between text-xs text-muted-foreground">
+                  <span></span>
+                  <div className="flex items-center gap-2">
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      onClick={fillExample}
+                    >
+                      Contoh
+                    </Button>
+                  </div>
+                </div>
+                {errors.text && (
+                  <p className="text-xs text-destructive">
+                    {errors.text.message}
+                  </p>
+                )}
+              </div>
+            ) : null}
+
+            {showMeta ? (
+              <div className="rounded-md border p-4">
+                <Label>Extra Metadata</Label>
+                <div className="mt-2 flex flex-col gap-2 sm:flex-row">
+                  <Input
+                    placeholder="key (mis. project)"
+                    value={metaKey}
+                    onChange={(e) => setMetaKey(e.target.value)}
+                  />
+                  <Input
+                    placeholder="value (mis. alpha)"
+                    value={metaValue}
+                    onChange={(e) => setMetaValue(e.target.value)}
+                  />
+                  <Button type="button" onClick={addMetaPair}>
+                    Tambah
                   </Button>
                 </div>
+                {Object.keys(metaObj).length ? (
+                  <ul className="mt-3 space-y-2">
+                    {Object.entries(metaObj).map(([k, v]) => (
+                      <li
+                        key={k}
+                        className="flex items-center justify-between rounded border px-2 py-1 text-sm"
+                      >
+                        <span className="truncate">
+                          <strong>{k}:</strong> {String(v)}
+                        </span>
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => removeMetaKey(k)}
+                        >
+                          Hapus
+                        </Button>
+                      </li>
+                    ))}
+                  </ul>
+                ) : (
+                  <p className="mt-2 text-xs text-muted-foreground">
+                    Belum ada metadata ditambahkan.
+                  </p>
+                )}
               </div>
-              {errors.text && (
-                <p className="text-xs text-destructive">
-                  {errors.text.message}
-                </p>
-              )}
-            </div>
+            ) : null}
 
-            <div className="space-y-2">
-              <Label htmlFor="extra">Extra Metadata (JSON opsional)</Label>
-              <Textarea
-                id="extra"
-                rows={4}
-                placeholder='{"project":"alpha","priority":"high"}'
-                aria-invalid={!!errors.extra}
-                {...register('extra')}
-              />
-              {errors.extra && (
-                <p className="text-xs text-destructive">
-                  {errors.extra.message}
-                </p>
-              )}
-            </div>
+            {showFile ? (
+              <div className="rounded-md border p-4">
+                <Label htmlFor="file">Unggah file (.txt, .docx, .xlsx)</Label>
+                <div className="mt-2 flex items-center gap-3">
+                  <Input
+                    id="file"
+                    type="file"
+                    accept=".txt,.docx,.xlsx"
+                    onChange={(e) => setFile(e.target.files?.[0] ?? null)}
+                  />
+                </div>
+                {file ? (
+                  <p className="mt-2 text-xs text-muted-foreground">
+                    Dipilih: {file.name} ({Math.ceil(file.size / 1024)} KB)
+                  </p>
+                ) : null}
+              </div>
+            ) : null}
 
             <div className="flex items-center justify-between">
-              <p className="text-xs text-muted-foreground">
-                Data akan diindeks ke tabel vektor dan digunakan sebagai konteks
-                RAG.
-              </p>
+              <span className="flex items-center gap-1 text-xs text-muted-foreground">
+                <Database className="size-4" />
+                {activeTokens > 0
+                  ? `Perkiraan ${activeTokens}/${TOKEN_LIMIT} tokens`
+                  : `Batas ${TOKEN_LIMIT} tokens`}
+              </span>
               <Button
                 type="submit"
-                disabled={submitting || loading || !user || !isDirty}
+                disabled={submitting || loading || !user || !canSubmit}
+                aria-disabled={submitting || loading || !user || !canSubmit}
+                title={
+                  activeTokens > TOKEN_LIMIT
+                    ? 'Melebihi batas token'
+                    : !((showText && hasText) || (showFile && !!file))
+                      ? 'Isi teks atau pilih file terlebih dahulu'
+                      : undefined
+                }
               >
-                <Upload className="size-4" /> Unggah ke RAG
+                {submitting ? (
+                  <Upload className="mr-2 size-4 animate-pulse" />
+                ) : (
+                  <Upload className="mr-2 size-4" />
+                )}
+                Unggah ke RAG
               </Button>
             </div>
           </form>

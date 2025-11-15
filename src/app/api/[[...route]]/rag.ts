@@ -5,8 +5,11 @@ import {
   listUserContributions,
   updateContribution,
 } from '@/lib/ingestion';
+import { normalizeToRAGNote } from '@/lib/rag.service';
 import { zValidator } from '@hono/zod-validator';
 import { Hono } from 'hono';
+import mammoth from 'mammoth';
+import * as XLSX from 'xlsx';
 import { z } from 'zod';
 
 import type { JWTPayload } from './types';
@@ -105,6 +108,105 @@ rag.delete('/contributions/:id', async (c) => {
     if ((e as Error).message === 'not_found')
       return c.json({ status: false, message: 'Not found' }, 404);
     throw e;
+  }
+});
+
+rag.post('/contributions/upload', async (c) => {
+  const jwt = c.get('jwtPayload') as JWTPayload | undefined;
+  if (!jwt?.sub) return c.json({ status: false, message: 'Unauthorized' }, 401);
+
+  const form = await c.req.formData();
+  const file = form.get('file');
+  if (!(file instanceof File)) {
+    return c.json({ status: false, message: 'No file uploaded' }, 400);
+  }
+
+  const type = (form.get('type') as string) || 'doc';
+  const domain_key = (form.get('domain_key') as string) || undefined;
+  const language_key = (form.get('language_key') as 'en' | 'id' | null) || null;
+  const source = (form.get('source') as string) || undefined;
+  const extraStr = (form.get('extra') as string) || '';
+  let extra: Record<string, unknown> | undefined;
+  try {
+    if (extraStr) extra = JSON.parse(extraStr);
+  } catch {
+    // ignore bad json
+  }
+
+  const name = file.name?.toLowerCase() || 'upload';
+  const buf = Buffer.from(await file.arrayBuffer());
+
+  function stripHtmlToText(html: string) {
+    return html
+      .replace(/<style[^>]*>[\s\S]*?<\/style>/gi, '')
+      .replace(/<script[^>]*>[\s\S]*?<\/script>/gi, '')
+      .replace(/<br\s*\/?>/gi, '\n')
+      .replace(/<\/(p|div|h\d|li|tr)>/gi, '\n')
+      .replace(/<li>/gi, '- ')
+      .replace(/<[^>]+>/g, '')
+      .replace(/\n{3,}/g, '\n\n')
+      .trim();
+  }
+
+  async function extractText(): Promise<string> {
+    if (name.endsWith('.txt')) {
+      return buf.toString('utf-8');
+    }
+    if (name.endsWith('.docx')) {
+      const { value } = await mammoth.convertToHtml({ buffer: buf });
+      return stripHtmlToText(value);
+    }
+    if (name.endsWith('.xlsx')) {
+      const wb = XLSX.read(buf, { type: 'buffer' });
+      const parts: string[] = [];
+      for (const sheetName of wb.SheetNames) {
+        const ws = wb.Sheets[sheetName];
+        const csv = XLSX.utils.sheet_to_csv(ws, { FS: ',', RS: '\n' });
+        parts.push(`# Sheet: ${sheetName}\n\n${csv}`);
+      }
+      return parts.join('\n\n---\n\n');
+    }
+    throw new Error('Unsupported file type. Use .txt, .docx, or .xlsx');
+  }
+
+  try {
+    const rawText = (await extractText()).trim();
+    if (!rawText) throw new Error('File content is empty');
+
+    const normalized = await normalizeToRAGNote(rawText, {
+      language: language_key ?? undefined,
+      domain: domain_key,
+      source,
+      filename: file.name,
+      format: name.split('.').pop() || 'unknown',
+    });
+
+    const allowed: readonly string[] = ['survey', 'interview', 'review', 'doc'];
+    const finalType = allowed.includes(type)
+      ? (type as 'survey' | 'interview' | 'review' | 'doc')
+      : 'doc';
+
+    const result = await ingestContribution({
+      text: normalized,
+      type: finalType,
+      domain_key,
+      language_key: language_key ?? undefined,
+      author_id: jwt.sub,
+      source,
+      extra: {
+        ...(extra || {}),
+        original_filename: file.name,
+        original_format: name.split('.').pop() || 'unknown',
+        normalized: true,
+      },
+    });
+
+    return c.json({ status: true, result });
+  } catch (e) {
+    return c.json(
+      { status: false, message: e instanceof Error ? e.message : String(e) },
+      400,
+    );
   }
 });
 

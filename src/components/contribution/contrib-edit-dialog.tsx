@@ -1,5 +1,6 @@
 'use client';
 
+import DomainCombobox from '@/components/shared/domain-combobox';
 import { Button } from '@/components/ui/button';
 import {
   Dialog,
@@ -32,22 +33,6 @@ const EditSchema = z.object({
   domain_key: z.string().optional().or(z.literal('')),
   language_key: z.enum(['en', 'id']).optional(),
   source: z.string().optional().or(z.literal('')),
-  extra: z
-    .string()
-    .optional()
-    .transform((v) => (v ? v.trim() : ''))
-    .refine(
-      (v) => {
-        if (!v) return true;
-        try {
-          const parsed = JSON.parse(v);
-          return typeof parsed === 'object' && parsed !== null;
-        } catch {
-          return false;
-        }
-      },
-      { message: 'Extra harus berupa JSON valid' },
-    ),
 });
 
 type EditForm = z.input<typeof EditSchema>;
@@ -68,6 +53,11 @@ export function ContribEditDialog({
   const [loading, setLoading] = useState(false);
   const [initializing, setInitializing] = useState(false);
 
+  // metadata builder state (key-value)
+  const [metaKey, setMetaKey] = useState('');
+  const [metaValue, setMetaValue] = useState('');
+  const [metaObj, setMetaObj] = useState<Record<string, string>>({});
+
   const {
     register,
     control,
@@ -83,7 +73,6 @@ export function ContribEditDialog({
       language_key: 'en',
       domain_key: '',
       source: '',
-      extra: '',
     },
   });
 
@@ -93,6 +82,21 @@ export function ContribEditDialog({
     () => Math.ceil((charCount || 0) / 4),
     [charCount],
   );
+
+  function addMetaPair() {
+    const k = metaKey.trim();
+    if (!k) return;
+    setMetaObj((prev) => ({ ...prev, [k]: metaValue }));
+    setMetaKey('');
+    setMetaValue('');
+  }
+  function removeMetaKey(k: string) {
+    setMetaObj((prev) => {
+      const next = { ...prev };
+      delete next[k];
+      return next;
+    });
+  }
 
   useEffect(() => {
     async function loadDetail() {
@@ -121,11 +125,23 @@ export function ContribEditDialog({
           domain_key: data.domain_key ?? '',
           language_key: (data.language_key as 'en' | 'id' | null) ?? undefined,
           source: data.source ?? '',
-          extra:
-            data.metadata && typeof data.metadata === 'object'
-              ? JSON.stringify(data.metadata)
-              : '',
         });
+        // preload metadata builder
+        if (
+          data.metadata &&
+          typeof data.metadata === 'object' &&
+          !Array.isArray(data.metadata)
+        ) {
+          const obj = data.metadata as Record<string, unknown>;
+          const initial: Record<string, string> = {};
+          for (const [k, v] of Object.entries(obj)) {
+            if (k === 'doc_id' || k === 'chunk_index') continue; // internal keys
+            initial[k] = typeof v === 'string' ? v : JSON.stringify(v);
+          }
+          setMetaObj(initial);
+        } else {
+          setMetaObj({});
+        }
       } catch (e) {
         toast.error('Gagal memuat', {
           description: e instanceof Error ? e.message : String(e),
@@ -155,7 +171,7 @@ export function ContribEditDialog({
           domain_key: values.domain_key || undefined,
           language_key: values.language_key,
           source: values.source || undefined,
-          extra: values.extra ? JSON.parse(values.extra) : undefined,
+          extra: Object.keys(metaObj).length ? metaObj : undefined,
         }),
       });
       if (!res.ok) throw new Error('Gagal menyimpan perubahan');
@@ -228,11 +244,21 @@ export function ContribEditDialog({
               </div>
               <div className="space-y-2 sm:col-span-2">
                 <Label htmlFor="domain_key">Domain</Label>
-                <Input
-                  id="domain_key"
-                  placeholder="mis. ecommerce"
-                  {...register('domain_key')}
+                <Controller
+                  name="domain_key"
+                  control={control}
+                  render={({ field }) => (
+                    <DomainCombobox
+                      value={field.value}
+                      onChangeAction={field.onChange}
+                    />
+                  )}
                 />
+                {errors.domain_key && (
+                  <p className="text-xs text-destructive">
+                    {errors.domain_key.message as string}
+                  </p>
+                )}
               </div>
               <div className="space-y-2 sm:col-span-2">
                 <Label htmlFor="source">Sumber</Label>
@@ -246,7 +272,12 @@ export function ContribEditDialog({
 
             <div className="space-y-2">
               <Label htmlFor="text">Isi</Label>
-              <Textarea id="text" rows={8} {...register('text')} />
+              <Textarea
+                id="text"
+                rows={8}
+                className="field-sizing-fixed max-h-29 min-h-29 resize-none"
+                {...register('text')}
+              />
               {errors.text && (
                 <p className="text-xs text-destructive">
                   {errors.text.message}
@@ -257,17 +288,48 @@ export function ContribEditDialog({
               </p>
             </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="extra">Extra Metadata (JSON)</Label>
-              <Textarea
-                id="extra"
-                rows={4}
-                placeholder='{"project":"alpha"}'
-                {...register('extra')}
-              />
-              {errors.extra && (
-                <p className="text-xs text-destructive">
-                  {errors.extra.message}
+            {/* Metadata builder */}
+            <div className="rounded-md border p-4">
+              <Label>Extra Metadata</Label>
+              <div className="mt-2 flex flex-col gap-2 sm:flex-row">
+                <Input
+                  placeholder="key (mis. project)"
+                  value={metaKey}
+                  onChange={(e) => setMetaKey(e.target.value)}
+                />
+                <Input
+                  placeholder="value (mis. alpha)"
+                  value={metaValue}
+                  onChange={(e) => setMetaValue(e.target.value)}
+                />
+                <Button type="button" onClick={addMetaPair}>
+                  Tambah
+                </Button>
+              </div>
+              {Object.keys(metaObj).length ? (
+                <ul className="mt-3 space-y-2">
+                  {Object.entries(metaObj).map(([k, v]) => (
+                    <li
+                      key={k}
+                      className="flex items-center justify-between rounded border px-2 py-1 text-sm"
+                    >
+                      <span className="truncate">
+                        <strong>{k}:</strong> {String(v)}
+                      </span>
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => removeMetaKey(k)}
+                      >
+                        Hapus
+                      </Button>
+                    </li>
+                  ))}
+                </ul>
+              ) : (
+                <p className="mt-2 text-xs text-muted-foreground">
+                  Belum ada metadata ditambahkan.
                 </p>
               )}
             </div>

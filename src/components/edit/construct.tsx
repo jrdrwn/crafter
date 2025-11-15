@@ -3,20 +3,37 @@
 import AdditionalDetailsCard from '@/components/create/cards/additional-details-card';
 import ContentLengthCard from '@/components/create/cards/content-length-card';
 import DomainCard from '@/components/create/cards/domain-card';
-import HumanFactorsCard from '@/components/create/cards/human-factors-card';
+import ExternalFactorsCard from '@/components/create/cards/external-factors-card';
+import InternalFactorsCard from '@/components/create/cards/internal-factors-card';
 import LLMConfigCard from '@/components/create/cards/llm-config-card';
 import type { CreateFormValues } from '@/components/create/types';
 import { cn } from '@/lib/utils';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { defineStepper } from '@stepperize/react';
 import { getCookie } from 'cookies-next/client';
-import { Sparkles } from 'lucide-react';
+import {
+  Building2,
+  CheckCircle2,
+  Cpu,
+  Database,
+  FileText,
+  Languages,
+  Layers,
+  Ruler,
+  SlidersHorizontal,
+  Sparkles,
+  StickyNote,
+} from 'lucide-react';
 import { useRouter } from 'next/navigation';
-import { useState } from 'react';
+import { Fragment, useMemo, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
 import z from 'zod';
 
+import { Badge } from '../ui/badge';
 import { Button } from '../ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
+import { Separator } from '../ui/separator';
 import { Spinner } from '../ui/spinner';
 
 const formSchema = z.object({
@@ -78,6 +95,14 @@ export interface PersonaData {
   language: { key: string; label: string };
 }
 
+const { useStepper, steps, utils } = defineStepper(
+  { id: 'domain', label: 'Domain' },
+  { id: 'internal', label: 'Internal Layer' },
+  { id: 'external', label: 'External Layer' },
+  { id: 'additional', label: 'Additional Settings' },
+  { id: 'review', label: 'Review' },
+);
+
 export default function Design({
   personaId,
   persona,
@@ -85,12 +110,16 @@ export default function Design({
   personaId: string;
   persona: PersonaData;
 }) {
+  const stepper = useStepper();
+  const currentIndex = utils.getIndex(stepper.current.id);
+
   const _cookies = getCookie('token');
   const router = useRouter();
   const [loading, setLoading] = useState(false);
 
   const form = useForm<CreateFormValues>({
     resolver: zodResolver(formSchema),
+    mode: 'onChange',
     defaultValues: {
       domain: persona?.domain ?? { key: 'health', label: 'Health' },
       internal: persona?.persona_attribute
@@ -139,45 +168,294 @@ export default function Design({
     setLoading(false);
   }
 
+  const stepFields = useMemo(
+    () => ({
+      domain: ['domain'],
+      internal: ['internal'],
+      external: ['external'],
+      additional: ['contentLength', 'llmModel', 'language', 'useRAG', 'detail'],
+      review: [] as (keyof CreateFormValues)[],
+    }),
+    [],
+  );
+
+  const handleNext = async () => {
+    const currentId = stepper.current.id as keyof typeof stepFields;
+    const fields = stepFields[currentId] as (keyof CreateFormValues)[];
+    const ok = fields.length
+      ? await form.trigger(fields as Parameters<typeof form.trigger>[0], {
+          shouldFocus: true,
+        })
+      : true;
+    if (ok) stepper.next();
+  };
+
   return (
     <section className="p-4 py-16">
       <form
         onSubmit={form.handleSubmit(onSubmit)}
-        className="container mx-auto grid grid-cols-3 gap-8"
+        className="container mx-auto flex flex-col gap-6"
       >
-        {/* Domain */}
-        <DomainCard control={form.control} />
-        {/* Human Factors */}
-        <HumanFactorsCard control={form.control} />
-        {/* Content Length */}
-        <ContentLengthCard control={form.control} />
-        {/* Submit + LLM */}
-        <div>
-          <LLMConfigCard control={form.control} />
-          <Button
-            className={cn('w-full', loading && 'cursor-not-allowed')}
-            type="submit"
-            disabled={loading}
-          >
-            {loading ? (
-              <>
-                <Spinner /> Editing...{' '}
-              </>
-            ) : (
-              <>
-                <Sparkles />
-                Edit persona
-              </>
-            )}
-          </Button>
-          <p className="mt-2 text-center text-xs text-gray-500">
-            By clicking{' '}
-            <span className="text-primary">&quot;Edit persona&quot;</span>, you
-            agree to our Terms of Service and Privacy Policy.
-          </p>
+        {/* Headless navigation */}
+        <nav aria-label="Edit Steps" className="group my-2">
+          <ol className="flex items-center justify-between gap-2">
+            {steps.map((s, idx, arr) => (
+              <Fragment key={s.id}>
+                <li key={s.id} className="flex shrink-0 items-center gap-3">
+                  <Button
+                    type="button"
+                    role="tab"
+                    variant={idx <= currentIndex ? 'default' : 'secondary'}
+                    aria-current={
+                      stepper.current.id === s.id ? 'step' : undefined
+                    }
+                    aria-posinset={idx + 1}
+                    aria-setsize={steps.length}
+                    aria-selected={stepper.current.id === s.id}
+                    className="flex size-10 items-center justify-center rounded-full"
+                    onClick={async () => {
+                      if (idx <= currentIndex) {
+                        stepper.goTo(s.id);
+                        return;
+                      }
+                      if (idx - currentIndex > 1) return;
+                      const fields = stepFields[
+                        stepper.current.id as keyof typeof stepFields
+                      ] as (keyof CreateFormValues)[];
+                      const valid = fields.length
+                        ? await form.trigger(
+                            fields as Parameters<typeof form.trigger>[0],
+                            { shouldFocus: true },
+                          )
+                        : true;
+                      if (!valid) return;
+                      stepper.goTo(s.id);
+                    }}
+                  >
+                    {idx + 1}
+                  </Button>
+                  <span className="text-sm font-medium">{s.label}</span>
+                </li>
+                {idx < arr.length - 1 && (
+                  <Separator
+                    className={`${idx < currentIndex ? 'bg-primary' : 'bg-muted'} flex-1`}
+                  />
+                )}
+              </Fragment>
+            ))}
+          </ol>
+        </nav>
+
+        <div className="mt-6">
+          {stepper.switch({
+            domain: () => (
+              <div className="grid grid-cols-3 gap-8">
+                <DomainCard control={form.control} />
+              </div>
+            ),
+            internal: () => (
+              <div className="grid grid-cols-3 gap-8">
+                <InternalFactorsCard control={form.control} />
+              </div>
+            ),
+            external: () => (
+              <div className="grid grid-cols-3 gap-8">
+                <ExternalFactorsCard control={form.control} />
+              </div>
+            ),
+            additional: () => (
+              <div className="grid grid-cols-3 gap-8">
+                <div>
+                  <ContentLengthCard control={form.control} />
+                </div>
+                <div>
+                  <LLMConfigCard control={form.control} />
+                </div>
+                <div>
+                  <AdditionalDetailsCard control={form.control} />
+                </div>
+              </div>
+            ),
+            review: () => (
+              <div className="grid grid-cols-3 gap-8">
+                <div className="col-span-3">
+                  <div className="mb-1 flex items-center gap-2">
+                    <CheckCircle2 className="h-5 w-5 text-primary" />
+                    <h3 className="text-lg font-semibold">
+                      Review your inputs
+                    </h3>
+                  </div>
+                  <p className="text-sm text-muted-foreground">
+                    Make sure everything looks correct before editing.
+                  </p>
+                </div>
+
+                <Card>
+                  <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                    <CardTitle className="text-sm font-medium">
+                      Overview
+                    </CardTitle>
+                    <FileText className="h-4 w-4 text-primary" />
+                  </CardHeader>
+                  <CardContent className="space-y-3 text-sm">
+                    <div className="flex items-center gap-2">
+                      <Building2 className="h-4 w-4 text-muted-foreground" />
+                      <span className="font-medium">Domain:</span>
+                      <Badge variant="secondary">
+                        {form.getValues('domain')?.label || '-'}
+                      </Badge>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Cpu className="h-4 w-4 text-muted-foreground" />
+                      <span className="font-medium">Model:</span>
+                      <span>{form.getValues('llmModel')?.label}</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Languages className="h-4 w-4 text-muted-foreground" />
+                      <span className="font-medium">Language:</span>
+                      <span>{form.getValues('language')?.label}</span>
+                    </div>
+                  </CardContent>
+                </Card>
+
+                <Card>
+                  <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                    <CardTitle className="text-sm font-medium">
+                      Factors
+                    </CardTitle>
+                    <Layers className="h-4 w-4 text-primary" />
+                  </CardHeader>
+                  <CardContent className="space-y-4 text-sm">
+                    <div>
+                      <div className="mb-2 flex items-center gap-2">
+                        <span className="font-medium">Internal</span>
+                        <span className="text-xs text-muted-foreground">
+                          ({form.getValues('internal')?.length || 0})
+                        </span>
+                      </div>
+                      <div className="flex flex-wrap gap-2">
+                        {(form.getValues('internal') || []).map((i) => (
+                          <Badge key={i.name} variant="secondary">
+                            {i.title}
+                          </Badge>
+                        ))}
+                      </div>
+                    </div>
+                    <Separator />
+                    <div>
+                      <div className="mb-2 flex items-center gap-2">
+                        <span className="font-medium">External</span>
+                        <span className="text-xs text-muted-foreground">
+                          ({form.getValues('external')?.length || 0})
+                        </span>
+                      </div>
+                      <div className="flex flex-wrap gap-2">
+                        {(form.getValues('external') || []).map((e) => (
+                          <Badge key={e.name} variant="outline">
+                            {e.title}
+                          </Badge>
+                        ))}
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+
+                <Card>
+                  <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                    <CardTitle className="text-sm font-medium">
+                      Generation Settings
+                    </CardTitle>
+                    <SlidersHorizontal className="h-4 w-4 text-primary" />
+                  </CardHeader>
+                  <CardContent className="space-y-3 text-sm">
+                    <div className="flex items-center gap-2">
+                      <Ruler className="h-4 w-4 text-muted-foreground" />
+                      <span className="font-medium">Content length:</span>
+                      <span>{form.getValues('contentLength')}</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Database className="h-4 w-4 text-muted-foreground" />
+                      <span className="font-medium">Use RAG:</span>
+                      <Badge
+                        variant={
+                          form.getValues('useRAG') ? 'default' : 'secondary'
+                        }
+                      >
+                        {form.getValues('useRAG') ? 'Enabled' : 'Disabled'}
+                      </Badge>
+                    </div>
+                    <div className="flex items-start gap-2">
+                      <StickyNote className="mt-0.5 h-4 w-4 text-muted-foreground" />
+                      <div className="w-full">
+                        <span className="font-medium">Detail</span>
+                        <p className="mt-1 max-h-28 overflow-auto rounded bg-muted/40 p-2 text-xs whitespace-pre-line text-muted-foreground">
+                          {form.getValues('detail') || '-'}
+                        </p>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
+            ),
+          })}
         </div>
-        {/* Additional details */}
-        <AdditionalDetailsCard control={form.control} />
+
+        {/* Controls */}
+        <div
+          className={cn(
+            'mt-6 flex items-center',
+            stepper.isLast ? 'justify-between' : 'justify-end gap-4',
+          )}
+        >
+          {stepper.isLast ? (
+            <>
+              <p className="text-xs text-muted-foreground">
+                By clicking &quot;Edit persona&quot;, you agree to our Terms of
+                Service and Privacy Policy.
+              </p>
+              <div className="flex items-center gap-4">
+                <Button
+                  type="button"
+                  variant="secondary"
+                  onClick={stepper.prev}
+                  disabled={stepper.isFirst}
+                >
+                  Back
+                </Button>
+                <Button
+                  className={cn('w-48', loading && 'cursor-not-allowed')}
+                  type="submit"
+                  disabled={loading}
+                >
+                  {loading ? (
+                    <>
+                      <Spinner /> Editing...{' '}
+                    </>
+                  ) : (
+                    <>
+                      <Sparkles />
+                      Edit persona
+                    </>
+                  )}
+                </Button>
+              </div>
+            </>
+          ) : (
+            <>
+              <Button
+                type="button"
+                variant="secondary"
+                onClick={stepper.prev}
+                disabled={stepper.isFirst}
+              >
+                Back
+              </Button>
+              <Button type="button" onClick={handleNext}>
+                Next
+              </Button>
+            </>
+          )}
+        </div>
       </form>
     </section>
   );

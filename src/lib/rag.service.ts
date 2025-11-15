@@ -85,11 +85,76 @@ function joinDocs(docs: Document[]) {
     .join('\n\n');
 }
 
-type RagFilters = {
+export type RagFilters = {
   domain_key?: string;
   language_key?: 'en' | 'id';
   author_id?: number | string;
 };
+
+export async function normalizeToRAGNote(
+  rawText: string,
+  meta?: {
+    language?: 'en' | 'id';
+    domain?: string;
+    source?: string;
+    filename?: string;
+    format?: string;
+  },
+) {
+  const lang = meta?.language ?? 'en';
+  const llm = new ChatGoogleGenerativeAI({
+    model: 'gemini-2.5-flash-lite',
+    apiKey: API_KEY!,
+    temperature: 0.2,
+  });
+
+  const sys = `You are a data cleaning assistant. Normalize messy user-provided content into a consistent RAG knowledge note in Markdown. Keep facts faithful. If the input is tabular (CSV/Excel), convert to a clean Markdown table and include a short summary.
+
+Output strictly in this Markdown structure:
+
+# Title
+
+- Source: <source or filename>
+- Domain: <domain or ->
+- Language: <en|id>
+- Format: <format>
+
+## Summary
+<3-6 bullet points summarizing the content>
+
+## Key Insights
+- <bullet>
+- <bullet>
+
+## Details
+<cleaned paragraphs or table>
+
+Do not add extra commentary.`;
+
+  const user = [
+    `Filename: ${meta?.filename ?? '-'}\nFormat: ${meta?.format ?? '-'}\nDomain: ${meta?.domain ?? '-'}\nSource: ${meta?.source ?? '-'}\nLanguage: ${lang}`,
+    '',
+    'Content:',
+    rawText.slice(0, 120000), // safety cap
+  ].join('\n');
+
+  const res = await llm.invoke([
+    { role: 'system', content: sys },
+    { role: 'user', content: user },
+  ]);
+  const content = res?.content as unknown;
+  let text = '';
+  if (typeof content === 'string') {
+    text = content;
+  } else if (Array.isArray(content)) {
+    type Part = string | { text?: string };
+    const parts = content as Part[];
+    text = parts
+      .map((p) => (typeof p === 'string' ? p : (p.text ?? '')))
+      .join('\n');
+  }
+  return text.trim() || rawText;
+}
 
 export async function runPersonaRAG(
   model: string,
@@ -141,16 +206,40 @@ export async function runPersonaRAG(
     docs = [...personal, ...general];
   }
 
-  const context = docs.length ? `\n\n[Context]\n${joinDocs(docs)}` : '';
-  const promptMd = await fs.readFile(
+  const context = docs.length
+    ? `\n\n[Retrieval For knowledge]\n${joinDocs(docs)}`
+    : '';
+
+  // Choose prompt file based on requested language; fall back gracefully
+  const langKey = opts?.filters?.language_key;
+  const preferredPrompt =
+    langKey === 'id' ? 'prompt-id.yaml' : 'prompt-en.yaml';
+  const candidates = [
+    path.join(process.cwd(), preferredPrompt),
     path.join(process.cwd(), 'prompt.yaml'),
-    'utf-8',
-  );
+    path.join(process.cwd(), 'public', 'prompt.yaml'),
+  ];
+
+  let promptMd: string | null = null;
+  for (const candidate of candidates) {
+    try {
+      // Attempt to read the candidate file; if not found, try next
+      promptMd = await fs.readFile(candidate, 'utf-8');
+      if (promptMd) break;
+    } catch {
+      // continue
+    }
+  }
+  if (!promptMd) {
+    throw new Error(
+      'Prompt template not found (prompt-en.yaml / prompt-id.yaml / prompt.yaml)',
+    );
+  }
 
   const finalPrompt = [
     promptMd.trim(),
     context,
-    '\n\n[User Construct]\n',
+    '\n\n[User Construct For Primary Prompting And Language]\n',
     construct,
   ].join('');
 

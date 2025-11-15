@@ -28,7 +28,7 @@ export default function FeatureWhy() {
                 style={{
                   borderRadius: '16px',
                   background:
-                    'linear-gradient(318deg, rgba(207, 225, 255, 0.73) 5.91%, rgba(58, 129, 246, 0.73) 95.37%)',
+                    'linear-gradient(318deg, rgba(212, 255, 215, 0.73) 5.91%, rgba(65, 137, 69, 0.73) 95.37%)',
                   display: 'inline-flex',
                   padding: '8px',
                 }}
@@ -50,7 +50,7 @@ export default function FeatureWhy() {
                 style={{
                   borderRadius: '16px',
                   background:
-                    'linear-gradient(318deg, rgba(207, 225, 255, 0.73) 5.91%, rgba(58, 129, 246, 0.73) 95.37%)',
+                    'linear-gradient(318deg, rgba(212, 255, 215, 0.73) 5.91%, rgba(65, 137, 69, 0.73) 95.37%)',
                   display: 'inline-flex',
                   padding: '8px',
                 }}
@@ -72,7 +72,7 @@ export default function FeatureWhy() {
                 style={{
                   borderRadius: '16px',
                   background:
-                    'linear-gradient(318deg, rgba(207, 225, 255, 0.73) 5.91%, rgba(58, 129, 246, 0.73) 95.37%)',
+                    'linear-gradient(318deg, rgba(212, 255, 215, 0.73) 5.91%, rgba(65, 137, 69, 0.73) 95.37%)',
                   display: 'inline-flex',
                   padding: '8px',
                 }}
