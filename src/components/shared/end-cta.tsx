@@ -69,22 +69,30 @@ export default function EndCTA() {
   return (
     <section className="relative flex h-full flex-col items-center justify-center px-2">
       <SvgComponent className="absolute inset-0 -z-10 h-full w-full object-cover" />
-      <div className="relative container mx-auto flex flex-col items-center justify-center px-4 py-20">
-        <h1 className="z-10 mb-4 text-center text-xl font-medium text-primary-foreground lg:text-2xl xl:text-4xl">
+      <div className="relative container mx-auto flex flex-col items-center justify-center px-4 py-12 md:py-16 lg:py-20">
+        <h1 className="z-10 mb-3 text-center text-xl font-medium text-primary-foreground sm:text-2xl md:mb-4 lg:text-3xl xl:text-4xl">
           Ready to Get Started?
         </h1>
-        <p className="z-10 mb-6 max-w-xl text-center text-sm text-primary-foreground md:text-lg">
+        <p className="z-10 mb-4 max-w-xl text-center text-sm text-primary-foreground sm:text-base md:mb-6 md:text-lg">
           Join thousands of professionals already using CRAFTER 2.0 to create
           high-quality personas.
         </p>
-        <div className="flex justify-center gap-4">
-          <Link href="/create-account" className="z-10">
-            <Button size={'lg'} variant={'secondary'}>
+        <div className="flex w-full flex-col justify-center gap-3 sm:w-auto sm:flex-row md:gap-4">
+          <Link href="/create-account" className="z-10 w-full sm:w-auto">
+            <Button
+              size={'lg'}
+              variant={'secondary'}
+              className="w-full sm:w-auto"
+            >
               Try for Free Now
             </Button>
           </Link>
-          <Link href="#" className="z-10">
-            <Button size={'lg'} variant={'secondary'}>
+          <Link href="#" className="z-10 w-full sm:w-auto">
+            <Button
+              size={'lg'}
+              variant={'secondary'}
+              className="w-full sm:w-auto"
+            >
               Learn More
               <ChevronRight />
             </Button>

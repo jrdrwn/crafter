@@ -201,7 +201,7 @@ export function ContribEditDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChangeAction}>
-      <DialogContent className="sm:max-w-2xl">
+      <DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-2xl">
         <DialogHeader>
           <DialogTitle>Edit Contribution</DialogTitle>
           <DialogDescription>
@@ -216,7 +216,7 @@ export function ContribEditDialog({
         ) : (
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
             {/* Row 1: Content Type | Visibility | Language */}
-            <div className="grid gap-4 sm:grid-cols-3">
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
               <div className="space-y-2">
                 <Label htmlFor="type">Type</Label>
                 <Controller
@@ -224,7 +224,7 @@ export function ContribEditDialog({
                   control={control}
                   render={({ field }) => (
                     <Select onValueChange={field.onChange} value={field.value}>
-                      <SelectTrigger id="type">
+                      <SelectTrigger id="type" className="w-full">
                         <SelectValue placeholder="Select type" />
                       </SelectTrigger>
                       <SelectContent>
@@ -245,7 +245,7 @@ export function ContribEditDialog({
                   control={control}
                   render={({ field }) => (
                     <Select onValueChange={field.onChange} value={field.value}>
-                      <SelectTrigger id="visibility">
+                      <SelectTrigger id="visibility" className="w-full">
                         <SelectValue placeholder="Select visibility" />
                       </SelectTrigger>
                       <SelectContent>
@@ -264,7 +264,7 @@ export function ContribEditDialog({
                   control={control}
                   render={({ field }) => (
                     <Select onValueChange={field.onChange} value={field.value}>
-                      <SelectTrigger id="language_key">
+                      <SelectTrigger id="language_key" className="w-full">
                         <SelectValue placeholder="Select language" />
                       </SelectTrigger>
                       <SelectContent>
@@ -278,7 +278,7 @@ export function ContribEditDialog({
             </div>
 
             {/* Row 2: Domain | Source */}
-            <div className="grid gap-4 sm:grid-cols-2">
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               <div className="space-y-2">
                 <Label htmlFor="domain_key">Domain</Label>
                 <Controller
@@ -312,7 +312,7 @@ export function ContribEditDialog({
               <Textarea
                 id="text"
                 rows={8}
-                className="field-sizing-fixed max-h-29 min-h-29 resize-none"
+                className="field-sizing-fixed max-h-29 min-h-29 w-full resize-none"
                 {...register('text')}
               />
               {errors.text && (
@@ -333,13 +333,19 @@ export function ContribEditDialog({
                   placeholder="key (e.g. project)"
                   value={metaKey}
                   onChange={(e) => setMetaKey(e.target.value)}
+                  className="w-full"
                 />
                 <Input
                   placeholder="value (e.g. alpha)"
                   value={metaValue}
                   onChange={(e) => setMetaValue(e.target.value)}
+                  className="w-full"
                 />
-                <Button type="button" onClick={addMetaPair}>
+                <Button
+                  type="button"
+                  onClick={addMetaPair}
+                  className="w-full sm:w-auto"
+                >
                   Add
                 </Button>
               </div>
@@ -348,9 +354,9 @@ export function ContribEditDialog({
                   {Object.entries(metaObj).map(([k, v]) => (
                     <li
                       key={k}
-                      className="flex items-center justify-between rounded border px-2 py-1 text-sm"
+                      className="flex flex-col items-start justify-between gap-2 rounded border px-2 py-1 text-sm sm:flex-row sm:items-center"
                     >
-                      <span className="truncate">
+                      <span className="truncate break-all">
                         <strong>{k}:</strong> {String(v)}
                       </span>
                       <Button
@@ -358,6 +364,7 @@ export function ContribEditDialog({
                         variant="ghost"
                         size="sm"
                         onClick={() => removeMetaKey(k)}
+                        className="w-full sm:w-auto"
                       >
                         Remove
                       </Button>
@@ -371,15 +378,20 @@ export function ContribEditDialog({
               )}
             </div>
 
-            <DialogFooter>
+            <DialogFooter className="flex-col gap-2 sm:flex-row">
               <Button
                 type="button"
                 variant="ghost"
                 onClick={() => onOpenChangeAction(false)}
+                className="w-full sm:w-auto"
               >
                 Cancel
               </Button>
-              <Button type="submit" disabled={loading || !isDirty}>
+              <Button
+                type="submit"
+                disabled={loading || !isDirty}
+                className="w-full sm:w-auto"
+              >
                 {loading ? (
                   <Loader2 className="mr-2 size-4 animate-spin" />
                 ) : null}

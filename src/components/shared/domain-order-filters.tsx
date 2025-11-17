@@ -64,7 +64,7 @@ export function DomainFilterCombobox({
           variant={'outline'}
           role="combobox"
           aria-expanded={open}
-          className="w-48 justify-between border-primary"
+          className="justify-between border-primary"
         >
           <div className="flex items-center gap-2">
             <Filter className="text-primary" />
@@ -73,7 +73,7 @@ export function DomainFilterCombobox({
           <ChevronsUpDown className="opacity-50" />
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="w-48 p-0">
+      <PopoverContent className="p-0">
         <Command>
           <CommandInput placeholder="Search domains..." className="h-9" />
           <CommandList>
@@ -135,7 +135,7 @@ export function OrderFilterCombobox({
           variant={'outline'}
           role="combobox"
           aria-expanded={open}
-          className="w-40 justify-between border-primary"
+          className="justify-between border-primary"
         >
           <div className="flex items-center gap-2">
             <ListFilter className="text-primary" />
@@ -144,7 +144,7 @@ export function OrderFilterCombobox({
           <ChevronsUpDown className="opacity-50" />
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="w-40 p-0">
+      <PopoverContent className="p-0">
         <Command>
           <CommandInput placeholder="Search order..." className="h-9" />
           <CommandList>

@@ -6,34 +6,34 @@ import { Badge } from '../ui/badge';
 
 export default function Hero() {
   return (
-    <section className="relative border-b border-dashed border-primary px-2 py-16">
+    <section className="relative border-b border-dashed border-primary px-2 py-8 md:py-12 lg:py-16">
       <div className="container mx-auto flex flex-col justify-center lg:flex-row lg:justify-between">
-        <div className="absolute inset-x-12 inset-y-0 border-x border-dashed border-primary">
+        <div className="absolute inset-x-4 inset-y-0 border-x border-dashed border-primary md:inset-x-8 lg:inset-x-12">
           <span
-            className="absolute -top-10 -left-10 size-20 overflow-hidden rounded-full border border-dashed border-primary"
+            className="absolute -top-6 -left-6 size-12 overflow-hidden rounded-full border border-dashed border-primary md:-top-10 md:-left-10 md:size-20"
             style={{
               clipPath: 'inset(50% 0 0 0)',
             }}
           ></span>
           <span
-            className="absolute -top-10 -right-10 size-20 overflow-hidden rounded-full border border-dashed border-primary"
+            className="absolute -top-6 -right-6 size-12 overflow-hidden rounded-full border border-dashed border-primary md:-top-10 md:-right-10 md:size-20"
             style={{
               clipPath: 'inset(50% 0 0 0)',
             }}
           ></span>
-          <span className="absolute right-0 bottom-0 size-20 overflow-hidden rounded-full border border-dashed border-primary"></span>
-          <span className="absolute bottom-0 left-0 size-20 overflow-hidden rounded-full border border-dashed border-primary"></span>
+          <span className="absolute right-0 bottom-0 size-12 overflow-hidden rounded-full border border-dashed border-primary md:size-20"></span>
+          <span className="absolute bottom-0 left-0 size-12 overflow-hidden rounded-full border border-dashed border-primary md:size-20"></span>
         </div>
-        <div className="z-1 mx-auto text-center">
+        <div className="z-1 mx-auto px-4 text-center md:px-8">
           <Badge
             variant={'outline'}
-            className="mb-4 rounded-full border-primary px-4 py-2"
+            className="mb-3 rounded-full border-primary px-3 py-1.5 text-xs md:mb-4 md:px-4 md:py-2 md:text-sm"
           >
-            <Tags className="h-4 w-4 text-primary" />
+            <Tags className="h-3 w-3 text-primary md:h-4 md:w-4" />
             Designed for Teams, Powered by AI
           </Badge>
           <h1
-            className="mb-6 max-w-4xl text-4xl leading-tight font-bold tracking-wide md:text-5xl"
+            className="mb-4 max-w-4xl text-2xl leading-tight font-bold tracking-wide sm:text-3xl md:mb-6 md:text-4xl lg:text-5xl"
             style={{
               background: 'linear-gradient(180deg, #418945 0%, #404040 100%)',
               backgroundClip: 'text',
@@ -43,7 +43,7 @@ export default function Hero() {
           >
             Discover Personas
           </h1>
-          <p className="mx-auto max-w-3xl text-xl text-muted-foreground">
+          <p className="mx-auto max-w-3xl text-base text-muted-foreground md:text-lg lg:text-xl">
             Browse community-shared personas or reuse your own as templates.
           </p>
         </div>

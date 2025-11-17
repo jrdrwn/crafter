@@ -75,18 +75,21 @@ export default function LLMConfigCard({ control }: Props) {
   }, []);
 
   return (
-    <div className="space-y-4">
-      <Card className="col-span-1 w-full border border-primary p-2">
-        <CardHeader className="relative p-2">
-          <CardTitle className="flex items-center gap-2 text-xl text-primary">
-            <Bot size={20} className="text-foreground" />
+    <div className="space-y-3 sm:space-y-4">
+      <Card className="col-span-1 w-full border border-primary p-1.5 sm:p-2">
+        <CardHeader className="relative p-1.5 sm:p-2">
+          <CardTitle className="flex items-center gap-1.5 text-base text-primary sm:gap-2 sm:text-lg md:text-xl">
+            <Bot
+              size={16}
+              className="text-foreground sm:size-[18px] md:size-5"
+            />
             LLM Configuration
           </CardTitle>
-          <CardDescription className="text-gray-400">
+          <CardDescription className="text-xs text-gray-400 sm:text-sm">
             Select the AI model used to generate personas
           </CardDescription>
         </CardHeader>
-        <CardContent className="px-2">
+        <CardContent className="px-1.5 sm:px-2">
           {loadingLlmModels && (
             <div>
               <Skeleton className="h-9 w-full rounded-md" />
@@ -152,7 +155,7 @@ export default function LLMConfigCard({ control }: Props) {
             />
           )}
         </CardContent>
-        <CardFooter className="flex items-center justify-between border-t border-dashed px-2 pb-1">
+        <CardFooter className="flex flex-col items-stretch gap-2 border-t border-dashed px-1.5 pb-1 sm:flex-row sm:items-center sm:justify-between sm:px-2">
           <Controller
             name="useRAG"
             control={control}
@@ -173,8 +176,8 @@ export default function LLMConfigCard({ control }: Props) {
             )}
           />
           {loadingLanguages && (
-            <div className="w-42">
-              <Skeleton className="h-9 w-32 rounded-md" />
+            <div className="w-full sm:w-42">
+              <Skeleton className="h-9 w-full rounded-md sm:w-32" />
             </div>
           )}
           {!loadingLanguages && !errorLanguages && (
@@ -183,7 +186,10 @@ export default function LLMConfigCard({ control }: Props) {
               control={control}
               render={({ field, fieldState }) => {
                 return (
-                  <Field data-invalid={fieldState.invalid} className="w-42">
+                  <Field
+                    data-invalid={fieldState.invalid}
+                    className="w-full sm:w-42"
+                  >
                     <Select
                       name={field.name}
                       value={field.value.key}
@@ -196,7 +202,7 @@ export default function LLMConfigCard({ control }: Props) {
                         })
                       }
                     >
-                      <SelectTrigger className="w-42 border-primary">
+                      <SelectTrigger className="w-full border-primary sm:w-42">
                         <SelectValue
                           placeholder="Select Language"
                           aria-invalid={fieldState.invalid}

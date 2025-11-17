@@ -447,12 +447,12 @@ export default function Contrib() {
     <section className="container mx-auto max-w-4xl pb-4">
       <Card>
         <CardHeader className="border-b">
-          <div className="flex items-start justify-between gap-4">
+          <div className="flex flex-col items-start justify-between gap-4 sm:flex-row">
             <div>
-              <CardTitle className="text-xl">
+              <CardTitle className="text-lg sm:text-xl">
                 RAG Knowledge Management
               </CardTitle>
-              <CardDescription>
+              <CardDescription className="text-sm">
                 Manage knowledge by uploading research, interviews, reviews, or
                 documents. Data will be chunked and indexed into the vector
                 store.
@@ -460,10 +460,10 @@ export default function Contrib() {
             </div>
           </div>
         </CardHeader>
-        <CardContent>
+        <CardContent className="pt-4">
           {!loading && !user ? (
-            <div className="flex items-center gap-3 rounded-md border p-4 text-sm">
-              <AlertCircle className="size-4 text-amber-600" />
+            <div className="flex flex-col items-start gap-3 rounded-md border p-4 text-sm sm:flex-row sm:items-center">
+              <AlertCircle className="size-4 shrink-0 text-amber-600" />
               <p>
                 You are not signed in. Please login to upload contributions.
               </p>
@@ -471,7 +471,7 @@ export default function Contrib() {
           ) : null}
 
           {/* Toggles */}
-          <div className="mt-4 grid gap-3 sm:grid-cols-3">
+          <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
             <div className="flex items-center justify-between rounded-md border p-3">
               <div className="text-sm">
                 <p className="font-medium">Text input</p>
@@ -488,7 +488,7 @@ export default function Contrib() {
               </div>
               <Switch checked={showFile} onCheckedChange={setShowFile} />
             </div>
-            <div className="flex items-center justify-between rounded-md border p-3">
+            <div className="flex items-center justify-between rounded-md border p-3 sm:col-span-2 lg:col-span-1">
               <div className="text-sm">
                 <p className="font-medium">Add metadata</p>
                 <p className="text-xs text-muted-foreground">
@@ -501,7 +501,7 @@ export default function Contrib() {
 
           <form onSubmit={handleSubmit(onSubmit)} className="mt-6 space-y-6">
             {/* Row 1: Content Type | Visibility | Language */}
-            <div className="grid gap-6 sm:grid-cols-3">
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
               <div className="space-y-2">
                 <Label htmlFor="type" className="flex items-center gap-2">
                   <ClipboardList className="size-4" /> Content Type
@@ -511,7 +511,11 @@ export default function Contrib() {
                   control={control}
                   render={({ field }) => (
                     <Select onValueChange={field.onChange} value={field.value}>
-                      <SelectTrigger id="type" aria-invalid={!!errors.type}>
+                      <SelectTrigger
+                        id="type"
+                        aria-invalid={!!errors.type}
+                        className="w-full"
+                      >
                         <SelectValue placeholder="Choose type" />
                       </SelectTrigger>
                       <SelectContent>
@@ -539,7 +543,7 @@ export default function Contrib() {
                   control={control}
                   render={({ field }) => (
                     <Select onValueChange={field.onChange} value={field.value}>
-                      <SelectTrigger id="visibility">
+                      <SelectTrigger id="visibility" className="w-full">
                         <SelectValue placeholder="Select visibility" />
                       </SelectTrigger>
                       <SelectContent>
@@ -563,7 +567,7 @@ export default function Contrib() {
                   control={control}
                   render={({ field }) => (
                     <Select onValueChange={field.onChange} value={field.value}>
-                      <SelectTrigger id="language_key">
+                      <SelectTrigger id="language_key" className="w-full">
                         <SelectValue placeholder="Choose language" />
                       </SelectTrigger>
                       <SelectContent>
@@ -577,7 +581,7 @@ export default function Contrib() {
             </div>
 
             {/* Row 2: Domain | Source */}
-            <div className="grid gap-6 sm:grid-cols-2">
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-6">
               <div className="space-y-2">
                 <Label htmlFor="domain_key">Domain (choose or create)</Label>
                 <Controller
@@ -617,6 +621,7 @@ export default function Contrib() {
                   rows={10}
                   placeholder="Paste raw text from survey/interview/review/document here..."
                   aria-invalid={!!errors.text}
+                  className="w-full"
                   {...register('text')}
                 />
                 {errors.text && (
@@ -635,13 +640,19 @@ export default function Contrib() {
                     placeholder="key (e.g. project)"
                     value={metaKey}
                     onChange={(e) => setMetaKey(e.target.value)}
+                    className="w-full"
                   />
                   <Input
                     placeholder="value (e.g. alpha)"
                     value={metaValue}
                     onChange={(e) => setMetaValue(e.target.value)}
+                    className="w-full"
                   />
-                  <Button type="button" onClick={addMetaPair}>
+                  <Button
+                    type="button"
+                    onClick={addMetaPair}
+                    className="w-full sm:w-auto"
+                  >
                     Add
                   </Button>
                 </div>
@@ -650,9 +661,9 @@ export default function Contrib() {
                     {Object.entries(metaObj).map(([k, v]) => (
                       <li
                         key={k}
-                        className="flex items-center justify-between rounded border px-2 py-1 text-sm"
+                        className="flex flex-col items-start justify-between gap-2 rounded border px-2 py-1 text-sm sm:flex-row sm:items-center"
                       >
-                        <span className="truncate">
+                        <span className="truncate break-all">
                           <strong>{k}:</strong> {String(v)}
                         </span>
                         <Button
@@ -660,6 +671,7 @@ export default function Contrib() {
                           variant="ghost"
                           size="sm"
                           onClick={() => removeMetaKey(k)}
+                          className="w-full sm:w-auto"
                         >
                           Remove
                         </Button>
@@ -683,6 +695,7 @@ export default function Contrib() {
                     type="file"
                     accept=".txt,.docx,.xlsx"
                     onChange={(e) => setFile(e.target.files?.[0] ?? null)}
+                    className="w-full"
                   />
                 </div>
                 {file ? (
@@ -693,12 +706,14 @@ export default function Contrib() {
               </div>
             ) : null}
 
-            <div className="flex items-center justify-between">
+            <div className="flex flex-col items-start justify-between gap-3 sm:flex-row sm:items-center">
               <span className="flex items-center gap-1 text-xs text-muted-foreground">
-                <Database className="size-4" />
-                {activeTokens > 0
-                  ? `Estimated ${activeTokens}/${TOKEN_LIMIT} tokens`
-                  : `Limit ${TOKEN_LIMIT} tokens`}
+                <Database className="size-4 shrink-0" />
+                <span className="break-all">
+                  {activeTokens > 0
+                    ? `Estimated ${activeTokens}/${TOKEN_LIMIT} tokens`
+                    : `Limit ${TOKEN_LIMIT} tokens`}
+                </span>
               </span>
               <Button
                 type="submit"
@@ -711,6 +726,7 @@ export default function Contrib() {
                       ? 'Provide text or choose a file first'
                       : undefined
                 }
+                className="w-full sm:w-auto"
               >
                 {submitting ? (
                   <Upload className="mr-2 size-4 animate-pulse" />

@@ -157,10 +157,10 @@ export default function PersonaItems() {
   );
 
   return (
-    <section className="p-4 py-8">
+    <section className="p-2 py-6 md:p-4 md:py-8">
       <div className="container mx-auto">
-        <Card className="w-full border-primary py-4">
-          <CardContent className="px-4">
+        <Card className="w-full border-primary py-3 md:py-4">
+          <CardContent className="px-3 md:px-4">
             <PersonasToolbar
               searchValue={searchInput}
               onSearchChangeAction={setSearchInput}
@@ -181,14 +181,14 @@ export default function PersonaItems() {
           </div>
         )}
 
-        <div className="mt-4 grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">
+        <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2 md:gap-6 lg:grid-cols-3 lg:gap-8">
           {loading &&
             Array.from({ length: pageSize }).map((_, i) => (
               <SkeletonCard key={i} />
             ))}
 
           {!loading && !error && personas.length === 0 && (
-            <p className="col-span-3 text-center text-muted-foreground">
+            <p className="col-span-full text-center text-sm text-muted-foreground md:text-base">
               No personas found.
             </p>
           )}
@@ -218,8 +218,8 @@ export default function PersonaItems() {
         </div>
 
         {!error && (
-          <Pagination className="mt-8">
-            <PaginationContent>
+          <Pagination className="mt-6 md:mt-8">
+            <PaginationContent className="flex-wrap gap-1">
               <PaginationItem>
                 <PaginationPrevious
                   href="#"

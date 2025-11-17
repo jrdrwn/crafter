@@ -54,28 +54,31 @@ export default function DomainCard({ control }: Props) {
   }, []);
 
   return (
-    <Card className="col-span-3 w-full border border-primary p-2">
-      <CardHeader className="p-2">
-        <CardTitle className="flex items-center gap-2 text-xl text-primary">
-          <Target size={20} className="text-foreground" />
+    <Card className="col-span-1 w-full border border-primary p-1.5 sm:p-2 lg:col-span-3">
+      <CardHeader className="p-1.5 sm:p-2">
+        <CardTitle className="flex items-center gap-1.5 text-base text-primary sm:gap-2 sm:text-lg md:text-xl">
+          <Target
+            size={16}
+            className="text-foreground sm:size-[18px] md:size-5"
+          />
           Choose Domain
         </CardTitle>
-        <CardDescription className="text-gray-400">
+        <CardDescription className="text-xs text-gray-400 sm:text-sm">
           Select the domain or industry for the persona you want to create.
         </CardDescription>
       </CardHeader>
-      <CardContent className="px-2">
+      <CardContent className="px-1.5 sm:px-2">
         <Controller
           name="domain"
           control={control}
           render={({ field, fieldState }) => (
             <Field data-invalid={fieldState.invalid}>
-              <div className="flex items-center justify-between gap-2">
+              <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
                 <Input
                   ref={searchInputRef}
                   type="search"
                   placeholder="Search..."
-                  className="max-w-xs border-primary"
+                  className="w-full border-primary sm:max-w-xs"
                   onChange={(e) => setSearchQuery(e.target.value)}
                 />
                 <div className="flex items-center gap-2">
@@ -84,12 +87,14 @@ export default function DomainCard({ control }: Props) {
                     type="text"
                     placeholder="Add a new domain..."
                     value={newDomain}
-                    className="border-primary"
+                    className="flex-1 border-primary"
                     onChange={(e) => setNewDomain(e.target.value)}
                   />
                   <Button
                     type="button"
                     disabled={!newDomain}
+                    size="icon"
+                    className="shrink-0"
                     onClick={() => {
                       if (
                         newDomain &&
@@ -109,7 +114,7 @@ export default function DomainCard({ control }: Props) {
                       }
                     }}
                   >
-                    <Plus />
+                    <Plus className="size-4" />
                   </Button>
                 </div>
               </div>
@@ -131,8 +136,8 @@ export default function DomainCard({ control }: Props) {
                     onRetry={fetchDomains}
                   />
                 )}
-                <ScrollArea className="max-h-72">
-                  <div className="grid grid-cols-1 gap-3 md:grid-cols-2 lg:grid-cols-3">
+                <ScrollArea className="max-h-60 sm:max-h-72 md:max-h-80">
+                  <div className="grid grid-cols-1 gap-2 sm:gap-3 md:grid-cols-2 lg:grid-cols-3">
                     {loading && (
                       <>
                         <DomainItemSkeleton />

@@ -139,10 +139,12 @@ export default function ContribList() {
   return (
     <section className="container mx-auto max-w-4xl pb-4">
       <Card>
-        <CardHeader className="flex flex-row items-center justify-between gap-4">
+        <CardHeader className="flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-center">
           <div>
-            <CardTitle>Your Contributions</CardTitle>
-            <CardDescription>
+            <CardTitle className="text-lg sm:text-xl">
+              Your Contributions
+            </CardTitle>
+            <CardDescription className="text-sm">
               Manage surveys, interviews, reviews, and documents you have added.
             </CardDescription>
           </div>
@@ -151,6 +153,7 @@ export default function ContribList() {
             size="sm"
             onClick={() => load('refresh')}
             disabled={fetching}
+            className="w-full sm:w-auto"
           >
             {fetching ? (
               <Loader2 className="mr-2 size-4 animate-spin" />
@@ -166,7 +169,7 @@ export default function ContribList() {
               No contributions yet.
             </div>
           ) : (
-            <ScrollArea className="max-h-[540px] pr-4">
+            <ScrollArea className="max-h-[540px] pr-2 sm:pr-4">
               <ul className="space-y-3">
                 {items.map((it) => {
                   const meta =
@@ -178,14 +181,17 @@ export default function ContribList() {
                     'private';
                   return (
                     <li key={it.id} className="rounded-md border p-3">
-                      <div className="flex items-center justify-between gap-3">
-                        <div className="mb-1 flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
+                      <div className="flex flex-wrap justify-between gap-3">
+                        <div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
                           <span className="inline-flex items-center gap-1 rounded border px-2 py-0.5">
                             <FileText className="size-3" /> {it.type}
                           </span>
                           {it.domain_key && (
                             <span className="inline-flex items-center gap-1 rounded border px-2 py-0.5">
-                              <Globe className="size-3" /> {it.domain_key}
+                              <Globe className="size-3" />{' '}
+                              <span className="max-w-[100px] truncate">
+                                {it.domain_key}
+                              </span>
                             </span>
                           )}
                           {it.language_key && (
@@ -200,16 +206,22 @@ export default function ContribList() {
                           >
                             {visibility === 'public' ? 'Public' : 'Private'}
                           </Badge>
-                          <span className="inline-flex items-center gap-1 rounded border px-2 py-0.5">
-                            <CalendarClock className="size-3" />
-                            {new Date(it.created_at).toLocaleString()}
+                          <span className="inline-flex items-center gap-1 rounded border px-2 py-0.5 text-[10px] sm:text-xs">
+                            <CalendarClock className="size-3 shrink-0" />
+                            <span className="hidden sm:inline">
+                              {new Date(it.created_at).toLocaleString()}
+                            </span>
+                            <span className="sm:hidden">
+                              {new Date(it.created_at).toLocaleDateString()}
+                            </span>
                           </span>
                         </div>
-                        <div className="flex shrink-0 items-center gap-2">
+                        <div className="flex flex-1 items-stretch gap-2">
                           <Button
                             variant="outline"
                             size="sm"
                             onClick={() => openEditDialog(it.id)}
+                            className="flex-1"
                           >
                             <Pencil className="mr-2 size-4" /> Edit
                           </Button>
@@ -230,6 +242,7 @@ export default function ContribList() {
                     variant="ghost"
                     onClick={() => load('more', cursor)}
                     disabled={fetching}
+                    className="w-full sm:w-auto"
                   >
                     {fetching ? (
                       <Loader2 className="mr-2 size-4 animate-spin" />
@@ -289,21 +302,27 @@ function DeleteButton({
   return (
     <AlertDialog open={open} onOpenChange={setOpen}>
       <AlertDialogTrigger asChild>
-        <Button variant="destructive" size="sm">
+        <Button variant="destructive" size="sm" className="flex-1">
           <Trash2 className="mr-2 size-4" /> Delete
         </Button>
       </AlertDialogTrigger>
-      <AlertDialogContent>
+      <AlertDialogContent className="max-w-[90vw] sm:max-w-lg">
         <AlertDialogHeader>
           <AlertDialogTitle>Delete contribution?</AlertDialogTitle>
-          <AlertDialogDescription>
+          <AlertDialogDescription className="text-sm">
             This will permanently delete the document and all related
             embeddings. This action cannot be undone.
           </AlertDialogDescription>
         </AlertDialogHeader>
-        <AlertDialogFooter>
-          <AlertDialogCancel>Cancel</AlertDialogCancel>
-          <AlertDialogAction onClick={handleDelete} disabled={loading}>
+        <AlertDialogFooter className="flex-col gap-2 sm:flex-row">
+          <AlertDialogCancel className="w-full sm:w-auto">
+            Cancel
+          </AlertDialogCancel>
+          <AlertDialogAction
+            onClick={handleDelete}
+            disabled={loading}
+            className="w-full sm:w-auto"
+          >
             {loading ? <Loader2 className="mr-2 size-4 animate-spin" /> : null}
             Delete
           </AlertDialogAction>

@@ -54,16 +54,19 @@ export default function Header() {
 
   return (
     <header className="w-full border-b border-dashed border-primary">
-      <div className="container mx-auto flex h-16 items-center justify-between rounded-none px-2">
+      <div className="container mx-auto flex h-14 items-center justify-between rounded-none px-2 md:h-16 md:px-4">
         <Link
           href="/"
           scroll={false}
           className="flex items-center gap-2"
           prefetch={false}
         >
-          <Button variant={'ghost'} className="rounded-full">
+          <Button variant={'ghost'} className="rounded-full px-2 md:px-4">
             <Brand className="text-muted-foreground" />
-            <span className="font-bold text-primary">CRAFTER 2.0</span>
+            <span className="hidden font-bold text-primary sm:inline">
+              CRAFTER 2.0
+            </span>
+            <span className="font-bold text-primary sm:hidden">CRAFTER</span>
           </Button>
         </Link>
         <NavigationMenu>
@@ -86,7 +89,7 @@ export default function Header() {
             ))}
           </NavigationMenuList>
         </NavigationMenu>
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-2 md:gap-4">
           {user ? (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
@@ -110,8 +113,10 @@ export default function Header() {
               </DropdownMenuContent>
             </DropdownMenu>
           ) : (
-            <Button className="shadow-md shadow-primary/35" asChild>
-              <Link href="/login">Login</Link>
+            <Button className="shadow-md shadow-primary/35" size="sm" asChild>
+              <Link href="/login" className="text-xs md:text-sm">
+                Login
+              </Link>
             </Button>
           )}
           <Sheet>

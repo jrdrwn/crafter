@@ -36,9 +36,14 @@ export function PersonasToolbar({
   onOrderChangeAction,
 }: PersonasToolbarProps) {
   return (
-    <div className={cn('flex items-center justify-between', className)}>
-      <div className="w-full max-w-md">
-        <InputGroup className="min-w-xs border-primary">
+    <div
+      className={cn(
+        'flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between',
+        className,
+      )}
+    >
+      <div className="w-full sm:max-w-md">
+        <InputGroup className="border-primary md:min-w-xs">
           <InputGroupInput
             type="search"
             placeholder={placeholder}
@@ -50,7 +55,7 @@ export function PersonasToolbar({
           </InputGroupAddon>
         </InputGroup>
       </div>
-      <div className="flex items-center justify-center gap-4">
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-center">
         <DomainFilterCombobox
           value={domainValue}
           onChangeAction={onDomainChangeAction}

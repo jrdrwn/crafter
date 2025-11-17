@@ -7,26 +7,26 @@ import { Button } from '../ui/button';
 
 export default function Hero() {
   return (
-    <section className="relative border-b border-dashed border-primary px-2 py-16">
+    <section className="relative border-b border-dashed border-primary px-2 py-8 md:py-12 lg:py-16">
       <div className="container mx-auto flex flex-col justify-center lg:flex-row lg:justify-between">
-        <div className="absolute inset-x-12 inset-y-0 border-x border-dashed border-primary">
+        <div className="absolute inset-x-4 inset-y-0 border-x border-dashed border-primary sm:inset-x-8 lg:inset-x-12">
           <span
-            className="absolute -top-10 -left-10 size-20 overflow-hidden rounded-full border border-dashed border-primary"
+            className="absolute -top-6 -left-6 size-12 overflow-hidden rounded-full border border-dashed border-primary sm:-top-8 sm:-left-8 sm:size-16 lg:-top-10 lg:-left-10 lg:size-20"
             style={{
               clipPath: 'inset(50% 0 0 0)',
             }}
           ></span>
           <span
-            className="absolute -top-10 -right-10 size-20 overflow-hidden rounded-full border border-dashed border-primary"
+            className="absolute -top-6 -right-6 size-12 overflow-hidden rounded-full border border-dashed border-primary sm:-top-8 sm:-right-8 sm:size-16 lg:-top-10 lg:-right-10 lg:size-20"
             style={{
               clipPath: 'inset(50% 0 0 0)',
             }}
           ></span>
         </div>
-        <div className="z-1 mx-14 flex w-full items-center justify-between gap-6">
-          <div>
+        <div className="z-1 flex w-full flex-col items-start gap-4 sm:mx-8 sm:gap-6 md:flex-row md:items-center md:justify-between lg:mx-14">
+          <div className="w-full md:w-auto">
             <h1
-              className="mb-2 max-w-4xl text-4xl leading-tight font-bold tracking-wide md:text-5xl"
+              className="mb-2 max-w-4xl text-2xl leading-tight font-bold tracking-wide sm:text-3xl md:text-4xl lg:text-5xl"
               style={{
                 background: 'linear-gradient(180deg, #418945 0%, #404040 100%)',
                 backgroundClip: 'text',
@@ -36,15 +36,15 @@ export default function Hero() {
             >
               Persona History
             </h1>
-            <p className="mx-auto max-w-3xl text-xl text-muted-foreground">
+            <p className="max-w-3xl text-base text-muted-foreground sm:text-lg md:text-xl">
               Manage all the personas you have created
             </p>
           </div>
-          <div>
-            <Link href="/create">
-              <Button size={'lg'}>
+          <div className="w-full md:w-auto">
+            <Link href="/create" className="block md:w-auto">
+              <Button size={'lg'} className="md:w-auto">
                 <Plus />
-                Create New Persona
+                <span className="sm:inline">Create New Persona</span>
               </Button>
             </Link>
           </div>

@@ -234,17 +234,20 @@ export default function Design() {
   };
 
   return (
-    <section className="p-4 py-16">
+    <section className="px-2 py-6 sm:px-4 sm:py-8 md:px-6 md:py-10 lg:py-14 xl:py-16">
       <form
         onSubmit={form.handleSubmit(onSubmit)}
-        className="container mx-auto flex flex-col gap-6"
+        className="container mx-auto flex flex-col gap-4 sm:gap-5 md:gap-6"
       >
         {/* Headless navigation */}
         <nav aria-label="Create Steps" className="group my-2">
-          <ol className="flex items-center justify-between gap-2">
+          <ol className="flex items-center justify-between gap-1 sm:gap-2">
             {steps.map((s, idx, arr) => (
               <Fragment key={s.id}>
-                <li key={s.id} className="flex shrink-0 items-center gap-3">
+                <li
+                  key={s.id}
+                  className="flex shrink-0 items-center gap-1 sm:gap-2 md:gap-3"
+                >
                   <Button
                     type="button"
                     role="tab"
@@ -255,7 +258,7 @@ export default function Design() {
                     aria-posinset={idx + 1}
                     aria-setsize={steps.length}
                     aria-selected={stepper.current.id === s.id}
-                    className="flex size-10 items-center justify-center rounded-full"
+                    className="flex size-8 items-center justify-center rounded-full text-xs sm:size-9 sm:text-sm md:size-10"
                     onClick={async () => {
                       if (idx <= currentIndex) {
                         stepper.goTo(s.id);
@@ -277,7 +280,9 @@ export default function Design() {
                   >
                     {idx + 1}
                   </Button>
-                  <span className="text-sm font-medium">{s.label}</span>
+                  <span className="hidden text-xs font-medium sm:inline sm:text-sm md:text-base">
+                    {s.label}
+                  </span>
                 </li>
                 {idx < arr.length - 1 && (
                   <Separator
@@ -289,46 +294,46 @@ export default function Design() {
           </ol>
         </nav>
 
-        <div className="mt-6">
+        <div className="mt-2 sm:mt-4 md:mt-6">
           {stepper.switch({
             domain: () => (
-              <div className="grid grid-cols-3 gap-8">
+              <div className="grid grid-cols-1 gap-4 sm:gap-6 md:gap-8 lg:grid-cols-3">
                 <DomainCard control={form.control} />
               </div>
             ),
             internal: () => (
-              <div className="grid grid-cols-3 gap-8">
+              <div className="grid grid-cols-1 gap-4 sm:gap-6 md:gap-8 lg:grid-cols-3">
                 <InternalFactorsCard control={form.control} />
               </div>
             ),
             external: () => (
-              <div className="grid grid-cols-3 gap-8">
+              <div className="grid grid-cols-1 gap-4 sm:gap-6 md:gap-8 lg:grid-cols-3">
                 <ExternalFactorsCard control={form.control} />
               </div>
             ),
             additional: () => (
-              <div className="grid grid-cols-3 gap-8">
+              <div className="grid grid-cols-1 gap-4 sm:gap-6 md:grid-cols-2 md:gap-8 lg:grid-cols-3">
                 <div>
                   <ContentLengthCard control={form.control} />
                 </div>
                 <div>
                   <LLMConfigCard control={form.control} />
                 </div>
-                <div>
+                <div className="md:col-span-2 lg:col-span-1">
                   <AdditionalDetailsCard control={form.control} />
                 </div>
               </div>
             ),
             review: () => (
-              <div className="grid grid-cols-3 gap-8">
-                <div className="col-span-3">
+              <div className="grid grid-cols-1 gap-4 sm:gap-6 md:grid-cols-2 md:gap-8 lg:grid-cols-3">
+                <div className="col-span-1 md:col-span-2 lg:col-span-3">
                   <div className="mb-1 flex items-center gap-2">
-                    <CheckCircle2 className="h-5 w-5 text-primary" />
-                    <h3 className="text-lg font-semibold">
+                    <CheckCircle2 className="h-4 w-4 text-primary sm:h-5 sm:w-5" />
+                    <h3 className="text-base font-semibold sm:text-lg">
                       Review your inputs
                     </h3>
                   </div>
-                  <p className="text-sm text-muted-foreground">
+                  <p className="text-xs text-muted-foreground sm:text-sm">
                     Make sure everything looks correct before creating.
                   </p>
                 </div>
@@ -403,7 +408,7 @@ export default function Design() {
                   </CardContent>
                 </Card>
 
-                <Card>
+                <Card className="md:col-span-2 lg:col-span-1">
                   <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                     <CardTitle className="text-sm font-medium">
                       Generation Settings
@@ -446,27 +451,31 @@ export default function Design() {
         {/* Controls */}
         <div
           className={cn(
-            'mt-6 flex items-center',
-            stepper.isLast ? 'justify-between' : 'justify-end gap-4',
+            'mt-4 flex flex-col items-stretch gap-3 sm:mt-6 sm:flex-row sm:items-center',
+            stepper.isLast ? 'sm:justify-between' : 'sm:justify-end sm:gap-4',
           )}
         >
           {stepper.isLast ? (
             <>
-              <p className="text-xs text-muted-foreground">
+              <p className="order-2 text-xs text-muted-foreground sm:order-1">
                 By clicking &quot;Create persona&quot;, you agree to our Terms
                 of Service and Privacy Policy.
               </p>
-              <div className="flex items-center gap-4">
+              <div className="order-1 flex items-center gap-3 sm:order-2 sm:gap-4">
                 <Button
                   type="button"
                   variant="secondary"
                   onClick={stepper.prev}
                   disabled={stepper.isFirst}
+                  className="flex-1 sm:flex-none"
                 >
                   Back
                 </Button>
                 <Button
-                  className={cn('w-48', loading && 'cursor-not-allowed')}
+                  className={cn(
+                    'flex-1 sm:w-48',
+                    loading && 'cursor-not-allowed',
+                  )}
                   type="submit"
                   disabled={loading}
                 >
@@ -490,10 +499,15 @@ export default function Design() {
                 variant="secondary"
                 onClick={stepper.prev}
                 disabled={stepper.isFirst}
+                className="flex-1 sm:flex-none"
               >
                 Back
               </Button>
-              <Button type="button" onClick={handleNext}>
+              <Button
+                type="button"
+                onClick={handleNext}
+                className="flex-1 sm:flex-none"
+              >
                 Next
               </Button>
             </>

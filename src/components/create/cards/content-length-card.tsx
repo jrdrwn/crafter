@@ -52,42 +52,43 @@ export default function ContentLengthCard({ control }: Props) {
   const isCustom = radioValue === 'custom';
 
   return (
-    <Card className="col-span-1 w-full border border-primary p-2">
-      <CardHeader className="relative p-2">
+    <Card className="col-span-1 w-full border border-primary p-1.5 sm:p-2">
+      <CardHeader className="relative p-1.5 sm:p-2">
         <Tooltip>
           <TooltipTrigger asChild>
-            <CircleAlertIcon className="absolute top-0 right-7 size-5 text-gray-400 hover:text-gray-600" />
+            <CircleAlertIcon className="absolute top-0 right-5 size-4 text-gray-400 hover:text-gray-600 sm:right-7 sm:size-5" />
           </TooltipTrigger>
           <TooltipContent>
-            <p>
+            <p className="text-xs sm:text-sm">
               if there are too many human factor, the response length can be not
               what you want
             </p>
           </TooltipContent>
         </Tooltip>
         <ContentLengthHelperModal />
-        <CardTitle className="flex items-center gap-2 text-xl text-primary">
-          <Text size={20} className="text-foreground" />
+        <CardTitle className="flex items-center gap-1.5 text-base text-primary sm:gap-2 sm:text-lg md:text-xl">
+          <Text
+            size={16}
+            className="text-foreground sm:size-[18px] md:size-5"
+          />
           Content Length Settings
         </CardTitle>
-        <CardDescription className="text-gray-400">
+        <CardDescription className="text-xs text-gray-400 sm:text-sm">
           Adjust the length of the generated persona description
         </CardDescription>
       </CardHeader>
-      <CardContent className="px-2">
+      <CardContent className="px-1.5 sm:px-2">
         <Controller
           name="contentLength"
           control={control}
           render={({ field, fieldState }) => (
             <Field data-invalid={fieldState.invalid}>
               <RadioGroup
-                // Controlled RadioGroup
                 value={radioValue}
-                className="flex flex-row flex-wrap gap-3"
+                className="flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:gap-3"
                 onValueChange={(value) => {
                   setRadioValue(value);
                   if (value === 'custom') {
-                    // When switching to custom, ensure length > 1000 or default 1100
                     const next = field.value > 1000 ? field.value : 1100;
                     setSliderValue(next);
                     field.onChange(next);
@@ -98,16 +99,32 @@ export default function ContentLengthCard({ control }: Props) {
                   }
                 }}
               >
-                <RadioBoxItem value="300" id="short" className="">
+                <RadioBoxItem
+                  value="300"
+                  id="short"
+                  className="flex-1 text-xs sm:text-sm"
+                >
                   Short
                 </RadioBoxItem>
-                <RadioBoxItem value="600" id="medium" className="">
+                <RadioBoxItem
+                  value="600"
+                  id="medium"
+                  className="flex-1 text-xs sm:text-sm"
+                >
                   Medium
                 </RadioBoxItem>
-                <RadioBoxItem value="1000" id="long" className="">
+                <RadioBoxItem
+                  value="1000"
+                  id="long"
+                  className="flex-1 text-xs sm:text-sm"
+                >
                   Long
                 </RadioBoxItem>
-                <RadioBoxItem value="custom" id="custom" className="flex-1">
+                <RadioBoxItem
+                  value="custom"
+                  id="custom"
+                  className="w-full text-xs sm:flex-1 sm:text-sm"
+                >
                   Custom ({sliderValue} words)
                 </RadioBoxItem>
               </RadioGroup>
@@ -115,7 +132,7 @@ export default function ContentLengthCard({ control }: Props) {
           )}
         />
       </CardContent>
-      <CardFooter className="border-t border-dashed px-2 pb-2">
+      <CardFooter className="border-t border-dashed px-1.5 pb-2 sm:px-2">
         <div className="flex w-full flex-col gap-2">
           <Label className="text-xs text-gray-500">
             Word count {isCustom ? '(drag to adjust)' : '(preset locked)'}

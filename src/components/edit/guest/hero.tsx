@@ -6,34 +6,34 @@ import { Badge } from '../../ui/badge';
 
 export default function Hero() {
   return (
-    <section className="relative border-b border-dashed border-primary px-2 py-16">
+    <section className="relative border-b border-dashed border-primary px-2 py-8 md:py-12 lg:py-16">
       <div className="container mx-auto flex flex-col justify-center lg:flex-row lg:justify-between">
-        <div className="absolute inset-x-12 inset-y-0 border-x border-dashed border-primary">
+        <div className="absolute inset-x-4 inset-y-0 border-x border-dashed border-primary sm:inset-x-8 lg:inset-x-12">
           <span
-            className="absolute -top-10 -left-10 size-20 overflow-hidden rounded-full border border-dashed border-primary"
+            className="absolute -top-6 -left-6 size-12 overflow-hidden rounded-full border border-dashed border-primary sm:-top-8 sm:-left-8 sm:size-16 lg:-top-10 lg:-left-10 lg:size-20"
             style={{
               clipPath: 'inset(50% 0 0 0)',
             }}
           ></span>
           <span
-            className="absolute -top-10 -right-10 size-20 overflow-hidden rounded-full border border-dashed border-primary"
+            className="absolute -top-6 -right-6 size-12 overflow-hidden rounded-full border border-dashed border-primary sm:-top-8 sm:-right-8 sm:size-16 lg:-top-10 lg:-right-10 lg:size-20"
             style={{
               clipPath: 'inset(50% 0 0 0)',
             }}
           ></span>
-          <span className="absolute right-0 bottom-0 size-20 overflow-hidden rounded-full border border-dashed border-primary"></span>
-          <span className="absolute bottom-0 left-0 size-20 overflow-hidden rounded-full border border-dashed border-primary"></span>
+          <span className="absolute right-0 bottom-0 size-12 overflow-hidden rounded-full border border-dashed border-primary sm:size-16 lg:size-20"></span>
+          <span className="absolute bottom-0 left-0 size-12 overflow-hidden rounded-full border border-dashed border-primary sm:size-16 lg:size-20"></span>
         </div>
-        <div className="z-1 mx-auto text-center">
+        <div className="z-1 mx-6 text-center sm:mx-10 lg:mx-auto">
           <Badge
             variant={'outline'}
-            className="mb-4 rounded-full border-primary px-4 py-2"
+            className="mb-4 rounded-full border-primary px-3 py-1.5 sm:px-4 sm:py-2"
           >
-            <Tags className="h-4 w-4 text-primary" />
+            <Tags className="h-3 w-3 text-primary sm:h-4 sm:w-4" />
             Define Your Domain and Factors
           </Badge>
           <h1
-            className="mb-6 max-w-4xl text-4xl leading-tight font-bold tracking-wide md:text-5xl"
+            className="mb-4 max-w-4xl text-2xl leading-tight font-bold tracking-wide sm:mb-5 sm:text-3xl md:mb-6 md:text-4xl lg:text-5xl"
             style={{
               background: 'linear-gradient(180deg, #418945 0%, #404040 100%)',
               backgroundClip: 'text',
@@ -43,7 +43,7 @@ export default function Hero() {
           >
             Regenerate Your Persona with AI
           </h1>
-          <p className="mx-auto max-w-3xl text-xl text-muted-foreground">
+          <p className="mx-auto max-w-3xl text-base text-muted-foreground sm:text-lg md:text-xl">
             Select a domain or industry, choose{' '}
             <span className="font-medium">
               relevant internal and external factors{' '}

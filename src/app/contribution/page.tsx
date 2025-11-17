@@ -11,8 +11,8 @@ export default function Page() {
     <>
       <Header />
       <Hero />
-      <section className="container mx-auto mt-2 max-w-4xl">
-        <Tabs defaultValue="add">
+      <section className="container mx-auto mt-2 max-w-4xl px-2">
+        <Tabs defaultValue="add" className="">
           <TabsList className="mx-auto flex justify-around">
             <TabsTrigger value="add" className="flex-1">
               Add

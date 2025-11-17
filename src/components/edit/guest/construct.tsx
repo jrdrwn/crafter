@@ -187,7 +187,7 @@ export default function Design({ persona }: DesignProps) {
   };
 
   return (
-    <section className="p-4 py-16">
+    <section className="p-2 py-8 sm:p-4 sm:py-12 lg:py-16">
       <form
         onSubmit={form.handleSubmit(onSubmit)}
         className="container mx-auto flex flex-col gap-6"
@@ -197,7 +197,10 @@ export default function Design({ persona }: DesignProps) {
           <ol className="flex items-center justify-between gap-2">
             {steps.map((s, idx, arr) => (
               <Fragment key={s.id}>
-                <li key={s.id} className="flex shrink-0 items-center gap-3">
+                <li
+                  key={s.id}
+                  className="flex shrink-0 items-center gap-2 sm:gap-3"
+                >
                   <Button
                     type="button"
                     role="tab"
@@ -208,7 +211,7 @@ export default function Design({ persona }: DesignProps) {
                     aria-posinset={idx + 1}
                     aria-setsize={steps.length}
                     aria-selected={stepper.current.id === s.id}
-                    className="flex size-10 items-center justify-center rounded-full"
+                    className="flex size-8 items-center justify-center rounded-full sm:size-10"
                     onClick={async () => {
                       if (idx <= currentIndex) {
                         stepper.goTo(s.id);
@@ -230,7 +233,9 @@ export default function Design({ persona }: DesignProps) {
                   >
                     {idx + 1}
                   </Button>
-                  <span className="text-sm font-medium">{s.label}</span>
+                  <span className="hidden text-sm font-medium sm:inline">
+                    {s.label}
+                  </span>
                 </li>
                 {idx < arr.length - 1 && (
                   <Separator
@@ -245,22 +250,22 @@ export default function Design({ persona }: DesignProps) {
         <div className="mt-6">
           {stepper.switch({
             domain: () => (
-              <div className="grid grid-cols-3 gap-8">
+              <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
                 <DomainCard control={form.control} />
               </div>
             ),
             internal: () => (
-              <div className="grid grid-cols-3 gap-8">
+              <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
                 <InternalFactorsCard control={form.control} />
               </div>
             ),
             external: () => (
-              <div className="grid grid-cols-3 gap-8">
+              <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
                 <ExternalFactorsCard control={form.control} />
               </div>
             ),
             additional: () => (
-              <div className="grid grid-cols-3 gap-8">
+              <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">
                 <div>
                   <ContentLengthCard control={form.control} />
                 </div>
@@ -273,8 +278,8 @@ export default function Design({ persona }: DesignProps) {
               </div>
             ),
             review: () => (
-              <div className="grid grid-cols-3 gap-8">
-                <div className="col-span-3">
+              <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">
+                <div className="col-span-1 md:col-span-2 lg:col-span-3">
                   <div className="mb-1 flex items-center gap-2">
                     <CheckCircle2 className="h-5 w-5 text-primary" />
                     <h3 className="text-lg font-semibold">
@@ -399,27 +404,31 @@ export default function Design({ persona }: DesignProps) {
         {/* Controls */}
         <div
           className={cn(
-            'mt-6 flex items-center',
-            stepper.isLast ? 'justify-between' : 'justify-end gap-4',
+            'mt-6 flex flex-col items-stretch gap-4 sm:flex-row sm:items-center',
+            stepper.isLast ? 'sm:justify-between' : 'sm:justify-end',
           )}
         >
           {stepper.isLast ? (
             <>
-              <p className="text-xs text-muted-foreground">
+              <p className="order-2 text-xs text-muted-foreground sm:order-1">
                 By clicking &quot;Edit persona&quot;, you agree to our Terms of
                 Service and Privacy Policy.
               </p>
-              <div className="flex items-center gap-4">
+              <div className="order-1 flex flex-col-reverse items-stretch gap-4 sm:order-2 sm:flex-row sm:items-center">
                 <Button
                   type="button"
                   variant="secondary"
                   onClick={stepper.prev}
                   disabled={stepper.isFirst}
+                  className="w-full sm:w-auto"
                 >
                   Back
                 </Button>
                 <Button
-                  className={cn('w-48', loading && 'cursor-not-allowed')}
+                  className={cn(
+                    'w-full sm:w-48',
+                    loading && 'cursor-not-allowed',
+                  )}
                   type="submit"
                   disabled={loading}
                 >
@@ -443,10 +452,15 @@ export default function Design({ persona }: DesignProps) {
                 variant="secondary"
                 onClick={stepper.prev}
                 disabled={stepper.isFirst}
+                className="w-full sm:w-auto"
               >
                 Back
               </Button>
-              <Button type="button" onClick={handleNext}>
+              <Button
+                type="button"
+                onClick={handleNext}
+                className="w-full sm:w-auto"
+              >
                 Next
               </Button>
             </>

@@ -112,26 +112,31 @@ export default function ExternalFactorsCard({ control }: Props) {
   }, [filtered]);
 
   return (
-    <Card className="col-span-3 w-full border border-primary p-2">
-      <CardHeader className="relative p-2">
-        <CardTitle className="flex items-center gap-2 text-xl text-primary">
-          <Brain size={20} className="text-foreground" />
+    <Card className="col-span-1 w-full border border-primary p-1.5 sm:p-2 lg:col-span-3">
+      <CardHeader className="relative p-1.5 sm:p-2">
+        <CardTitle className="flex items-center gap-1.5 text-base text-primary sm:gap-2 sm:text-lg md:text-xl">
+          <Brain
+            size={16}
+            className="text-foreground sm:size-[18px] md:size-5"
+          />
           Human Factors — External Layer
         </CardTitle>
-        <CardDescription className="text-gray-400">
+        <CardDescription className="text-xs text-gray-400 sm:text-sm">
           Pilih faktor eksternal yang tersedia. Ubah deskripsi sebagai daftar
           item.
         </CardDescription>
       </CardHeader>
-      <CardContent className="px-2">
-        <div className="grid grid-cols-3 gap-6">
+      <CardContent className="px-1.5 sm:px-2">
+        <div className="grid grid-cols-1 gap-3 sm:gap-4 md:gap-6 lg:grid-cols-3">
           {/* Left: Available factors */}
           <div className="space-y-2">
-            <h3 className="text-sm font-medium text-primary">Layer</h3>
+            <h3 className="text-xs font-medium text-primary sm:text-sm">
+              Layer
+            </h3>
             <Input
               type="search"
               placeholder="Search..."
-              className="border-primary"
+              className="border-primary text-sm"
               onChange={(e) => setQuery(e.target.value)}
             />
             <Controller
@@ -139,7 +144,7 @@ export default function ExternalFactorsCard({ control }: Props) {
               control={control}
               render={({ field, fieldState }) => (
                 <Field data-invalid={fieldState.invalid}>
-                  <ScrollArea className="h-68">
+                  <ScrollArea className="h-56 sm:h-64 md:h-68">
                     {!loading && error && (
                       <ErrorMessageButtonRetry
                         message={error}
@@ -228,12 +233,14 @@ export default function ExternalFactorsCard({ control }: Props) {
 
           {/* Middle: Selected */}
           <div className="space-y-2">
-            <h3 className="text-sm font-medium text-primary">Selected</h3>
+            <h3 className="text-xs font-medium text-primary sm:text-sm">
+              Selected
+            </h3>
             <Controller
               name="external"
               control={control}
               render={({ field }) => (
-                <ScrollArea className="h-80 rounded-md border p-2">
+                <ScrollArea className="h-56 rounded-md border p-2 sm:h-64 md:h-80">
                   <div className="flex flex-col gap-2">
                     {((field.value || []) as Factor[]).map((s) => {
                       const previewArr = (s.description || '')
@@ -338,7 +345,9 @@ export default function ExternalFactorsCard({ control }: Props) {
 
           {/* Right: Details editor */}
           <div className="space-y-2">
-            <h3 className="text-sm font-medium text-primary">Details</h3>
+            <h3 className="text-xs font-medium text-primary sm:text-sm">
+              Details
+            </h3>
             <Controller
               name="external"
               control={control}
@@ -358,7 +367,7 @@ export default function ExternalFactorsCard({ control }: Props) {
                 };
 
                 return (
-                  <div className="h-80 rounded-md border p-3">
+                  <div className="h-56 rounded-md border p-2 sm:h-64 md:h-80 md:p-3">
                     {!selected ? (
                       <p className="text-sm text-muted-foreground">
                         Select a factor from the middle list to edit details.

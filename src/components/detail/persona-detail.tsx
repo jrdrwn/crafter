@@ -113,10 +113,14 @@ function TopActions({
     }
   }
   return (
-    <div className="flex items-center justify-center gap-4">
-      <Button variant={'ghost'} className="text-green-500">
-        <Wifi />
-        Online
+    <div className="flex flex-wrap items-center justify-center gap-2 md:gap-4">
+      <Button
+        variant={'ghost'}
+        size={'sm'}
+        className="md:size-default text-green-500"
+      >
+        <Wifi className="size-4 md:size-5" />
+        <span className="hidden sm:inline">Online</span>
       </Button>
       {user && persona.user.id === user.id && (
         <>
@@ -124,37 +128,42 @@ function TopActions({
             <Link href={`?free_edit=true`}>
               <Button
                 variant={'outline'}
-                className="border-primary text-primary hover:bg-primary/10 hover:text-primary"
+                size={'sm'}
+                className="md:size-default border-primary text-primary hover:bg-primary/10 hover:text-primary"
               >
-                <Edit />
-                Edit Result
+                <Edit className="size-4 md:size-5" />
+                <span className="hidden sm:inline">Edit Result</span>
               </Button>
             </Link>
           ) : (
             <>
               <Button
+                size={'sm'}
+                className="md:size-default"
                 onClick={() => router.push(`?free_edit=true&save_edit=true`)}
               >
-                <Save />
-                Save
+                <Save className="size-4 md:size-5" />
+                <span className="hidden sm:inline">Save</span>
               </Button>
               <Button
+                size={'sm'}
+                className="md:size-default"
                 onClick={() => {
                   router.push(`/detail/${persona.id}`);
                   fetchPersona(persona.id);
                 }}
               >
-                <Eye />
-                View Mode
+                <Eye className="size-4 md:size-5" />
+                <span className="hidden sm:inline">View Mode</span>
               </Button>
             </>
           )}
           {!searchParams.get('free_edit') && (
             <>
               <Link href={`/edit/${persona.id}`}>
-                <Button>
-                  <Recycle />
-                  Regenerate
+                <Button size={'sm'} className="md:size-default">
+                  <Recycle className="size-4 md:size-5" />
+                  <span className="hidden sm:inline">Regenerate</span>
                 </Button>
               </Link>
 
@@ -164,9 +173,13 @@ function TopActions({
         </>
       )}
       {user && persona.user.id !== user.id && (
-        <Button onClick={copyThisPersona}>
-          <Copy />
-          Copy this Persona
+        <Button
+          size={'sm'}
+          className="md:size-default"
+          onClick={copyThisPersona}
+        >
+          <Copy className="size-4 md:size-5" />
+          <span className="hidden sm:inline">Copy this Persona</span>
         </Button>
       )}
     </div>
@@ -175,19 +188,21 @@ function TopActions({
 
 function AuthorCard({ user }: { user: { name: string; email: string } }) {
   return (
-    <Card className="w-full gap-2 border-foreground py-4">
-      <CardHeader className="px-4">
-        <CardTitle className="text-2xl text-primary">Author</CardTitle>
+    <Card className="w-full gap-2 border-foreground py-3 md:py-4">
+      <CardHeader className="px-3 md:px-4">
+        <CardTitle className="text-xl text-primary md:text-2xl">
+          Author
+        </CardTitle>
       </CardHeader>
-      <CardContent className="px-4">
+      <CardContent className="px-3 md:px-4">
         <div>
           <div>
-            <h3 className="mb-2 font-medium">Name</h3>
-            <p>{user.name}</p>
+            <h3 className="mb-2 text-sm font-medium md:text-base">Name</h3>
+            <p className="text-sm md:text-base">{user.name}</p>
           </div>
-          <div className="mt-4">
-            <h3 className="mb-2 font-medium">Email</h3>
-            <p>{user.email}</p>
+          <div className="mt-3 md:mt-4">
+            <h3 className="mb-2 text-sm font-medium md:text-base">Email</h3>
+            <p className="text-sm md:text-base">{user.email}</p>
           </div>
         </div>
       </CardContent>
@@ -219,18 +234,20 @@ function QuickInfoCard({
       })
     : '-';
   return (
-    <Card className="w-full gap-2 border-foreground py-4">
-      <CardHeader className="px-4">
-        <CardTitle className="text-2xl text-primary">Quick Info</CardTitle>
+    <Card className="w-full gap-2 border-foreground py-3 md:py-4">
+      <CardHeader className="px-3 md:px-4">
+        <CardTitle className="text-xl text-primary md:text-2xl">
+          Quick Info
+        </CardTitle>
       </CardHeader>
-      <CardContent className="px-4">
-        <div className="mb-4">
-          <h3 className="mb-2 font-medium">Created</h3>
-          <p>{created}</p>
+      <CardContent className="px-3 md:px-4">
+        <div className="mb-3 md:mb-4">
+          <h3 className="mb-2 text-sm font-medium md:text-base">Created</h3>
+          <p className="text-sm md:text-base">{created}</p>
         </div>
         <div>
-          <h3 className="mb-2 font-medium">Updated</h3>
-          <p>{updated}</p>
+          <h3 className="mb-2 text-sm font-medium md:text-base">Updated</h3>
+          <p className="text-sm md:text-base">{updated}</p>
         </div>
       </CardContent>
     </Card>
@@ -271,19 +288,25 @@ function SharePersonaCard({
   }
 
   return (
-    <Card className="w-full border-foreground py-4">
-      <CardHeader className="px-4">
-        <CardTitle className="text-2xl text-primary">Share Persona</CardTitle>
-        <CardDescription>Make this persona publicly accessible</CardDescription>
+    <Card className="w-full border-foreground py-3 md:py-4">
+      <CardHeader className="px-3 md:px-4">
+        <CardTitle className="text-xl text-primary md:text-2xl">
+          Share Persona
+        </CardTitle>
+        <CardDescription className="text-xs md:text-sm">
+          Make this persona publicly accessible
+        </CardDescription>
       </CardHeader>
-      <CardContent className="px-4">
+      <CardContent className="px-3 md:px-4">
         <Label
           htmlFor="visibility"
           className="flex items-center justify-between"
         >
           <div className="flex items-center gap-2">
-            <LockKeyhole className="text-primary" />{' '}
-            {visibility === 'private' ? 'Private' : 'Public'}
+            <LockKeyhole className="size-4 text-primary md:size-5" />{' '}
+            <span className="text-sm md:text-base">
+              {visibility === 'private' ? 'Private' : 'Public'}
+            </span>
           </div>
           <Switch
             id="visibility"
@@ -298,14 +321,16 @@ function SharePersonaCard({
 
 function DownloadPersonaCard() {
   return (
-    <Card className="w-full border-foreground py-4">
-      <CardHeader className="px-4">
-        <CardTitle className="text-2xl text-primary">
+    <Card className="w-full border-foreground py-3 md:py-4">
+      <CardHeader className="px-3 md:px-4">
+        <CardTitle className="text-xl text-primary md:text-2xl">
           Download Persona
         </CardTitle>
-        <CardDescription>Save persona in multiple formats</CardDescription>
+        <CardDescription className="text-xs md:text-sm">
+          Save persona in multiple formats
+        </CardDescription>
       </CardHeader>
-      <CardContent className="space-y-2 px-4">
+      <CardContent className="space-y-2 px-3 md:px-4">
         <Item
           size={'sm'}
           variant={'outline'}
@@ -314,9 +339,11 @@ function DownloadPersonaCard() {
         >
           <Link href={'#'}>
             <ItemMedia>
-              <FileText className="text-primary" />
+              <FileText className="size-4 text-primary md:size-5" />
             </ItemMedia>
-            <ItemContent>Download as PDF</ItemContent>
+            <ItemContent className="text-sm md:text-base">
+              Download as PDF
+            </ItemContent>
             <ItemActions>
               <ChevronRight className="size-4" />
             </ItemActions>
@@ -330,9 +357,11 @@ function DownloadPersonaCard() {
         >
           <Link href={'#'}>
             <ItemMedia>
-              <FileJson className="text-primary" />
+              <FileJson className="size-4 text-primary md:size-5" />
             </ItemMedia>
-            <ItemContent>Download as JSON</ItemContent>
+            <ItemContent className="text-sm md:text-base">
+              Download as JSON
+            </ItemContent>
             <ItemActions>
               <ChevronRight className="size-4" />
             </ItemActions>
@@ -375,19 +404,19 @@ export default function PersonaDetail({ personaId }: { personaId: string }) {
   }
 
   return (
-    <section className="px-4 py-4">
+    <section className="px-2 py-3 md:px-4 md:py-4">
       <div className="container mx-auto">
-        <div className="flex items-center justify-between">
+        <div className="flex flex-row items-center justify-between gap-3">
           <BackToHistory />
           <TopActions persona={persona} fetchPersona={fetchPersona} />
         </div>
-        <div className="mt-4 grid grid-cols-3 gap-8">
+        <div className="mt-3 grid grid-cols-1 gap-4 md:mt-4 md:gap-6 lg:grid-cols-3 lg:gap-8">
           {/* Left: Persona content */}
-          <div className="col-span-2 space-y-4">
+          <div className="col-span-full space-y-3 md:space-y-4 lg:col-span-2">
             <Persona persona={persona} />
           </div>
           {/* Right: Sidebar */}
-          <div className="col-span-1 space-y-4">
+          <div className="col-span-full space-y-3 md:space-y-4 lg:col-span-1">
             <AuthorCard user={persona.user} />
             <QuickInfoCard
               createdAt={
@@ -433,15 +462,17 @@ function DeleteConfirmationDialog({ personaId }: { personaId?: string }) {
   return (
     <AlertDialog>
       <AlertDialogTrigger asChild>
-        <Button variant={'destructive'}>
-          <Trash />
-          Delete
+        <Button variant={'destructive'} size={'sm'} className="md:size-default">
+          <Trash className="size-4 md:size-5" />
+          <span className="hidden sm:inline">Delete</span>
         </Button>
       </AlertDialogTrigger>
-      <AlertDialogContent>
+      <AlertDialogContent className="mx-4 max-w-md">
         <AlertDialogHeader>
-          <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
-          <AlertDialogDescription>
+          <AlertDialogTitle className="text-base md:text-lg">
+            Are you absolutely sure?
+          </AlertDialogTitle>
+          <AlertDialogDescription className="text-sm md:text-base">
             This action cannot be undone. This will permanently delete your
             persona and remove your data from our servers.
           </AlertDialogDescription>
