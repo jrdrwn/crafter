@@ -1,9 +1,12 @@
 'use client';
 
+import { Skeleton } from '@/components/ui/skeleton';
+import { ErrorMessageButtonRetry } from '@/helpers/error-retry';
 import { slugify } from '@/lib/utils';
 import { Plus, Target } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import { Control, Controller } from 'react-hook-form';
+import z from 'zod';
 
 import { Badge } from '../../ui/badge';
 import { Button } from '../../ui/button';
@@ -11,7 +14,6 @@ import {
   Card,
   CardContent,
   CardDescription,
-  CardFooter,
   CardHeader,
   CardTitle,
 } from '../../ui/card';
@@ -19,13 +21,15 @@ import { Field, FieldLabel } from '../../ui/field';
 import { Input } from '../../ui/input';
 import { RadioGroup, RadioGroupItem } from '../../ui/radio-group';
 import { ScrollArea } from '../../ui/scroll-area';
-import type { CreateFormValues } from '../types';
+import { createFormSchema } from '../construct';
 
 type Props = {
-  control: Control<CreateFormValues>;
+  control: Control<z.infer<typeof createFormSchema>>;
 };
 
 export default function DomainCard({ control }: Props) {
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const [domains, setDomains] = useState<{ key: string; label: string }[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [newDomain, setNewDomain] = useState('');
@@ -33,7 +37,14 @@ export default function DomainCard({ control }: Props) {
   const newDomainInputRef = useRef<HTMLInputElement>(null);
 
   async function fetchDomains() {
+    setLoading(true);
+    setError(null);
     const res = await fetch('/api/persona/helper/domain');
+    setLoading(false);
+    if (!res.ok) {
+      setError('Failed to fetch domains.');
+      return;
+    }
     const json = await res.json();
     setDomains(json.data);
   }
@@ -59,7 +70,7 @@ export default function DomainCard({ control }: Props) {
           control={control}
           render={({ field, fieldState }) => (
             <Field data-invalid={fieldState.invalid}>
-              <div className="mb-3 flex items-center justify-between gap-2">
+              <div className="flex items-center justify-between gap-2">
                 <Input
                   ref={searchInputRef}
                   type="search"
@@ -92,8 +103,9 @@ export default function DomainCard({ control }: Props) {
                           ...prev,
                         ]);
                         setNewDomain('');
-                        newDomainInputRef.current &&
-                          (newDomainInputRef.current.value = '');
+                        if (newDomainInputRef.current) {
+                          newDomainInputRef.current.value = '';
+                        }
                       }
                     }}
                   >
@@ -113,8 +125,21 @@ export default function DomainCard({ control }: Props) {
                 aria-invalid={fieldState.invalid}
                 value={field.value.key}
               >
-                <ScrollArea className="h-72">
+                {!loading && error && (
+                  <ErrorMessageButtonRetry
+                    message={error}
+                    onRetry={fetchDomains}
+                  />
+                )}
+                <ScrollArea className="max-h-72">
                   <div className="grid grid-cols-1 gap-3 md:grid-cols-2 lg:grid-cols-3">
+                    {loading && (
+                      <>
+                        <DomainItemSkeleton />
+                        <DomainItemSkeleton />
+                        <DomainItemSkeleton />
+                      </>
+                    )}
                     {domains
                       .filter((d) =>
                         d.label
@@ -133,7 +158,7 @@ export default function DomainCard({ control }: Props) {
                               className={
                                 'flex w-full cursor-pointer items-center gap-3 rounded-md border p-3 transition-colors ' +
                                 (selected
-                                  ? 'border-primary bg-primary/5 ring-2 ring-primary'
+                                  ? 'border-primary bg-primary/5'
                                   : 'border-muted hover:border-primary/50')
                               }
                             >
@@ -172,7 +197,18 @@ export default function DomainCard({ control }: Props) {
           )}
         />
       </CardContent>
-      <CardFooter className="border-t border-dashed px-2 pb-2"></CardFooter>
     </Card>
+  );
+}
+
+function DomainItemSkeleton() {
+  return (
+    <div className="flex w-full animate-pulse items-center gap-3 rounded-md border p-3">
+      <div className="h-4 w-4 rounded-full border bg-muted" />
+      <div className="flex min-w-0 flex-1 flex-col gap-2">
+        <Skeleton className="h-4 w-3/4 rounded-md" />
+        <Skeleton className="h-3 w-1/2 rounded-md" />
+      </div>
+    </div>
   );
 }

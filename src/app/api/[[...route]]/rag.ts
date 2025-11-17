@@ -5,7 +5,7 @@ import {
   listUserContributions,
   updateContribution,
 } from '@/lib/ingestion';
-import { normalizeToRAGNote } from '@/lib/rag.service';
+import { normalizeToRAGNote } from '@/lib/persona.service';
 import { zValidator } from '@hono/zod-validator';
 import { Hono } from 'hono';
 import mammoth from 'mammoth';
@@ -27,6 +27,7 @@ rag.post(
       language_key: z.enum(['en', 'id']).optional(),
       source: z.string().optional(),
       extra: z.record(z.any()).optional(),
+      visibility: z.enum(['public', 'private']).optional(),
     }),
   ),
   async (c) => {
@@ -41,6 +42,7 @@ rag.post(
       author_id: jwt?.sub,
       source: body.source,
       extra: body.extra,
+      visibility: body.visibility,
     });
 
     return c.json({ status: true, result });
@@ -78,6 +80,7 @@ rag.put(
       language_key: z.enum(['en', 'id']).optional(),
       source: z.string().optional(),
       extra: z.record(z.any()).optional(),
+      visibility: z.enum(['public', 'private']).optional(),
     }),
   ),
   async (c) => {
@@ -132,6 +135,11 @@ rag.post('/contributions/upload', async (c) => {
   } catch {
     // ignore bad json
   }
+  const visibilityStr = (form.get('visibility') as string) || '';
+  const visibility =
+    visibilityStr === 'public' || visibilityStr === 'private'
+      ? (visibilityStr as 'public' | 'private')
+      : undefined;
 
   const name = file.name?.toLowerCase() || 'upload';
   const buf = Buffer.from(await file.arrayBuffer());
@@ -199,6 +207,7 @@ rag.post('/contributions/upload', async (c) => {
         original_format: name.split('.').pop() || 'unknown',
         normalized: true,
       },
+      visibility: visibility ?? 'private',
     });
 
     return c.json({ status: true, result });

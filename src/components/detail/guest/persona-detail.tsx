@@ -4,14 +4,19 @@ import {
   ChevronLeft,
   ChevronRight,
   Edit,
+  Eye,
   FileJson,
   FileText,
   LockKeyhole,
+  Recycle,
+  Save,
   Trash,
   Wifi,
 } from 'lucide-react';
 import Link from 'next/link';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
+import { toast } from 'sonner';
 
 import {
   AlertDialog,
@@ -56,20 +61,53 @@ function BackToHistory() {
   );
 }
 
-function TopActions() {
+function TopActions({ refresh }: { refresh: () => void }) {
+  const searchParams = useSearchParams();
+  const router = useRouter();
   return (
     <div className="flex items-center justify-center gap-4">
       <Button variant={'ghost'} className="text-green-500">
         <Wifi />
         Online
       </Button>
-      <Link href={'/edit/guest'}>
-        <Button>
-          <Edit />
-          Edit
-        </Button>
-      </Link>
-      <DeleteConfirmationDialog />
+      {!searchParams.get('free_edit') ? (
+        <>
+          <Link href={`?free_edit=true`}>
+            <Button
+              variant={'outline'}
+              className="border-primary text-primary hover:bg-primary/10 hover:text-primary"
+            >
+              <Edit />
+              Edit Result
+            </Button>
+          </Link>
+          <Link href={'/edit/guest'}>
+            <Button>
+              <Recycle />
+              Regenerate
+            </Button>
+          </Link>
+          <DeleteConfirmationDialog />
+        </>
+      ) : (
+        <>
+          <Button onClick={() => router.push(`?free_edit=true&save_edit=true`)}>
+            <Save />
+            Save
+          </Button>
+          <Button
+            onClick={() => {
+              router.push(`/detail/guest`);
+              // ensure state reloads from localStorage
+              setTimeout(() => refresh(), 0);
+              toast.success('Saved');
+            }}
+          >
+            <Eye />
+            View Mode
+          </Button>
+        </>
+      )}
     </div>
   );
 }
@@ -194,19 +232,29 @@ function DownloadPersonaCard() {
 
 export default function PersonaDetail() {
   const [persona, setPersona] = useState<StoredPersona | null>(null);
-  useEffect(() => {
+  const searchParams = useSearchParams();
+  function refreshFromStorage() {
     const STORAGE_KEY = 'crafter:personas';
     const data = JSON.parse(
       localStorage.getItem(STORAGE_KEY) || 'null',
     ) as StoredPersona | null;
     setPersona(data ?? null);
+  }
+  useEffect(() => {
+    refreshFromStorage();
   }, []);
+  useEffect(() => {
+    // When exiting free edit, reload data
+    if (!searchParams.get('free_edit')) {
+      refreshFromStorage();
+    }
+  }, [searchParams]);
   return (
     <section className="px-4 py-4">
       <div className="container mx-auto">
         <div className="flex items-center justify-between">
           <BackToHistory />
-          <TopActions />
+          <TopActions refresh={refreshFromStorage} />
         </div>
         <div className="mt-4 grid grid-cols-3 gap-8">
           {persona && <Persona markdown={persona?.response} />}
@@ -249,11 +297,7 @@ function DeleteConfirmationDialog() {
           <AlertDialogCancel>Cancel</AlertDialogCancel>
           <AlertDialogAction
             onClick={() => {
-              // delete persona from local storage
-              const STORAGE_KEY = 'crafter:personas';
-              localStorage.removeItem(STORAGE_KEY);
-              // redirect to history page
-              window.location.href = '/history/guest';
+              window.location.href = '/create';
             }}
           >
             Continue

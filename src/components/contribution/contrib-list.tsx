@@ -11,6 +11,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
+import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import {
   Card,
@@ -78,7 +79,7 @@ export default function ContribList() {
         const res = await fetch(url.toString(), {
           headers: { Authorization: `Bearer ${token}` },
         });
-        if (!res.ok) throw new Error('Gagal memuat data');
+        if (!res.ok) throw new Error('Failed to load data');
         const json = (await res.json()) as {
           status: boolean;
           items: ContributionItem[];
@@ -89,7 +90,7 @@ export default function ContribList() {
         );
         setCursor(json.nextCursor ?? null);
       } catch (e) {
-        toast.error('Gagal memuat', {
+        toast.error('Failed to load', {
           description: e instanceof Error ? e.message : String(e),
         });
       } finally {
@@ -125,9 +126,9 @@ export default function ContribList() {
       <section className="container mx-auto max-w-4xl px-4 py-6">
         <Card>
           <CardHeader>
-            <CardTitle>Daftar Kontribusi</CardTitle>
+            <CardTitle>Contributions</CardTitle>
             <CardDescription>
-              Masuk untuk melihat dan mengelola kontribusi.
+              Sign in to view and manage your contributions.
             </CardDescription>
           </CardHeader>
         </Card>
@@ -140,9 +141,9 @@ export default function ContribList() {
       <Card>
         <CardHeader className="flex flex-row items-center justify-between gap-4">
           <div>
-            <CardTitle>Kontribusi Anda</CardTitle>
+            <CardTitle>Your Contributions</CardTitle>
             <CardDescription>
-              Kelola hasil survey, interview, review, maupun dokumen.
+              Manage surveys, interviews, reviews, and documents you have added.
             </CardDescription>
           </div>
           <Button
@@ -162,15 +163,22 @@ export default function ContribList() {
         <CardContent>
           {items.length === 0 ? (
             <div className="text-sm text-muted-foreground">
-              Belum ada kontribusi.
+              No contributions yet.
             </div>
           ) : (
             <ScrollArea className="max-h-[540px] pr-4">
               <ul className="space-y-3">
-                {items.map((it) => (
-                  <li key={it.id} className="rounded-md border p-3">
-                    <div className="flex items-start justify-between gap-3">
-                      <div className="min-w-0">
+                {items.map((it) => {
+                  const meta =
+                    it.metadata && typeof it.metadata === 'object'
+                      ? (it.metadata as Record<string, unknown>)
+                      : null;
+                  const visibility =
+                    (meta?.visibility as 'public' | 'private' | undefined) ??
+                    'private';
+                  return (
+                    <li key={it.id} className="rounded-md border p-3">
+                      <div className="flex items-center justify-between gap-3">
                         <div className="mb-1 flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
                           <span className="inline-flex items-center gap-1 rounded border px-2 py-0.5">
                             <FileText className="size-3" /> {it.type}
@@ -185,35 +193,36 @@ export default function ContribList() {
                               <Languages className="size-3" /> {it.language_key}
                             </span>
                           )}
+                          <Badge
+                            variant={
+                              visibility === 'public' ? 'secondary' : 'outline'
+                            }
+                          >
+                            {visibility === 'public' ? 'Public' : 'Private'}
+                          </Badge>
                           <span className="inline-flex items-center gap-1 rounded border px-2 py-0.5">
                             <CalendarClock className="size-3" />
                             {new Date(it.created_at).toLocaleString()}
                           </span>
                         </div>
-                        <p className="line-clamp-3 text-sm whitespace-pre-wrap">
-                          {typeof it.metadata === 'object' &&
-                          it.metadata !== null
-                            ? JSON.stringify(it.metadata)
-                            : ''}
-                        </p>
+                        <div className="flex shrink-0 items-center gap-2">
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => openEditDialog(it.id)}
+                          >
+                            <Pencil className="mr-2 size-4" /> Edit
+                          </Button>
+                          <DeleteButton
+                            id={it.id}
+                            token={token!}
+                            onDeleted={onDeleted}
+                          />
+                        </div>
                       </div>
-                      <div className="flex shrink-0 items-center gap-2">
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => openEditDialog(it.id)}
-                        >
-                          <Pencil className="mr-2 size-4" /> Edit
-                        </Button>
-                        <DeleteButton
-                          id={it.id}
-                          token={token!}
-                          onDeleted={onDeleted}
-                        />
-                      </div>
-                    </div>
-                  </li>
-                ))}
+                    </li>
+                  );
+                })}
               </ul>
               {cursor ? (
                 <div className="mt-4 flex justify-center">
@@ -225,7 +234,7 @@ export default function ContribList() {
                     {fetching ? (
                       <Loader2 className="mr-2 size-4 animate-spin" />
                     ) : null}
-                    Muat lebih banyak
+                    Load more
                   </Button>
                 </div>
               ) : null}
@@ -264,12 +273,12 @@ function DeleteButton({
         method: 'DELETE',
         headers: { Authorization: `Bearer ${token}` },
       });
-      if (!res.ok) throw new Error('Gagal menghapus');
-      toast.success('Berhasil dihapus');
+      if (!res.ok) throw new Error('Failed to delete');
+      toast.success('Deleted successfully');
       onDeleted(id);
       setOpen(false);
     } catch (e) {
-      toast.error('Gagal', {
+      toast.error('Failed', {
         description: e instanceof Error ? e.message : String(e),
       });
     } finally {
@@ -281,22 +290,22 @@ function DeleteButton({
     <AlertDialog open={open} onOpenChange={setOpen}>
       <AlertDialogTrigger asChild>
         <Button variant="destructive" size="sm">
-          <Trash2 className="mr-2 size-4" /> Hapus
+          <Trash2 className="mr-2 size-4" /> Delete
         </Button>
       </AlertDialogTrigger>
       <AlertDialogContent>
         <AlertDialogHeader>
-          <AlertDialogTitle>Hapus kontribusi?</AlertDialogTitle>
+          <AlertDialogTitle>Delete contribution?</AlertDialogTitle>
           <AlertDialogDescription>
-            Tindakan ini akan menghapus dokumen dan seluruh embeddings terkait.
-            Tindakan tidak dapat dibatalkan.
+            This will permanently delete the document and all related
+            embeddings. This action cannot be undone.
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
-          <AlertDialogCancel>Batal</AlertDialogCancel>
+          <AlertDialogCancel>Cancel</AlertDialogCancel>
           <AlertDialogAction onClick={handleDelete} disabled={loading}>
             {loading ? <Loader2 className="mr-2 size-4 animate-spin" /> : null}
-            Hapus
+            Delete
           </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>

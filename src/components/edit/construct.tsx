@@ -7,6 +7,7 @@ import ExternalFactorsCard from '@/components/create/cards/external-factors-card
 import InternalFactorsCard from '@/components/create/cards/internal-factors-card';
 import LLMConfigCard from '@/components/create/cards/llm-config-card';
 import type { CreateFormValues } from '@/components/create/types';
+import { useUser } from '@/contexts/user-context';
 import { cn } from '@/lib/utils';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { defineStepper } from '@stepperize/react';
@@ -113,10 +114,11 @@ export default function Design({
   const stepper = useStepper();
   const currentIndex = utils.getIndex(stepper.current.id);
 
+  const { user } = useUser();
+
   const _cookies = getCookie('token');
   const router = useRouter();
   const [loading, setLoading] = useState(false);
-
   const form = useForm<CreateFormValues>({
     resolver: zodResolver(formSchema),
     mode: 'onChange',
@@ -155,17 +157,17 @@ export default function Design({
       },
       body: JSON.stringify(data),
     });
-    const json = await res.json();
+    setLoading(false);
     if (!res.ok) {
       toast.error(
-        `Failed to edit persona(s): ${json.message || 'Unknown error'}`,
+        `Failed to edit persona: ${user ? 'Unknown error' : 'Please login again'}`,
       );
-      setLoading(false);
       return;
     }
-    toast.success('Persona(s) edited successfully!');
+    const json = await res.json();
+
+    toast.success('Persona edited successfully!');
     router.push(`/detail/${personaId}`);
-    setLoading(false);
   }
 
   const stepFields = useMemo(

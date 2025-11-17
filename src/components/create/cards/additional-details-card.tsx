@@ -35,7 +35,7 @@ export default function AdditionalDetailsCard({ control }: Props) {
           Specific aspects you want to focus on (optional).
         </CardDescription>
       </CardHeader>
-      <CardContent className="px-2">
+      <CardContent className="px-2 pb-1">
         <Controller
           name="detail"
           control={control}
@@ -50,15 +50,15 @@ export default function AdditionalDetailsCard({ control }: Props) {
                     onBlur={field.onBlur}
                     ref={field.ref}
                     aria-invalid={fieldState.invalid}
-                    className="max-h-29 min-h-29 resize-none"
-                    maxLength={150}
+                    className="max-h-20 min-h-20 resize-none"
+                    maxLength={500}
                     value={value}
                     onChange={(e) => field.onChange(e.target.value)}
                     placeholder="Example: Focus on users with visual impairments, or users with minimal technology experience..."
                   />
                   <InputGroupAddon align="block-end">
                     <InputGroupText className="tabular-nums">
-                      {count}/150
+                      {count}/500
                     </InputGroupText>
                   </InputGroupAddon>
                 </InputGroup>

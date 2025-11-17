@@ -1,4 +1,4 @@
-import { runPersonaRAG } from '@/lib/rag.service';
+import { runPersonaRAG } from '@/lib/persona.service';
 import prisma from '@db';
 import { zValidator } from '@hono/zod-validator';
 import { layer, visibility } from '@prisma/client';
@@ -137,7 +137,7 @@ persona.post(
       expected_output_structure: {
         json_schema: {
           language: json.language.label,
-          persona_result_max_length: json.contentLength,
+          persona_result_max_length: `${json.contentLength} words`,
           result: {
             narative: '...',
             bullets: '...',
@@ -302,7 +302,7 @@ persona.put(
       expected_output_structure: {
         json_schema: {
           language: json.language.label,
-          persona_result_max_length: json.contentLength,
+          persona_result_max_length: `${json.contentLength} words`,
           result: {
             narative: '...',
             bullets: '...',
@@ -470,39 +470,50 @@ persona.delete('/:id', async (c) => {
   return c.json({ status: true, message: 'Persona deleted successfully' });
 });
 
-persona.get('/', async (c) => {
-  const personas = await prisma.persona.findMany({
-    where: { visibility: visibility.public },
-    select: {
-      id: true,
-      result: true,
-      max_length: true,
-      detail: true,
-      visibility: true,
-      created_at: true,
-      updated_at: true,
-      domain: {
-        select: {
-          key: true,
-          label: true,
-        },
-      },
-      user: {
-        select: {
-          id: true,
-          name: true,
-          email: true,
-        },
-      },
-    },
-  });
-  return c.json({ status: true, data: personas });
+// Query schema for pagination/filter/order
+const listQuerySchema = z.object({
+  page: z.coerce.number().min(1).default(1),
+  pageSize: z.coerce.number().min(1).max(50).default(9),
+  domain: z.string().optional(),
+  order: z
+    .enum(['recent', 'updated', 'alphabetical'])
+    .optional()
+    .default('recent'),
+  search: z.string().optional(),
+  mine: z.coerce.boolean().optional().default(false),
 });
 
-persona.get('/me', async (c) => {
-  const jwtPayload = c.get('jwtPayload') as JWTPayload;
+persona.get('/', zValidator('query', listQuerySchema), async (c) => {
+  const { page, pageSize, domain, order, search, mine } = c.req.valid('query');
+  const jwtPayload = c.get('jwtPayload') as JWTPayload | undefined;
+
+  const where = {
+    visibility: visibility.public,
+    ...(domain ? { domain: { key: domain } } : {}),
+    ...(mine && jwtPayload?.sub ? { owner_id: jwtPayload.sub } : {}),
+    ...(search
+      ? {
+          OR: [
+            { detail: { contains: search, mode: 'insensitive' as const } },
+            {
+              domain: {
+                label: { contains: search, mode: 'insensitive' as const },
+              },
+            },
+          ],
+        }
+      : {}),
+  } as const;
+
+  const total = await prisma.persona.count({ where });
+
+  const orderBy =
+    order === 'updated'
+      ? { updated_at: 'desc' as const }
+      : { created_at: 'desc' as const }; // 'recent' and fallback for 'alphabetical'
+
   const personas = await prisma.persona.findMany({
-    where: { owner_id: jwtPayload.sub },
+    where,
     select: {
       id: true,
       result: true,
@@ -512,21 +523,71 @@ persona.get('/me', async (c) => {
       created_at: true,
       updated_at: true,
       domain: {
-        select: {
-          key: true,
-          label: true,
-        },
+        select: { key: true, label: true },
       },
       user: {
-        select: {
-          id: true,
-          name: true,
-          email: true,
-        },
+        select: { id: true, name: true, email: true },
       },
     },
+    skip: (page - 1) * pageSize,
+    take: pageSize,
+    orderBy,
   });
-  return c.json({ status: true, data: personas });
+
+  return c.json({ status: true, data: personas, total, page, pageSize });
+});
+
+persona.get('/me', zValidator('query', listQuerySchema), async (c) => {
+  const jwtPayload = c.get('jwtPayload') as JWTPayload;
+  const { page, pageSize, domain, order, search } = c.req.valid('query');
+
+  const where = {
+    owner_id: jwtPayload.sub,
+    ...(domain ? { domain: { key: domain } } : {}),
+    ...(search
+      ? {
+          OR: [
+            { detail: { contains: search, mode: 'insensitive' as const } },
+            {
+              domain: {
+                label: { contains: search, mode: 'insensitive' as const },
+              },
+            },
+          ],
+        }
+      : {}),
+  } as const;
+
+  const total = await prisma.persona.count({ where });
+
+  const orderBy =
+    order === 'updated'
+      ? { updated_at: 'desc' as const }
+      : { created_at: 'desc' as const };
+
+  const personas = await prisma.persona.findMany({
+    where,
+    select: {
+      id: true,
+      result: true,
+      max_length: true,
+      detail: true,
+      visibility: true,
+      created_at: true,
+      updated_at: true,
+      domain: {
+        select: { key: true, label: true },
+      },
+      user: {
+        select: { id: true, name: true, email: true },
+      },
+    },
+    skip: (page - 1) * pageSize,
+    take: pageSize,
+    orderBy,
+  });
+
+  return c.json({ status: true, data: personas, total, page, pageSize });
 });
 
 persona.get('/:id', async (c) => {
@@ -632,16 +693,27 @@ persona.get('/helper/domain', async (c) => {
   return c.json({ status: true, data: domains });
 });
 
-persona.get('/helper/attribute', async (c) => {
-  const attributes = await prisma.attribute.findMany();
-  return c.json({
-    status: true,
-    data: {
-      internal: attributes.filter((attr) => attr.layer === 'internal'),
-      external: attributes.filter((attr) => attr.layer === 'external'),
-    },
-  });
-});
+persona.get(
+  '/helper/attribute',
+  zValidator(
+    'query',
+    z.object({
+      layer: z.enum([layer.internal, layer.external]),
+    }),
+  ),
+  async (c) => {
+    const validLayerQuery = c.req.valid('query').layer;
+    const attributes = await prisma.attribute.findMany({
+      where: {
+        layer: validLayerQuery,
+      },
+    });
+    return c.json({
+      status: true,
+      data: attributes,
+    });
+  },
+);
 
 persona.get('/helper/language', async (c) => {
   const languages = await prisma.language.findMany();

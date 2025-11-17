@@ -56,8 +56,9 @@ import { z } from 'zod';
 const ContributionSchema = z.object({
   text: z.string().optional().default(''),
   type: z.enum(['survey', 'interview', 'review', 'doc'], {
-    required_error: 'Jenis wajib dipilih',
+    required_error: 'Type is required',
   }),
+  visibility: z.enum(['public', 'private']).optional(),
   domain_key: z.string().optional().or(z.literal('')),
   language_key: z.enum(['en', 'id']).optional(),
   source: z.string().optional().or(z.literal('')),
@@ -75,7 +76,7 @@ const ContributionSchema = z.object({
           return false;
         }
       },
-      { message: 'Extra harus berupa JSON valid' },
+      { message: 'Extra must be valid JSON' },
     ),
 });
 
@@ -120,7 +121,7 @@ function DomainCombobox({
 
   const createLabel =
     query && !domains.some((d) => d.key.toLowerCase() === query.toLowerCase())
-      ? `Buat baru: "${query}"`
+      ? `Create new: "${query}"`
       : '';
 
   return (
@@ -143,7 +144,7 @@ function DomainCombobox({
               ? selected.label
               : value
                 ? value
-                : 'Pilih atau ketik domain'}
+                : 'Choose or type a domain'}
           </span>
           <div className="flex items-center gap-1">
             {value ? (
@@ -162,7 +163,7 @@ function DomainCombobox({
       <PopoverContent className="w-[var(--radix-popover-trigger-width)] p-0">
         <Command>
           <CommandInput
-            placeholder="Cari domain atau ketik baru..."
+            placeholder="Search domain or type new..."
             onValueChange={setQuery}
             className="h-9"
           />
@@ -179,10 +180,10 @@ function DomainCombobox({
                   <PlusCircle className="size-4" /> {createLabel}
                 </button>
               ) : (
-                'Tidak ada domain'
+                'No domains'
               )}
             </CommandEmpty>
-            <CommandGroup heading="Domain tersedia">
+            <CommandGroup heading="Available domains">
               {domains.map((d) => (
                 <CommandItem
                   key={d.key}
@@ -207,7 +208,7 @@ function DomainCombobox({
               ))}
             </CommandGroup>
             {query && (
-              <CommandGroup heading="Aksi">
+              <CommandGroup heading="Actions">
                 <CommandItem
                   value={`__create__ ${query}`}
                   onSelect={() => {
@@ -215,7 +216,7 @@ function DomainCombobox({
                     setOpen(false);
                   }}
                 >
-                  <PlusCircle className="mr-2 size-4" /> Buat &quot;{query}
+                  <PlusCircle className="mr-2 size-4" /> Create &quot;{query}
                   &quot;
                 </CommandItem>
               </CommandGroup>
@@ -249,11 +250,11 @@ export default function Contrib() {
     reset,
     formState: { errors },
     watch,
-    setValue,
   } = useForm<ContributionForm>({
     resolver: zodResolver(ContributionSchema),
     defaultValues: {
       type: 'review',
+      visibility: 'private',
       language_key: 'en',
       domain_key: '',
       source: '',
@@ -293,33 +294,35 @@ export default function Contrib() {
 
   async function onSubmit(values: ContributionForm) {
     if (!user) {
-      toast.error('Harap login terlebih dahulu');
+      toast.error('Please login first');
       return;
     }
     const token = getCookie('token');
     if (!token) {
-      toast.error('Token tidak ditemukan');
+      toast.error('Token not found');
       return;
     }
 
     if (!showText && !showFile) {
-      toast.error('Pilih minimal satu opsi: isi teks atau unggah file');
+      toast.error('Select at least one option: text input or upload file');
       return;
     }
 
     if (activeTokens > TOKEN_LIMIT) {
-      toast.error('Melebihi batas token', {
-        description: `Perkiraan token ${activeTokens} > limit ${TOKEN_LIMIT}. Kurangi ukuran input.`,
+      toast.error('Token limit exceeded', {
+        description: `Estimated tokens ${activeTokens} > limit ${TOKEN_LIMIT}. Reduce input size.`,
       });
       return;
     }
 
-    // Jika ada file dan toggle file aktif, pakai alur upload file
+    const visibility = values.visibility || 'private';
+
+    // File upload flow
     if (showFile && file) {
       const name = file.name.toLowerCase();
       if (!/[.](txt|docx|xlsx)$/i.test(name)) {
-        toast.error('Format tidak didukung', {
-          description: 'Hanya .txt, .docx, atau .xlsx',
+        toast.error('Unsupported format', {
+          description: 'Only .txt, .docx, or .xlsx',
         });
         return;
       }
@@ -337,8 +340,8 @@ export default function Contrib() {
         if (domain_key) fd.append('domain_key', domain_key);
         if (language_key) fd.append('language_key', language_key);
         if (source) fd.append('source', source);
-        if (Object.keys(metaObj).length)
-          fd.append('extra', JSON.stringify(metaObj));
+        const extraMerged = { ...metaObj, visibility };
+        fd.append('extra', JSON.stringify(extraMerged));
 
         const res = await fetch('/api/rag/contributions/upload', {
           method: 'POST',
@@ -349,30 +352,35 @@ export default function Contrib() {
           const payload = (await res.json().catch(() => ({}))) as {
             message?: string;
           };
-          throw new Error(payload?.message || 'Gagal mengunggah file');
+          throw new Error(payload?.message || 'Failed to upload file');
         }
         const json = (await res.json()) as {
           status: boolean;
           result?: { chunks: number };
         };
-        toast.success('File terunggah', {
-          description: `${json?.result?.chunks ?? 0} potongan disimpan ke RAG`,
+        toast.success('File uploaded', {
+          description: `${json?.result?.chunks ?? 0} chunks saved to RAG`,
           icon: <CheckCircle2 className="size-4 text-green-600" />,
         });
         setFile(null);
         return;
       } catch (e) {
-        toast.error('Gagal', {
-          description: e instanceof Error ? e.message : 'Terjadi kesalahan',
+        toast.error('Failed', {
+          description: e instanceof Error ? e.message : 'An error occurred',
           icon: <AlertCircle className="size-4 text-red-600" />,
         });
         return;
       } finally {
         setSubmitting(false);
+        // reset file input
+        const fileInput = document.getElementById(
+          'file',
+        ) as HTMLInputElement | null;
+        if (fileInput) fileInput.value = '';
       }
     }
 
-    // Jika tidak ada file, gunakan alur teks
+    // Text flow
     if (showText) {
       setSubmitting(true);
       try {
@@ -388,7 +396,7 @@ export default function Contrib() {
             domain_key: values.domain_key || undefined,
             language_key: values.language_key,
             source: values.source || undefined,
-            extra: Object.keys(metaObj).length ? metaObj : undefined,
+            extra: { ...metaObj, visibility },
           }),
         });
 
@@ -396,7 +404,7 @@ export default function Contrib() {
           const payload = await res.json().catch(() => ({}));
           throw new Error(
             (payload as { message?: string })?.message ||
-              'Gagal menyimpan kontribusi',
+              'Failed to save contribution',
           );
         }
 
@@ -404,12 +412,13 @@ export default function Contrib() {
           status: boolean;
           result?: { chunks: number };
         };
-        toast.success('Kontribusi berhasil diunggah', {
-          description: `${json?.result?.chunks ?? 0} potongan disimpan ke RAG`,
+        toast.success('Contribution uploaded', {
+          description: `${json?.result?.chunks ?? 0} chunks saved to RAG`,
           icon: <CheckCircle2 className="size-4 text-green-600" />,
         });
         reset({
           type: undefined,
+          visibility: 'private',
           language_key: 'en',
           domain_key: '',
           source: '',
@@ -418,27 +427,20 @@ export default function Contrib() {
         });
         setMetaObj({});
       } catch (e) {
-        const message = e instanceof Error ? e.message : 'Terjadi kesalahan';
-        toast.error('Gagal', {
+        const message = e instanceof Error ? e.message : 'An error occurred';
+        toast.error('Failed', {
           description: message,
           icon: <AlertCircle className="size-4 text-red-600" />,
         });
       } finally {
         setSubmitting(false);
+
+        const fileInput = document.getElementById(
+          'file',
+        ) as HTMLInputElement | null;
+        if (fileInput) fileInput.value = '';
       }
     }
-  }
-
-  function fillExample() {
-    setValue(
-      'text',
-      'User interview: The onboarding feels confusing. I expected a guided tour. I love the dashboard charts but exporting to CSV is hidden. I use the product 3x/week for reporting. Biggest pain: permissions settings are hard to find.',
-      { shouldDirty: true },
-    );
-    setValue('type', 'interview', { shouldDirty: true });
-    setValue('domain_key', 'analytics', { shouldDirty: true });
-    setValue('language_key', 'en', { shouldDirty: true });
-    setValue('source', 'UX Research Sprint 12', { shouldDirty: true });
   }
 
   return (
@@ -448,12 +450,12 @@ export default function Contrib() {
           <div className="flex items-start justify-between gap-4">
             <div>
               <CardTitle className="text-xl">
-                Manajemen Pengetahuan RAG
+                RAG Knowledge Management
               </CardTitle>
               <CardDescription>
-                Kelola pengetahuan dengan mengunggah hasil riset, wawancara,
-                ulasan, maupun dokumen. Data akan dipecah menjadi chunk dan
-                diindeks ke vektor store.
+                Manage knowledge by uploading research, interviews, reviews, or
+                documents. Data will be chunked and indexed into the vector
+                store.
               </CardDescription>
             </div>
           </div>
@@ -463,7 +465,7 @@ export default function Contrib() {
             <div className="flex items-center gap-3 rounded-md border p-4 text-sm">
               <AlertCircle className="size-4 text-amber-600" />
               <p>
-                Anda belum masuk. Silakan login untuk mengunggah kontribusi.
+                You are not signed in. Please login to upload contributions.
               </p>
             </div>
           ) : null}
@@ -472,25 +474,25 @@ export default function Contrib() {
           <div className="mt-4 grid gap-3 sm:grid-cols-3">
             <div className="flex items-center justify-between rounded-md border p-3">
               <div className="text-sm">
-                <p className="font-medium">Isi teks</p>
+                <p className="font-medium">Text input</p>
                 <p className="text-xs text-muted-foreground">
-                  Tulis/Tempel konten manual
+                  Write/Paste content manually
                 </p>
               </div>
               <Switch checked={showText} onCheckedChange={setShowText} />
             </div>
             <div className="flex items-center justify-between rounded-md border p-3">
               <div className="text-sm">
-                <p className="font-medium">Unggah file</p>
+                <p className="font-medium">Upload file</p>
                 <p className="text-xs text-muted-foreground">TXT/DOCX/XLSX</p>
               </div>
               <Switch checked={showFile} onCheckedChange={setShowFile} />
             </div>
             <div className="flex items-center justify-between rounded-md border p-3">
               <div className="text-sm">
-                <p className="font-medium">Tambahkan metadata</p>
+                <p className="font-medium">Add metadata</p>
                 <p className="text-xs text-muted-foreground">
-                  Key-Value untuk konteks
+                  Key-Value for context
                 </p>
               </div>
               <Switch checked={showMeta} onCheckedChange={setShowMeta} />
@@ -498,10 +500,11 @@ export default function Contrib() {
           </div>
 
           <form onSubmit={handleSubmit(onSubmit)} className="mt-6 space-y-6">
-            <div className="grid gap-6 sm:grid-cols-2">
+            {/* Row 1: Content Type | Visibility | Language */}
+            <div className="grid gap-6 sm:grid-cols-3">
               <div className="space-y-2">
                 <Label htmlFor="type" className="flex items-center gap-2">
-                  <ClipboardList className="size-4" /> Jenis Konten
+                  <ClipboardList className="size-4" /> Content Type
                 </Label>
                 <Controller
                   name="type"
@@ -509,13 +512,13 @@ export default function Contrib() {
                   render={({ field }) => (
                     <Select onValueChange={field.onChange} value={field.value}>
                       <SelectTrigger id="type" aria-invalid={!!errors.type}>
-                        <SelectValue placeholder="Pilih jenis" />
+                        <SelectValue placeholder="Choose type" />
                       </SelectTrigger>
                       <SelectContent>
                         <SelectItem value="survey">Survey</SelectItem>
                         <SelectItem value="interview">Interview</SelectItem>
                         <SelectItem value="review">Review</SelectItem>
-                        <SelectItem value="doc">Dokumen</SelectItem>
+                        <SelectItem value="doc">Document</SelectItem>
                       </SelectContent>
                     </Select>
                   )}
@@ -528,11 +531,32 @@ export default function Contrib() {
               </div>
 
               <div className="space-y-2">
+                <Label htmlFor="visibility" className="flex items-center gap-2">
+                  Visibility
+                </Label>
+                <Controller
+                  name="visibility"
+                  control={control}
+                  render={({ field }) => (
+                    <Select onValueChange={field.onChange} value={field.value}>
+                      <SelectTrigger id="visibility">
+                        <SelectValue placeholder="Select visibility" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="public">Public</SelectItem>
+                        <SelectItem value="private">Private</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  )}
+                />
+              </div>
+
+              <div className="space-y-2">
                 <Label
                   htmlFor="language_key"
                   className="flex items-center gap-2"
                 >
-                  <Languages className="size-4" /> Bahasa
+                  <Languages className="size-4" /> Language
                 </Label>
                 <Controller
                   name="language_key"
@@ -540,7 +564,7 @@ export default function Contrib() {
                   render={({ field }) => (
                     <Select onValueChange={field.onChange} value={field.value}>
                       <SelectTrigger id="language_key">
-                        <SelectValue placeholder="Pilih bahasa" />
+                        <SelectValue placeholder="Choose language" />
                       </SelectTrigger>
                       <SelectContent>
                         <SelectItem value="en">English</SelectItem>
@@ -550,11 +574,12 @@ export default function Contrib() {
                   )}
                 />
               </div>
+            </div>
 
+            {/* Row 2: Domain | Source */}
+            <div className="grid gap-6 sm:grid-cols-2">
               <div className="space-y-2">
-                <Label htmlFor="domain_key">
-                  Domain (pilih atau buat baru)
-                </Label>
+                <Label htmlFor="domain_key">Domain (choose or create)</Label>
                 <Controller
                   name="domain_key"
                   control={control}
@@ -573,10 +598,10 @@ export default function Contrib() {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="source">Sumber (opsional)</Label>
+                <Label htmlFor="source">Source (optional)</Label>
                 <Input
                   id="source"
-                  placeholder="mis. Sprint 12 Research"
+                  placeholder="e.g. Sprint 12 Research"
                   {...register('source')}
                 />
               </div>
@@ -585,28 +610,15 @@ export default function Contrib() {
             {showText ? (
               <div className="space-y-2">
                 <Label htmlFor="text" className="flex items-center gap-2">
-                  <FileText className="size-4" /> Isi Kontribusi
+                  <FileText className="size-4" /> Contribution Content
                 </Label>
                 <Textarea
                   id="text"
                   rows={10}
-                  placeholder="Tempel teks mentah dari survey/interview/review/dokumen di sini..."
+                  placeholder="Paste raw text from survey/interview/review/document here..."
                   aria-invalid={!!errors.text}
                   {...register('text')}
                 />
-                <div className="flex items-center justify-between text-xs text-muted-foreground">
-                  <span></span>
-                  <div className="flex items-center gap-2">
-                    <Button
-                      type="button"
-                      variant="ghost"
-                      size="sm"
-                      onClick={fillExample}
-                    >
-                      Contoh
-                    </Button>
-                  </div>
-                </div>
                 {errors.text && (
                   <p className="text-xs text-destructive">
                     {errors.text.message}
@@ -620,17 +632,17 @@ export default function Contrib() {
                 <Label>Extra Metadata</Label>
                 <div className="mt-2 flex flex-col gap-2 sm:flex-row">
                   <Input
-                    placeholder="key (mis. project)"
+                    placeholder="key (e.g. project)"
                     value={metaKey}
                     onChange={(e) => setMetaKey(e.target.value)}
                   />
                   <Input
-                    placeholder="value (mis. alpha)"
+                    placeholder="value (e.g. alpha)"
                     value={metaValue}
                     onChange={(e) => setMetaValue(e.target.value)}
                   />
                   <Button type="button" onClick={addMetaPair}>
-                    Tambah
+                    Add
                   </Button>
                 </div>
                 {Object.keys(metaObj).length ? (
@@ -649,14 +661,14 @@ export default function Contrib() {
                           size="sm"
                           onClick={() => removeMetaKey(k)}
                         >
-                          Hapus
+                          Remove
                         </Button>
                       </li>
                     ))}
                   </ul>
                 ) : (
                   <p className="mt-2 text-xs text-muted-foreground">
-                    Belum ada metadata ditambahkan.
+                    No metadata added yet.
                   </p>
                 )}
               </div>
@@ -664,7 +676,7 @@ export default function Contrib() {
 
             {showFile ? (
               <div className="rounded-md border p-4">
-                <Label htmlFor="file">Unggah file (.txt, .docx, .xlsx)</Label>
+                <Label htmlFor="file">Upload file (.txt, .docx, .xlsx)</Label>
                 <div className="mt-2 flex items-center gap-3">
                   <Input
                     id="file"
@@ -675,7 +687,7 @@ export default function Contrib() {
                 </div>
                 {file ? (
                   <p className="mt-2 text-xs text-muted-foreground">
-                    Dipilih: {file.name} ({Math.ceil(file.size / 1024)} KB)
+                    Selected: {file.name} ({Math.ceil(file.size / 1024)} KB)
                   </p>
                 ) : null}
               </div>
@@ -685,8 +697,8 @@ export default function Contrib() {
               <span className="flex items-center gap-1 text-xs text-muted-foreground">
                 <Database className="size-4" />
                 {activeTokens > 0
-                  ? `Perkiraan ${activeTokens}/${TOKEN_LIMIT} tokens`
-                  : `Batas ${TOKEN_LIMIT} tokens`}
+                  ? `Estimated ${activeTokens}/${TOKEN_LIMIT} tokens`
+                  : `Limit ${TOKEN_LIMIT} tokens`}
               </span>
               <Button
                 type="submit"
@@ -694,9 +706,9 @@ export default function Contrib() {
                 aria-disabled={submitting || loading || !user || !canSubmit}
                 title={
                   activeTokens > TOKEN_LIMIT
-                    ? 'Melebihi batas token'
+                    ? 'Exceeds token limit'
                     : !((showText && hasText) || (showFile && !!file))
-                      ? 'Isi teks atau pilih file terlebih dahulu'
+                      ? 'Provide text or choose a file first'
                       : undefined
                 }
               >
@@ -705,7 +717,7 @@ export default function Contrib() {
                 ) : (
                   <Upload className="mr-2 size-4" />
                 )}
-                Unggah ke RAG
+                Upload to RAG
               </Button>
             </div>
           </form>

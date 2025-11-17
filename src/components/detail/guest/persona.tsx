@@ -3,11 +3,14 @@
 import { cn } from '@/lib/utils';
 import parse from 'html-react-parser';
 import { Blend, List, Text, User } from 'lucide-react';
-import { useState } from 'react';
+import { useSearchParams } from 'next/navigation';
+import { useEffect, useState } from 'react';
+import { toast } from 'sonner';
 
 import { Badge } from '../../ui/badge';
 import { Button } from '../../ui/button';
 import { Card, CardContent } from '../../ui/card';
+import { MinimalTiptap } from '../../ui/shadcn-io/minimal-tiptap';
 import { PersonaStyle } from '../persona';
 
 // Types
@@ -138,7 +141,84 @@ function PersonaContent({
   );
 }
 
+// Persona content editor (guest)
+function PersonaContentEdit({
+  personaStyle,
+  markdown,
+}: {
+  personaStyle: PersonaStyle;
+  markdown?: PersonaResponse;
+}) {
+  const searchParams = useSearchParams();
+  const [mixedContent, setMixedContent] = useState<string>(
+    markdown?.result?.mixed || '',
+  );
+  const [bulletsContent, setBulletsContent] = useState<string>(
+    markdown?.result?.bullets || '',
+  );
+  const [narativeContent, setNarativeContent] = useState<string>(
+    markdown?.result?.narative || '',
+  );
+
+  function saveToLocalStorage() {
+    try {
+      const STORAGE_KEY = 'crafter:personas';
+      const stored = localStorage.getItem(STORAGE_KEY);
+      if (!stored) return;
+      const data = JSON.parse(stored);
+      const updated = {
+        ...data,
+        response: {
+          ...data?.response,
+          result: {
+            ...data?.response?.result,
+            mixed: mixedContent,
+            bullets: bulletsContent,
+            narative: narativeContent,
+          },
+        },
+        updated_at: new Date().toISOString(),
+      };
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
+      toast.success('Persona content updated successfully!');
+    } catch (_e) {
+      toast.error('Failed to save changes.');
+    }
+  }
+
+  useEffect(() => {
+    if (searchParams.get('save_edit')) {
+      saveToLocalStorage();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [searchParams]);
+
+  if (!markdown) return null;
+  return (
+    <Card className="w-full border-primary p-0">
+      <div className="prose prose-lg max-w-full p-0 dark:prose-invert prose-headings:text-primary prose-h2:mb-2">
+        {personaStyle === 'mixed' && (
+          <MinimalTiptap content={mixedContent} onChange={setMixedContent} />
+        )}
+        {personaStyle === 'bullets' && (
+          <MinimalTiptap
+            content={bulletsContent}
+            onChange={setBulletsContent}
+          />
+        )}
+        {personaStyle === 'narative' && (
+          <MinimalTiptap
+            content={narativeContent}
+            onChange={setNarativeContent}
+          />
+        )}
+      </div>
+    </Card>
+  );
+}
+
 export default function Persona({ markdown }: { markdown?: PersonaResponse }) {
+  const searchParams = useSearchParams();
   const [personaStyle, setPersonaStyle] = useState<PersonaStyle>('mixed');
   return (
     <>
@@ -148,7 +228,11 @@ export default function Persona({ markdown }: { markdown?: PersonaResponse }) {
           personaStyle={personaStyle}
           setPersonaStyle={setPersonaStyle}
         />
-        <PersonaContent personaStyle={personaStyle} markdown={markdown} />
+        {searchParams.get('free_edit') ? (
+          <PersonaContentEdit personaStyle={personaStyle} markdown={markdown} />
+        ) : (
+          <PersonaContent personaStyle={personaStyle} markdown={markdown} />
+        )}
       </div>
     </>
   );

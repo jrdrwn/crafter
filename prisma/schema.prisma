@@ -76,23 +76,26 @@ model user {
 }
 
 model llm {
-  id      Int       @id @default(autoincrement())
-  label   String    @db.VarChar(120)
-  key     String    @unique(map: "llm_key_uindex") @db.VarChar(120)
-  persona persona[]
+  id          Int       @id @default(autoincrement())
+  label       String    @db.VarChar(120)
+  key         String    @unique(map: "llm_key_uindex") @db.VarChar(120)
+  category    String?   @db.VarChar(120)
+  description String?
+  persona     persona[]
 }
 
 /// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
 model rag_documents {
-  id           Int      @id @default(autoincrement())
+  id           Int         @id @default(autoincrement())
   text         String
   type         String
   domain_key   String?
   language_key String?
   author_id    BigInt?
   source       String?
-  metadata     Json     @default("{}")
-  created_at   DateTime @default(now()) @db.Timestamptz(6)
+  metadata     Json        @default("{}")
+  created_at   DateTime    @default(now()) @db.Timestamptz(6)
+  visibility   visibility?
 
   @@index([author_id], map: "idx_rag_documents_author")
   @@index([domain_key], map: "idx_rag_documents_domain")

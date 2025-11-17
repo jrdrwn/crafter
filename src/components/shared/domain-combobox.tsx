@@ -53,7 +53,7 @@ export default function DomainCombobox({
 
   const createLabel =
     query && !domains.some((d) => d.key.toLowerCase() === query.toLowerCase())
-      ? `Buat baru: "${query}"`
+      ? `Create new: "${query}"`
       : '';
 
   return (
@@ -76,7 +76,7 @@ export default function DomainCombobox({
               ? selected.label
               : value
                 ? value
-                : 'Pilih atau ketik domain'}
+                : 'Choose or type a domain'}
           </span>
           <div className="flex items-center gap-1">
             {value ? (
@@ -95,7 +95,7 @@ export default function DomainCombobox({
       <PopoverContent className="w-[var(--radix-popover-trigger-width)] p-0">
         <Command>
           <CommandInput
-            placeholder="Cari domain atau ketik baru..."
+            placeholder="Search domain or type new..."
             onValueChange={setQuery}
             className="h-9"
           />
@@ -112,10 +112,10 @@ export default function DomainCombobox({
                   <PlusCircle className="size-4" /> {createLabel}
                 </button>
               ) : (
-                'Tidak ada domain'
+                'No domains'
               )}
             </CommandEmpty>
-            <CommandGroup heading="Domain tersedia">
+            <CommandGroup heading="Available domains">
               {domains.map((d) => (
                 <CommandItem
                   key={d.key}
@@ -126,7 +126,9 @@ export default function DomainCombobox({
                   }}
                 >
                   <Check
-                    className={`mr-2 size-4 ${d.key === value ? 'opacity-100' : 'opacity-0'}`}
+                    className={`mr-2 size-4 ${
+                      d.key === value ? 'opacity-100' : 'opacity-0'
+                    }`}
                   />
                   <div className="flex flex-col">
                     <span className="text-sm">{d.label}</span>
@@ -138,7 +140,7 @@ export default function DomainCombobox({
               ))}
             </CommandGroup>
             {query && (
-              <CommandGroup heading="Aksi">
+              <CommandGroup heading="Actions">
                 <CommandItem
                   value={`__create__ ${query}`}
                   onSelect={() => {
@@ -146,7 +148,7 @@ export default function DomainCombobox({
                     setOpen(false);
                   }}
                 >
-                  <PlusCircle className="mr-2 size-4" /> Buat &quot;{query}
+                  <PlusCircle className="mr-2 size-4" /> Create &quot;{query}
                   &quot;
                 </CommandItem>
               </CommandGroup>

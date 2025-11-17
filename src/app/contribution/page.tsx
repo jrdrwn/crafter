@@ -15,10 +15,10 @@ export default function Page() {
         <Tabs defaultValue="add">
           <TabsList className="mx-auto flex justify-around">
             <TabsTrigger value="add" className="flex-1">
-              Tambah
+              Add
             </TabsTrigger>
             <TabsTrigger value="list" className="flex-1">
-              Daftar
+              List
             </TabsTrigger>
           </TabsList>
           <TabsContent value="add">

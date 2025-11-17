@@ -28,8 +28,9 @@ import { toast } from 'sonner';
 import { z } from 'zod';
 
 const EditSchema = z.object({
-  text: z.string().min(1, 'Teks tidak boleh kosong'),
+  text: z.string().min(1, 'Text must not be empty'),
   type: z.enum(['survey', 'interview', 'review', 'doc']),
+  visibility: z.enum(['public', 'private']).optional(),
   domain_key: z.string().optional().or(z.literal('')),
   language_key: z.enum(['en', 'id']).optional(),
   source: z.string().optional().or(z.literal('')),
@@ -70,6 +71,7 @@ export function ContribEditDialog({
     defaultValues: {
       text: '',
       type: 'review',
+      visibility: 'private',
       language_key: 'en',
       domain_key: '',
       source: '',
@@ -106,7 +108,7 @@ export function ContribEditDialog({
         const res = await fetch(`/api/rag/contributions/${id}`, {
           headers: { Authorization: `Bearer ${token}` },
         });
-        if (!res.ok) throw new Error('Gagal memuat detail');
+        if (!res.ok) throw new Error('Failed to load detail');
         const json = (await res.json()) as {
           status: boolean;
           data?: {
@@ -119,31 +121,38 @@ export function ContribEditDialog({
           };
         };
         const data = json.data!;
-        reset({
-          text: data.text,
-          type: data.type,
-          domain_key: data.domain_key ?? '',
-          language_key: (data.language_key as 'en' | 'id' | null) ?? undefined,
-          source: data.source ?? '',
-        });
-        // preload metadata builder
+
+        // extract visibility from metadata if present
+        let visibilityVal: 'public' | 'private' | undefined = undefined;
+        const nextMeta: Record<string, string> = {};
         if (
           data.metadata &&
           typeof data.metadata === 'object' &&
           !Array.isArray(data.metadata)
         ) {
           const obj = data.metadata as Record<string, unknown>;
-          const initial: Record<string, string> = {};
           for (const [k, v] of Object.entries(obj)) {
             if (k === 'doc_id' || k === 'chunk_index') continue; // internal keys
-            initial[k] = typeof v === 'string' ? v : JSON.stringify(v);
+            if (k === 'visibility') {
+              const vv = String(v).toLowerCase();
+              if (vv === 'public' || vv === 'private') visibilityVal = vv;
+              continue;
+            }
+            nextMeta[k] = typeof v === 'string' ? v : JSON.stringify(v);
           }
-          setMetaObj(initial);
-        } else {
-          setMetaObj({});
         }
+
+        reset({
+          text: data.text,
+          type: data.type,
+          domain_key: data.domain_key ?? '',
+          language_key: (data.language_key as 'en' | 'id' | null) ?? undefined,
+          source: data.source ?? '',
+          visibility: visibilityVal ?? 'private',
+        });
+        setMetaObj(nextMeta);
       } catch (e) {
-        toast.error('Gagal memuat', {
+        toast.error('Failed to load', {
           description: e instanceof Error ? e.message : String(e),
         });
         onOpenChangeAction(false);
@@ -171,15 +180,18 @@ export function ContribEditDialog({
           domain_key: values.domain_key || undefined,
           language_key: values.language_key,
           source: values.source || undefined,
-          extra: Object.keys(metaObj).length ? metaObj : undefined,
+          extra: {
+            ...(Object.keys(metaObj).length ? metaObj : {}),
+            ...(values.visibility ? { visibility: values.visibility } : {}),
+          },
         }),
       });
-      if (!res.ok) throw new Error('Gagal menyimpan perubahan');
-      toast.success('Berhasil disimpan');
+      if (!res.ok) throw new Error('Failed to save changes');
+      toast.success('Saved successfully');
       onSavedAction();
       onOpenChangeAction(false);
     } catch (e) {
-      toast.error('Gagal', {
+      toast.error('Failed', {
         description: e instanceof Error ? e.message : String(e),
       });
     } finally {
@@ -191,48 +203,69 @@ export function ContribEditDialog({
     <Dialog open={open} onOpenChange={onOpenChangeAction}>
       <DialogContent className="sm:max-w-2xl">
         <DialogHeader>
-          <DialogTitle>Edit Kontribusi</DialogTitle>
+          <DialogTitle>Edit Contribution</DialogTitle>
           <DialogDescription>
-            Perbarui isi dan metadata. Sistem akan re-index embeddings.
+            Update content and metadata. The system will re-index embeddings.
           </DialogDescription>
         </DialogHeader>
 
         {initializing ? (
           <div className="flex items-center gap-2 py-8 text-sm text-muted-foreground">
-            <Loader2 className="size-4 animate-spin" /> Memuat...
+            <Loader2 className="size-4 animate-spin" /> Loading...
           </div>
         ) : (
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-            <div className="grid gap-4 sm:grid-cols-2">
+            {/* Row 1: Content Type | Visibility | Language */}
+            <div className="grid gap-4 sm:grid-cols-3">
               <div className="space-y-2">
-                <Label htmlFor="type">Jenis</Label>
+                <Label htmlFor="type">Type</Label>
                 <Controller
                   name="type"
                   control={control}
                   render={({ field }) => (
                     <Select onValueChange={field.onChange} value={field.value}>
                       <SelectTrigger id="type">
-                        <SelectValue placeholder="Pilih jenis" />
+                        <SelectValue placeholder="Select type" />
                       </SelectTrigger>
                       <SelectContent>
                         <SelectItem value="survey">Survey</SelectItem>
                         <SelectItem value="interview">Interview</SelectItem>
                         <SelectItem value="review">Review</SelectItem>
-                        <SelectItem value="doc">Dokumen</SelectItem>
+                        <SelectItem value="doc">Document</SelectItem>
                       </SelectContent>
                     </Select>
                   )}
                 />
               </div>
+
               <div className="space-y-2">
-                <Label htmlFor="language_key">Bahasa</Label>
+                <Label htmlFor="visibility">Visibility</Label>
+                <Controller
+                  name="visibility"
+                  control={control}
+                  render={({ field }) => (
+                    <Select onValueChange={field.onChange} value={field.value}>
+                      <SelectTrigger id="visibility">
+                        <SelectValue placeholder="Select visibility" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="public">Public</SelectItem>
+                        <SelectItem value="private">Private</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  )}
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="language_key">Language</Label>
                 <Controller
                   name="language_key"
                   control={control}
                   render={({ field }) => (
                     <Select onValueChange={field.onChange} value={field.value}>
                       <SelectTrigger id="language_key">
-                        <SelectValue placeholder="Pilih bahasa" />
+                        <SelectValue placeholder="Select language" />
                       </SelectTrigger>
                       <SelectContent>
                         <SelectItem value="en">English</SelectItem>
@@ -242,7 +275,11 @@ export function ContribEditDialog({
                   )}
                 />
               </div>
-              <div className="space-y-2 sm:col-span-2">
+            </div>
+
+            {/* Row 2: Domain | Source */}
+            <div className="grid gap-4 sm:grid-cols-2">
+              <div className="space-y-2">
                 <Label htmlFor="domain_key">Domain</Label>
                 <Controller
                   name="domain_key"
@@ -260,18 +297,18 @@ export function ContribEditDialog({
                   </p>
                 )}
               </div>
-              <div className="space-y-2 sm:col-span-2">
-                <Label htmlFor="source">Sumber</Label>
+              <div className="space-y-2">
+                <Label htmlFor="source">Source</Label>
                 <Input
                   id="source"
-                  placeholder="opsional"
+                  placeholder="optional"
                   {...register('source')}
                 />
               </div>
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="text">Isi</Label>
+              <Label htmlFor="text">Content</Label>
               <Textarea
                 id="text"
                 rows={8}
@@ -293,17 +330,17 @@ export function ContribEditDialog({
               <Label>Extra Metadata</Label>
               <div className="mt-2 flex flex-col gap-2 sm:flex-row">
                 <Input
-                  placeholder="key (mis. project)"
+                  placeholder="key (e.g. project)"
                   value={metaKey}
                   onChange={(e) => setMetaKey(e.target.value)}
                 />
                 <Input
-                  placeholder="value (mis. alpha)"
+                  placeholder="value (e.g. alpha)"
                   value={metaValue}
                   onChange={(e) => setMetaValue(e.target.value)}
                 />
                 <Button type="button" onClick={addMetaPair}>
-                  Tambah
+                  Add
                 </Button>
               </div>
               {Object.keys(metaObj).length ? (
@@ -322,14 +359,14 @@ export function ContribEditDialog({
                         size="sm"
                         onClick={() => removeMetaKey(k)}
                       >
-                        Hapus
+                        Remove
                       </Button>
                     </li>
                   ))}
                 </ul>
               ) : (
                 <p className="mt-2 text-xs text-muted-foreground">
-                  Belum ada metadata ditambahkan.
+                  No metadata added yet.
                 </p>
               )}
             </div>
@@ -340,13 +377,13 @@ export function ContribEditDialog({
                 variant="ghost"
                 onClick={() => onOpenChangeAction(false)}
               >
-                Batal
+                Cancel
               </Button>
               <Button type="submit" disabled={loading || !isDirty}>
                 {loading ? (
                   <Loader2 className="mr-2 size-4 animate-spin" />
                 ) : null}
-                Simpan
+                Save
               </Button>
             </DialogFooter>
           </form>

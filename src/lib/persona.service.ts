@@ -103,7 +103,7 @@ export async function normalizeToRAGNote(
 ) {
   const lang = meta?.language ?? 'en';
   const llm = new ChatGoogleGenerativeAI({
-    model: 'gemini-2.5-flash-lite',
+    model: 'gemini-2.5-flash',
     apiKey: API_KEY!,
     temperature: 0.2,
   });
@@ -188,6 +188,7 @@ export async function runPersonaRAG(
           ...(opts.filters.language_key
             ? { language_key: opts.filters.language_key }
             : {}),
+          // No visibility filter here so the author can see both private and public of their own
         },
       );
     }
@@ -201,6 +202,7 @@ export async function runPersonaRAG(
             ...(opts?.filters?.language_key
               ? { language_key: opts.filters.language_key }
               : {}),
+            visibility: 'public', // only public docs are visible to everyone
           })
         : [];
     docs = [...personal, ...general];

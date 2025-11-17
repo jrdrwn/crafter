@@ -1,8 +1,24 @@
 'use client';
 
-import { Text } from 'lucide-react';
+import {
+  ResponsiveModal,
+  ResponsiveModalContent,
+  ResponsiveModalDescription,
+  ResponsiveModalHeader,
+  ResponsiveModalTitle,
+  ResponsiveModalTrigger,
+} from '@/components/ui/responsive-modal';
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from '@/components/ui/tooltip';
+import { cn } from '@/lib/utils';
+import * as RadioGroupPrimitive from '@radix-ui/react-radio-group';
+import { CircleAlertIcon, CircleQuestionMark, Text } from 'lucide-react';
 import { useState } from 'react';
 import { Control, Controller } from 'react-hook-form';
+import z from 'zod';
 
 import {
   Card,
@@ -14,25 +30,42 @@ import {
 } from '../../ui/card';
 import { Field } from '../../ui/field';
 import { Label } from '../../ui/label';
-import { RadioGroup, RadioGroupItem } from '../../ui/radio-group';
+import { RadioGroup } from '../../ui/radio-group';
 import { Slider } from '../../ui/slider';
-import type { CreateFormValues } from '../types';
+import { createFormSchema } from '../construct';
 
 type Props = {
-  control: Control<CreateFormValues>;
+  control: Control<z.infer<typeof createFormSchema>>;
 };
 
 export default function ContentLengthCard({ control }: Props) {
-  const [sliderValue, setSliderValue] = useState([
-    control._formValues.contentLength || 300,
-  ]);
-  const [sliderDisabled, setSliderDisabled] = useState(
-    control._formValues.contentLength <= 1000,
+  // Determine initial values
+  const initialLength = control._formValues.contentLength || 300;
+  const presetValues = [300, 600, 1000];
+  const initialIsPreset = presetValues.includes(initialLength);
+  const [radioValue, setRadioValue] = useState<string>(
+    initialIsPreset ? String(initialLength) : 'custom',
   );
+  const [sliderValue, setSliderValue] = useState<number>(
+    initialIsPreset ? initialLength : Math.max(initialLength, 1100),
+  );
+  const isCustom = radioValue === 'custom';
 
   return (
     <Card className="col-span-1 w-full border border-primary p-2">
       <CardHeader className="relative p-2">
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <CircleAlertIcon className="absolute top-0 right-7 size-5 text-gray-400 hover:text-gray-600" />
+          </TooltipTrigger>
+          <TooltipContent>
+            <p>
+              if there are too many human factor, the response length can be not
+              what you want
+            </p>
+          </TooltipContent>
+        </Tooltip>
+        <ContentLengthHelperModal />
         <CardTitle className="flex items-center gap-2 text-xl text-primary">
           <Text size={20} className="text-foreground" />
           Content Length Settings
@@ -48,45 +81,45 @@ export default function ContentLengthCard({ control }: Props) {
           render={({ field, fieldState }) => (
             <Field data-invalid={fieldState.invalid}>
               <RadioGroup
-                defaultValue={
-                  +field.value > 1000 ? 'custom' : String(field.value)
-                }
+                // Controlled RadioGroup
+                value={radioValue}
+                className="flex flex-row flex-wrap gap-3"
                 onValueChange={(value) => {
+                  setRadioValue(value);
                   if (value === 'custom') {
-                    setSliderDisabled(false);
+                    // When switching to custom, ensure length > 1000 or default 1100
+                    const next = field.value > 1000 ? field.value : 1100;
+                    setSliderValue(next);
+                    field.onChange(next);
                   } else {
                     const length = parseInt(value, 10);
+                    setSliderValue(length);
                     field.onChange(length);
-                    setSliderValue([length]);
-                    setSliderDisabled(true);
                   }
                 }}
               >
-                <div className="flex items-center space-x-2">
-                  <RadioGroupItem value="300" id="short" />
-                  <Label htmlFor="short">Short</Label>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <RadioGroupItem value="600" id="medium" />
-                  <Label htmlFor="medium">Medium</Label>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <RadioGroupItem value="1000" id="long" />
-                  <Label htmlFor="long">Long</Label>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <RadioGroupItem value="custom" id="custom" />
-                  <Label htmlFor="custom">
-                    Custom {!sliderDisabled && `(${sliderValue} words)`}
-                  </Label>
-                </div>
+                <RadioBoxItem value="300" id="short" className="">
+                  Short
+                </RadioBoxItem>
+                <RadioBoxItem value="600" id="medium" className="">
+                  Medium
+                </RadioBoxItem>
+                <RadioBoxItem value="1000" id="long" className="">
+                  Long
+                </RadioBoxItem>
+                <RadioBoxItem value="custom" id="custom" className="flex-1">
+                  Custom ({sliderValue} words)
+                </RadioBoxItem>
               </RadioGroup>
             </Field>
           )}
         />
       </CardContent>
       <CardFooter className="border-t border-dashed px-2 pb-2">
-        <div className="flex w-full items-center gap-2">
+        <div className="flex w-full flex-col gap-2">
+          <Label className="text-xs text-gray-500">
+            Word count {isCustom ? '(drag to adjust)' : '(preset locked)'}
+          </Label>
           <Controller
             name="contentLength"
             control={control}
@@ -94,11 +127,12 @@ export default function ContentLengthCard({ control }: Props) {
               <Slider
                 max={2000}
                 step={50}
-                disabled={sliderDisabled}
-                value={sliderValue}
+                disabled={!isCustom}
+                value={[sliderValue]}
                 onValueChange={(value) => {
-                  field.onChange(value[0]);
-                  setSliderValue(value);
+                  const next = value[0];
+                  setSliderValue(next);
+                  field.onChange(next);
                 }}
               />
             )}
@@ -106,5 +140,84 @@ export default function ContentLengthCard({ control }: Props) {
         </div>
       </CardFooter>
     </Card>
+  );
+}
+
+function ContentLengthHelperModal() {
+  return (
+    <ResponsiveModal>
+      <ResponsiveModalTrigger asChild>
+        <CircleQuestionMark className="absolute top-0 right-0 size-5 text-gray-400 hover:text-gray-600" />
+      </ResponsiveModalTrigger>
+      <ResponsiveModalContent>
+        <ResponsiveModalHeader>
+          <ResponsiveModalTitle className="text-2xl">
+            Helper: Content Length
+          </ResponsiveModalTitle>
+          <ResponsiveModalDescription>
+            The length of the persona determines the details shown: short for
+            quick ideas, medium for balance, long for in-depth analysis.
+          </ResponsiveModalDescription>
+        </ResponsiveModalHeader>
+        <div className="mt-4 space-y-4">
+          <ul className="space-y-2">
+            <li>
+              <span className="font-medium text-primary">
+                Short (±100-200 kata)
+              </span>
+              <br />
+              <span>
+                Cocok untuk brainstorming; berisi inti seperti demografi, tujuan
+                utama, dan 1-2 pain points
+              </span>
+            </li>
+            <li>
+              <span className="font-medium text-primary">
+                Medium (±200-400 kata)
+              </span>
+              <br />
+              <span>
+                Seimbang untuk workshop; memuat motivasi, beberapa tujuan, pain
+                points, dan interaksi dengan teknologi
+              </span>
+            </li>
+            <li>
+              <span className="font-medium text-primary">Long (≥400 kata)</span>
+              <br />
+              <span>
+                Mendalam; menambahkan cerita personal, konteks domain, serta
+                faktor manusia lebih lengkap
+              </span>
+            </li>
+            <li>
+              <span className="font-medium text-primary">Custom</span>
+              <br />
+              <span>Pengguna dapat mengatur jumlah kata sesuai kebutuhan</span>
+            </li>
+          </ul>
+        </div>
+      </ResponsiveModalContent>
+    </ResponsiveModal>
+  );
+}
+
+function RadioBoxItem({
+  className,
+  children,
+  ...props
+}: React.ComponentProps<typeof RadioGroupPrimitive.Item>) {
+  return (
+    <RadioGroupPrimitive.Item
+      data-slot="radio-group-box-item"
+      className={cn(
+        'flex cursor-pointer flex-col items-center justify-center rounded-md border px-3 py-2 text-sm font-medium transition-all outline-none select-none hover:border-primary/60 focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/40 disabled:cursor-not-allowed disabled:opacity-50 data-[state=checked]:border-primary data-[state=checked]:bg-primary/10 data-[state=checked]:shadow-sm data-[state=checked]:ring-2 data-[state=checked]:ring-primary/30',
+        className,
+      )}
+      {...props}
+    >
+      {/* Hide default circular indicator if present */}
+      <RadioGroupPrimitive.Indicator className="hidden" />
+      {children}
+    </RadioGroupPrimitive.Item>
   );
 }

@@ -6,6 +6,7 @@ import DomainCard from '@/components/create/cards/domain-card';
 import ExternalFactorsCard from '@/components/create/cards/external-factors-card';
 import InternalFactorsCard from '@/components/create/cards/internal-factors-card';
 import LLMConfigCard from '@/components/create/cards/llm-config-card';
+import { useUser } from '@/contexts/user-context';
 import { cn } from '@/lib/utils';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { defineStepper } from '@stepperize/react';
@@ -36,7 +37,7 @@ import { Separator } from '../ui/separator';
 import { Spinner } from '../ui/spinner';
 import type { CreateFormValues } from './types';
 
-const formSchema = z.object({
+export const createFormSchema = z.object({
   domain: z
     .object({
       key: z.string().min(1, 'Domain is required'),
@@ -105,11 +106,12 @@ const { useStepper, steps, utils } = defineStepper(
 );
 
 export default function Design() {
+  const { user } = useUser();
   const stepper = useStepper();
   const currentIndex = utils.getIndex(stepper.current.id);
 
   const form = useForm<CreateFormValues>({
-    resolver: zodResolver(formSchema),
+    resolver: zodResolver(createFormSchema),
     mode: 'onChange',
     defaultValues: {
       domain: { key: '', label: '' },
@@ -166,15 +168,13 @@ export default function Design() {
         },
         body: JSON.stringify(data),
       });
-      const json = await res.json();
+      setLoading(false);
       if (!res.ok) {
-        toast.error(
-          `Failed to create persona(s): ${json.message || 'Unknown error'}`,
-        );
-        setLoading(false);
+        toast.error('Failed to create persona: Unknown error');
         return;
       }
-      toast.success('Persona(s) created successfully!');
+      const json = await res.json();
+      toast.success('Persona created successfully!');
       try {
         const STORAGE_KEY = 'crafter:personas';
         const entry = {
@@ -197,16 +197,18 @@ export default function Design() {
         },
         body: JSON.stringify(data),
       });
-      const json = await res.json();
+      setLoading(false);
       if (!res.ok) {
         toast.error(
-          `Failed to create persona(s): ${json.message || 'Unknown error'}`,
+          `Failed to create persona: ${user ? 'Unknown error' : 'Please login again'}`,
         );
+        return;
       }
-      toast.success('Persona(s) created successfully!');
+      const json = await res.json();
+
+      toast.success('Persona created successfully!');
       router.push(`/detail/${json.personaId}`);
     }
-    setLoading(false);
   }
 
   const stepFields = useMemo(
@@ -412,7 +414,7 @@ export default function Design() {
                     <div className="flex items-center gap-2">
                       <Ruler className="h-4 w-4 text-muted-foreground" />
                       <span className="font-medium">Content length:</span>
-                      <span>{form.getValues('contentLength')}</span>
+                      <span>{form.getValues('contentLength')} words</span>
                     </div>
                     <div className="flex items-center gap-2">
                       <Database className="h-4 w-4 text-muted-foreground" />
@@ -429,7 +431,7 @@ export default function Design() {
                       <StickyNote className="mt-0.5 h-4 w-4 text-muted-foreground" />
                       <div className="w-full">
                         <span className="font-medium">Detail</span>
-                        <p className="mt-1 max-h-28 overflow-auto rounded bg-muted/40 p-2 text-xs whitespace-pre-line text-muted-foreground">
+                        <p className="mt-1 max-h-15 overflow-auto rounded bg-muted/40 p-2 text-xs whitespace-pre-line text-muted-foreground">
                           {form.getValues('detail') || '-'}
                         </p>
                       </div>

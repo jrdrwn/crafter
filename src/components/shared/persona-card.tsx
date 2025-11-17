@@ -39,7 +39,7 @@ export function PersonaCard({
   return (
     <Card
       className={cn(
-        'h-full w-full gap-4 border-primary bg-primary/5 py-4',
+        'h-full w-full gap-4 py-4 hover:border-primary hover:bg-primary/5',
         className,
       )}
     >

@@ -44,6 +44,7 @@ export type ContributionPayload = {
   author_id?: number | string | bigint | null;
   source?: string;
   extra?: Prisma.InputJsonValue;
+  visibility?: 'public' | 'private';
 };
 
 // CREATE
@@ -58,6 +59,7 @@ export async function ingestContribution(payload: ContributionPayload) {
       author_id: payload.author_id ? BigInt(String(payload.author_id)) : null,
       source: payload.source ?? null,
       metadata: payload.extra ?? ({} as Prisma.InputJsonValue),
+      visibility: payload.visibility ?? 'private',
     },
     select: { id: true },
   });
@@ -82,6 +84,10 @@ export async function ingestContribution(payload: ContributionPayload) {
     language_key: payload.language_key,
     author_id: payload.author_id ? String(payload.author_id) : null,
     source: payload.source ?? 'contribution',
+    visibility:
+      (extraObject.visibility as 'public' | 'private' | undefined) ??
+      payload.visibility ??
+      'private',
     ...extraObject,
   } as Record<string, unknown>;
 
@@ -172,6 +178,7 @@ export async function updateContribution(
       language_key: newLang,
       source: newSource,
       metadata: extra,
+      visibility: data.visibility ?? existing.visibility,
     },
   });
 
@@ -199,6 +206,9 @@ export async function updateContribution(
     language_key: newLang,
     author_id: String(authorId),
     source: newSource ?? 'contribution',
+    visibility:
+      (extraObject.visibility as 'public' | 'private' | undefined) ??
+      (existing.visibility as 'public' | 'private'),
     ...extraObject,
   } as Record<string, unknown>;
 

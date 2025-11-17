@@ -1,5 +1,6 @@
 'use client';
 
+import { ErrorMessageButtonRetry } from '@/helpers/error-retry';
 import { Brain, Users, X } from 'lucide-react';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { Control, Controller } from 'react-hook-form';
@@ -25,6 +26,8 @@ type Props = {
 };
 
 export default function ExternalFactorsCard({ control }: Props) {
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const [factors, setFactors] = useState<Factor[]>([]);
   const [query, setQuery] = useState('');
   const [activeName, setActiveName] = useState<string | null>(null);
@@ -37,12 +40,19 @@ export default function ExternalFactorsCard({ control }: Props) {
     [],
   );
 
-  useEffect(() => {
-    async function fetchAttributes() {
-      const res = await fetch('/api/persona/helper/attribute');
-      const json = await res.json();
-      setFactors(json.data.external as Factor[]);
+  async function fetchAttributes() {
+    setLoading(true);
+    setError(null);
+    const res = await fetch('/api/persona/helper/attribute?layer=external');
+    setLoading(false);
+    if (!res.ok) {
+      setError('Failed to load attributes');
+      return;
     }
+    const json = await res.json();
+    setFactors(json.data as Factor[]);
+  }
+  useEffect(() => {
     fetchAttributes();
   }, []);
 
@@ -129,7 +139,20 @@ export default function ExternalFactorsCard({ control }: Props) {
               control={control}
               render={({ field, fieldState }) => (
                 <Field data-invalid={fieldState.invalid}>
-                  <ScrollArea className="h-80">
+                  <ScrollArea className="h-68">
+                    {!loading && error && (
+                      <ErrorMessageButtonRetry
+                        message={error}
+                        onRetry={fetchAttributes}
+                      />
+                    )}
+                    {loading && (
+                      <div className="space-y-2 p-2">
+                        <LayerItemSkeleton />
+                        <LayerItemSkeleton />
+                        <LayerItemSkeleton />
+                      </div>
+                    )}
                     {groups.map((group) => (
                       <div key={group.id} className="mb-3">
                         <p className="mb-2 text-xs font-semibold text-muted-foreground">
@@ -161,14 +184,7 @@ export default function ExternalFactorsCard({ control }: Props) {
                                             (s) => s.name === val.name,
                                           )
                                         ) {
-                                          field.onChange([
-                                            ...selected,
-                                            {
-                                              name: val.name,
-                                              title: val.title,
-                                              description: val.description,
-                                            },
-                                          ]);
+                                          field.onChange([...selected, val]);
                                         }
                                       } else {
                                         const next = selected.filter(
@@ -274,6 +290,7 @@ export default function ExternalFactorsCard({ control }: Props) {
                                 {s.title}
                               </button>
                               <Button
+                                hidden={required.has(s.name)}
                                 type="button"
                                 size="icon"
                                 variant="ghost"
@@ -471,5 +488,15 @@ export default function ExternalFactorsCard({ control }: Props) {
         </div>
       </CardContent>
     </Card>
+  );
+}
+
+function LayerItemSkeleton() {
+  return (
+    <div className="animate-pulse">
+      <div className="mb-2 h-4 w-1/2 rounded bg-gray-300" />
+      <div className="mb-1 h-3 w-full rounded bg-gray-200" />
+      <div className="mb-1 h-3 w-5/6 rounded bg-gray-200" />
+    </div>
   );
 }

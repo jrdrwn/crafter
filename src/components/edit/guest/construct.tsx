@@ -142,15 +142,13 @@ export default function Design({ persona }: DesignProps) {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(data),
     });
-    const json = await res.json();
+    setLoading(false);
     if (!res.ok) {
-      toast.error(
-        `Failed to create persona(s): ${json.message || 'Unknown error'}`,
-      );
-      setLoading(false);
+      toast.error('Failed to edit persona: Unknown error');
       return;
     }
-    toast.success('Persona(s) created successfully!');
+    const json = await res.json();
+    toast.success('Persona edited successfully!');
     try {
       const STORAGE_KEY = 'crafter:personas';
       const entry = {
@@ -164,7 +162,6 @@ export default function Design({ persona }: DesignProps) {
     } catch (err) {
       console.error('Failed to save personas to localStorage:', err);
     }
-    setLoading(false);
   }
 
   const stepFields = useMemo(
