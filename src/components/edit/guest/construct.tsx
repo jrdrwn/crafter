@@ -1,5 +1,4 @@
-"use client";
-import { useRef } from "react";
+'use client';
 
 import AdditionalDetailsCard from '@/components/create/cards/additional-details-card';
 import ContentLengthCard from '@/components/create/cards/content-length-card';
@@ -25,7 +24,7 @@ import {
   StickyNote,
 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
-import { Fragment, useMemo, useState } from 'react';
+import { Fragment, useMemo, useRef, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
 import z from 'zod';
@@ -93,7 +92,7 @@ const { useStepper, steps, utils } = defineStepper(
   { id: 'review', label: 'Review' },
 );
 
-
+export default function Design({ persona }: DesignProps) {
   // Ref for the multi-step form area
   const formSectionRef = useRef<HTMLDivElement>(null);
 
@@ -191,7 +190,10 @@ const { useStepper, steps, utils } = defineStepper(
       stepper.next();
       // Scroll to the top of the multi-step form area
       if (formSectionRef.current) {
-        formSectionRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        formSectionRef.current.scrollIntoView({
+          behavior: 'smooth',
+          block: 'start',
+        });
       }
     }
   };
@@ -200,15 +202,15 @@ const { useStepper, steps, utils } = defineStepper(
   const handlePrev = () => {
     stepper.prev();
     if (formSectionRef.current) {
-      formSectionRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      formSectionRef.current.scrollIntoView({
+        behavior: 'smooth',
+        block: 'start',
+      });
     }
   };
 
   return (
-    <section
-      ref={formSectionRef}
-      className="p-2 py-8 sm:p-4 sm:py-12 lg:py-16"
-    >
+    <section ref={formSectionRef} className="p-2 py-8 sm:p-4 sm:py-12 lg:py-16">
       <form
         onSubmit={form.handleSubmit(onSubmit)}
         className="container mx-auto flex flex-col gap-6"
@@ -489,3 +491,5 @@ const { useStepper, steps, utils } = defineStepper(
         </div>
       </form>
     </section>
+  );
+}
