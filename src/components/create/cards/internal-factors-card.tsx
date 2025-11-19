@@ -263,7 +263,7 @@ export default function InternalFactorsCard({ control }: Props) {
                           >
                             <Item
                               variant="outline"
-                              className="mr-4 w-full border-primary p-2"
+                              className="w-full border-primary p-2"
                             >
                               <ItemContent>
                                 <ItemTitle>

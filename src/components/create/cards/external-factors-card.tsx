@@ -286,7 +286,7 @@ export default function ExternalFactorsCard({ control }: Props) {
                           >
                             <Item
                               variant="outline"
-                              className={`mr-4 w-full p-2 ${
+                              className={`w-full p-2 ${
                                 required.has(val.name)
                                   ? 'border-gray-300'
                                   : 'border-primary'
