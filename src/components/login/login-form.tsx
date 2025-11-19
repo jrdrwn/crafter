@@ -76,19 +76,19 @@ export default function LoginForm() {
   }
 
   return (
-    <section className="py-20">
-      <div className="container">
+    <section className="px-2 py-12 sm:py-16 lg:py-20">
+      <div className="container mx-auto">
         <form onSubmit={form.handleSubmit(onSubmit)}>
-          <Card className="mx-auto max-w-sm border-primary">
+          <Card className="mx-auto w-full max-w-md border-primary">
             <CardHeader>
-              <CardTitle className="text-center text-2xl text-primary">
+              <CardTitle className="text-center text-xl text-primary sm:text-2xl">
                 Login to Your Account
               </CardTitle>
-              <CardDescription className="text-center">
+              <CardDescription className="text-center text-xs sm:text-sm">
                 Log in to access your persona history and advanced features.
               </CardDescription>
             </CardHeader>
-            <CardContent>
+            <CardContent className="space-y-4 sm:space-y-5">
               <Controller
                 name="identifier"
                 control={form.control}
