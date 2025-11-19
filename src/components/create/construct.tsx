@@ -246,7 +246,7 @@ export default function Design() {
               <Fragment key={s.id}>
                 <li
                   key={s.id}
-                  className="flex shrink-0 items-center gap-1 sm:gap-2 md:gap-3"
+                  className="flex shrink-0 flex-col items-center gap-1 sm:gap-2 md:gap-3 lg:flex-row"
                 >
                   <Button
                     type="button"

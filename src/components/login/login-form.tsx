@@ -3,14 +3,7 @@
 import { useUser } from '@/contexts/user-context';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { setCookie } from 'cookies-next/client';
-import {
-  BadgeAlert,
-  BadgeCheck,
-  Eye,
-  EyeOff,
-  LockKeyhole,
-  MailIcon,
-} from 'lucide-react';
+import { Eye, EyeOff, LockKeyhole, MailIcon } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
@@ -71,15 +64,12 @@ export default function LoginForm() {
     };
     if (res.status === 200) {
       setCookie('token', json.data.token);
-      toast('Login Berhasil', {
-        icon: <BadgeCheck />,
-      });
+      toast.success('Login Successful');
       refresh();
       router.push('/');
     } else {
-      toast('Login Gagal', {
+      toast.error('Login Failed', {
         description: json.message,
-        icon: <BadgeAlert />,
       });
     }
     setLoading(false);

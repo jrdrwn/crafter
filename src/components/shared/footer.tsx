@@ -4,16 +4,13 @@ import Link from 'next/link';
 export default function Footer() {
   return (
     <footer className="px-2 md:px-4">
-      <div className="container mx-auto p-4 text-muted-foreground md:p-6 lg:p-8">
-        <div className="flex flex-col-reverse flex-wrap items-center justify-center gap-3 text-center md:flex-row md:justify-between md:gap-2 md:text-left">
+      <div className="container mx-auto text-muted-foreground md:p-2">
+        <div className="flex flex-wrap items-center justify-between gap-2 text-center md:flex-row md:justify-between md:gap-2 md:text-left">
           <p className="text-xs leading-7 md:text-sm [&:not(:first-child)]:mt-0 md:[&:not(:first-child)]:mt-6">
             © 2025 Crafter. All rights reserved.
           </p>
           <div className="flex gap-2">
-            <Link
-              href={'https://www.instagram.com/_qalamify/'}
-              target={'_blank'}
-            >
+            <Link href={'https://www.instagram.com/crafter/'} target={'_blank'}>
               <Button
                 variant={'link'}
                 className="px-0 text-xs text-muted-foreground md:text-sm"

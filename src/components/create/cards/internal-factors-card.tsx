@@ -107,8 +107,8 @@ export default function InternalFactorsCard({ control }: Props) {
           Human Factors — Internal Layer
         </CardTitle>
         <CardDescription className="text-xs text-gray-400 sm:text-sm">
-          Pilih faktor internal yang tersedia. Ubah deskripsi sebagai daftar
-          item.
+          Select available internal factors. Edit the description as a list of
+          items.
         </CardDescription>
       </CardHeader>
       <CardContent className="px-1.5 sm:px-2">

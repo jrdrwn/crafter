@@ -136,7 +136,7 @@ export default function DomainCard({ control }: Props) {
                     onRetry={fetchDomains}
                   />
                 )}
-                <ScrollArea className="max-h-60 sm:max-h-72 md:max-h-80">
+                <ScrollArea className="h-60 overflow-hidden sm:h-72 md:h-80">
                   <div className="grid grid-cols-1 gap-2 sm:gap-3 md:grid-cols-2 lg:grid-cols-3">
                     {loading && (
                       <>

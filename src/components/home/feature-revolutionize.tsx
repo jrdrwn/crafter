@@ -6,7 +6,7 @@ import { Card, CardContent } from '../ui/card';
 
 export default function FeatureRevolutionize() {
   return (
-    <section className="relative px-4 py-8 md:px-8 md:py-12 lg:px-16 lg:py-14 xl:px-24">
+    <section className="relative px-8 py-8 md:px-12 md:py-12 lg:px-16 lg:py-14 xl:px-24">
       <div className="container mx-auto">
         <div className="absolute inset-x-4 top-0 bottom-1/3 before:absolute before:top-0 before:bottom-0 before:left-0 before:w-[1px] before:bg-gradient-to-b before:from-primary before:to-transparent before:[mask-image:repeating-linear-gradient(to_bottom,black_0_2.5px,transparent_2.5px_4px)] before:content-[''] after:absolute after:top-0 after:right-0 after:bottom-0 after:w-[1px] after:bg-gradient-to-b after:from-primary after:to-transparent after:[mask-image:repeating-linear-gradient(to_bottom,black_0_2.5px,transparent_2.5px_4px)] after:content-[''] md:inset-x-8 lg:inset-x-12"></div>
         <div className="grid grid-cols-1 gap-8 lg:grid-cols-2 lg:gap-12">
@@ -62,22 +62,22 @@ export default function FeatureRevolutionize() {
                       Ahmad Rizky
                     </p>
                     <p className="text-sm font-medium text-gray-500 md:text-base">
-                      Product Manager, 28 tahun
+                      Product Manager, 28 years old
                     </p>
                   </div>
                 </div>
                 <p className="text-sm text-gray-500 italic md:text-base">
-                  &ldquo;Saya butuh solusi yang efisien untuk mengautomasi
-                  proses bisnis tanpa mengorbankan kualitas.&rdquo;
+                  &ldquo;I need an efficient solution to automate business
+                  processes without sacrificing quality.&rdquo;
                 </p>
                 <div className="mt-4 space-y-2 [&>div]:flex [&>div]:justify-between [&>div]:text-xs [&>div]:font-medium [&>div]:text-gray-500 [&>div]:md:text-sm [&>div>:first-child]:text-primary">
                   <div>
-                    <span>Motivasi:</span>
-                    <span>Efisiensi operasional</span>
+                    <span>Motivation:</span>
+                    <span>Operational efficiency</span>
                   </div>
                   <div>
                     <span>Pain Point:</span>
-                    <span>Interface kompleks</span>
+                    <span>Complex interface</span>
                   </div>
                   <div>
                     <span>Skill Level:</span>

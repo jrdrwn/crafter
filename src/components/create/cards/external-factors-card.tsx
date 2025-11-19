@@ -25,6 +25,15 @@ type Props = {
   control: Control<CreateFormValues>;
 };
 
+const defaultExplanations: Record<string, string> = {
+  'motivation':
+    'Explains the main driving forces or underlying reasons that make the persona act or decide.',
+  'goals':
+    'Specific objectives or outcomes the persona wants to achieve in the context of the product / system.',
+  'pain-points':
+    'Key challenges, obstacles, or problems frequently experienced by the persona that need to be solved.',
+};
+
 export default function ExternalFactorsCard({ control }: Props) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -122,8 +131,8 @@ export default function ExternalFactorsCard({ control }: Props) {
           Human Factors — External Layer
         </CardTitle>
         <CardDescription className="text-xs text-gray-400 sm:text-sm">
-          Pilih faktor eksternal yang tersedia. Ubah deskripsi sebagai daftar
-          item.
+          Select available external factors. Edit the description as a list of
+          items.
         </CardDescription>
       </CardHeader>
       <CardContent className="px-1.5 sm:px-2">
@@ -171,7 +180,11 @@ export default function ExternalFactorsCard({ control }: Props) {
                           >
                             <Item
                               variant="outline"
-                              className="mr-4 w-full border-primary p-2"
+                              className={`mr-4 w-full p-2 ${
+                                required.has(val.name)
+                                  ? 'border-gray-300'
+                                  : 'border-primary'
+                              }`}
                             >
                               <ItemContent>
                                 <ItemTitle>
@@ -179,10 +192,8 @@ export default function ExternalFactorsCard({ control }: Props) {
                                     onCheckedChange={(checked) => {
                                       const selected = (field.value ||
                                         []) as Factor[];
-                                      if (!checked && required.has(val.name)) {
-                                        // Prevent unchecking mandatory items
+                                      if (!checked && required.has(val.name))
                                         return;
-                                      }
                                       if (checked) {
                                         if (
                                           !selected.some(
@@ -213,8 +224,19 @@ export default function ExternalFactorsCard({ control }: Props) {
                                       ) || false
                                     }
                                   />
-                                  <Users className="size-4 text-primary" />
+                                  <Users
+                                    className={`size-4 ${
+                                      required.has(val.name)
+                                        ? 'text-primary'
+                                        : 'text-primary'
+                                    }`}
+                                  />
                                   {val.title}
+                                  {required.has(val.name) && (
+                                    <span className="ml-2 rounded bg-gray-200 px-1.5 py-0.5 text-[10px] font-medium text-gray-600">
+                                      default
+                                    </span>
+                                  )}
                                 </ItemTitle>
                                 <ItemDescription className="ml-6 text-xs">
                                   {val.description}
@@ -230,7 +252,6 @@ export default function ExternalFactorsCard({ control }: Props) {
               )}
             />
           </div>
-
           {/* Middle: Selected */}
           <div className="space-y-2">
             <h3 className="text-xs font-medium text-primary sm:text-sm">
@@ -250,7 +271,6 @@ export default function ExternalFactorsCard({ control }: Props) {
                       const preview = previewArr.length
                         ? `${previewArr.slice(0, 3).join(', ')}${previewArr.length > 3 ? '…' : ''}`
                         : 'No items';
-
                       const selectItem = () => {
                         setActiveName(s.name);
                         const arr = (s.description || '')
@@ -265,9 +285,15 @@ export default function ExternalFactorsCard({ control }: Props) {
                         <Item
                           key={s.name}
                           variant="outline"
-                          className={`w-full border-primary p-2 ${
+                          className={`w-full p-2 ${
+                            required.has(s.name)
+                              ? 'border-gray-300'
+                              : 'border-primary'
+                          } ${
                             activeName === s.name
-                              ? 'bg-primary/5 ring-1 ring-primary'
+                              ? required.has(s.name)
+                                ? 'ring-1 ring-gray-300'
+                                : 'bg-primary/5 ring-1 ring-primary'
                               : ''
                           }`}
                           role="button"
@@ -324,6 +350,11 @@ export default function ExternalFactorsCard({ control }: Props) {
                               >
                                 <X className="size-4" />
                               </Button>
+                              {required.has(s.name) && (
+                                <span className="rounded bg-gray-200 px-1.5 py-0.5 text-[10px] font-medium text-gray-600">
+                                  default
+                                </span>
+                              )}
                             </ItemTitle>
                             <ItemDescription className="text-xs text-muted-foreground">
                               {preview}
@@ -342,7 +373,6 @@ export default function ExternalFactorsCard({ control }: Props) {
               )}
             />
           </div>
-
           {/* Right: Details editor */}
           <div className="space-y-2">
             <h3 className="text-xs font-medium text-primary sm:text-sm">
@@ -355,9 +385,8 @@ export default function ExternalFactorsCard({ control }: Props) {
                 const selected = ((field.value || []) as Factor[]).find(
                   (s) => s.name === activeName,
                 );
-
                 const commitTokens = (nextTokens: string[]) => {
-                  if (!selected) return;
+                  if (!selected || required.has(selected.name)) return;
                   const next = ((field.value || []) as Factor[]).map((s) =>
                     s.name === selected.name
                       ? { ...s, description: nextTokens.join(', ') }
@@ -365,13 +394,29 @@ export default function ExternalFactorsCard({ control }: Props) {
                   );
                   field.onChange(next);
                 };
-
                 return (
                   <div className="h-56 rounded-md border p-2 sm:h-64 md:h-80 md:p-3">
                     {!selected ? (
                       <p className="text-sm text-muted-foreground">
                         Select a factor from the middle list to edit details.
                       </p>
+                    ) : required.has(selected.name) ? (
+                      <div className="flex h-full flex-col gap-3">
+                        <div>
+                          <p className="text-sm font-medium text-gray-700">
+                            {selected.title} (default)
+                          </p>
+                          <p className="text-xs text-muted-foreground">
+                            Layer explanation (read-only).
+                          </p>
+                        </div>
+                        <div className="h-32 w-full overflow-auto rounded border border-gray-200 bg-gray-50 p-2 text-xs leading-relaxed whitespace-pre-line text-gray-700">
+                          {defaultExplanations[selected.name] ||
+                            (selected as any).explanation ||
+                            'No explanation.'}
+                        </div>
+                        {/* no editing controls for default factors */}
+                      </div>
                     ) : (
                       <div className="flex h-full flex-col gap-3">
                         <div>

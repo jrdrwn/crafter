@@ -70,6 +70,7 @@
     "eslint-config-prettier": "^10.1.8",
     "hono": "^4.9.7",
     "html-react-parser": "^5.2.7",
+    "jspdf": "^3.0.3",
     "lucide-react": "^0.544.0",
     "mammoth": "^1.11.0",
     "motion": "^12.23.24",

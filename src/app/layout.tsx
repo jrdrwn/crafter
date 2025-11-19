@@ -1,3 +1,4 @@
+import { ThemeProvider } from '@/components/shared/theme-provider';
 import { Toaster } from '@/components/ui/sonner';
 import { UserProvider } from '@/contexts/user-context';
 import type { Metadata } from 'next';
@@ -27,14 +28,21 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <body
         className={`${jakartaSans.variable} ${geistMono.variable} antialiased`}
       >
-        <UserProvider>
-          <div className="flex min-h-screen flex-col">{children}</div>
-        </UserProvider>
-        <Toaster />
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="system"
+          enableSystem
+          disableTransitionOnChange
+        >
+          <UserProvider>
+            <div className="flex min-h-screen flex-col">{children}</div>
+          </UserProvider>
+          <Toaster />
+        </ThemeProvider>
       </body>
     </html>
   );

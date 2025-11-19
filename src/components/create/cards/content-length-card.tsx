@@ -102,21 +102,21 @@ export default function ContentLengthCard({ control }: Props) {
                 <RadioBoxItem
                   value="300"
                   id="short"
-                  className=" text-xs sm:text-sm"
+                  className="text-xs sm:text-sm"
                 >
                   Short
                 </RadioBoxItem>
                 <RadioBoxItem
                   value="600"
                   id="medium"
-                  className=" text-xs sm:text-sm"
+                  className="text-xs sm:text-sm"
                 >
                   Medium
                 </RadioBoxItem>
                 <RadioBoxItem
                   value="1000"
                   id="long"
-                  className=" text-xs sm:text-sm"
+                  className="text-xs sm:text-sm"
                 >
                   Long
                 </RadioBoxItem>
