@@ -15,6 +15,8 @@ interface PersonaCardProps {
   createdByMe?: boolean;
   className?: string;
   quoteClamp?: 2 | 3 | 4;
+  authorName?: string;
+  authorEmail?: string;
 }
 
 export function PersonaCard({
@@ -26,6 +28,8 @@ export function PersonaCard({
   createdByMe,
   className,
   quoteClamp,
+  authorName,
+  authorEmail,
 }: PersonaCardProps) {
   const clampClass =
     quoteClamp === 2
@@ -60,6 +64,13 @@ export function PersonaCard({
             <p className="text-lg font-semibold text-primary">{name}</p>
             {subtitle && (
               <p className="font-medium text-gray-500">{subtitle}</p>
+            )}
+            {(authorName || authorEmail) && (
+              <p className="mt-0.5 text-xs text-muted-foreground">
+                {createdByMe
+                  ? 'by You'
+                  : `by ${authorName || (authorEmail ? authorEmail.split('@')[0] : '')}`}
+              </p>
             )}
           </div>
         </div>

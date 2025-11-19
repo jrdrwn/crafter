@@ -1,10 +1,21 @@
 'use client';
 
 import { ErrorMessageButtonRetry } from '@/helpers/error-retry';
-import { Brain, Users, X } from 'lucide-react';
+import { Brain, RotateCcw, Users, X } from 'lucide-react';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { Control, Controller } from 'react-hook-form';
 
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from '../../ui/alert-dialog';
 import { Badge } from '../../ui/badge';
 import { Button } from '../../ui/button';
 import {
@@ -142,12 +153,97 @@ export default function ExternalFactorsCard({ control }: Props) {
             <h3 className="text-xs font-medium text-primary sm:text-sm">
               Layer
             </h3>
-            <Input
-              type="search"
-              placeholder="Search..."
-              className="border-primary text-sm"
-              onChange={(e) => setQuery(e.target.value)}
-            />
+
+            {/* CHANGED: search + reset inline */}
+            <div className="flex items-center gap-2">
+              <Input
+                type="search"
+                placeholder="Search..."
+                className="flex-1 border-primary text-sm"
+                onChange={(e) => setQuery(e.target.value)}
+                aria-label="Search layer attributes"
+              />
+              <Controller
+                name="external"
+                control={control}
+                render={({ field }) => (
+                  <AlertDialog>
+                    <AlertDialogTrigger asChild>
+                      <Button
+                        type="button"
+                        size="sm"
+                        variant="outline"
+                        title="Reset edited external attributes"
+                        aria-label="Reset edited external attributes"
+                      >
+                        <RotateCcw className="size-4" />
+                        <span className="ml-1 hidden sm:inline">Reset</span>
+                      </Button>
+                    </AlertDialogTrigger>
+                    <AlertDialogContent>
+                      <AlertDialogHeader>
+                        <AlertDialogTitle>
+                          Reset edited attributes?
+                        </AlertDialogTitle>
+                        <AlertDialogDescription>
+                          This will revert descriptions of selected external
+                          attributes to their defaults. Selection remains
+                          unchanged.
+                        </AlertDialogDescription>
+                      </AlertDialogHeader>
+                      <AlertDialogFooter>
+                        <AlertDialogCancel>Cancel</AlertDialogCancel>
+                        <AlertDialogAction
+                          onClick={() => {
+                            const selected = (field.value || []) as Factor[];
+                            if (!selected.length) return;
+
+                            const defaultByName = new Map<string, string>(
+                              factors.map((f) => [f.name, f.description || '']),
+                            );
+
+                            const updated = selected.map((s) => {
+                              const def = defaultByName.get(s.name) ?? '';
+                              const cur = s.description || '';
+                              return cur !== def
+                                ? { ...s, description: def }
+                                : s;
+                            });
+
+                            const changed = updated.some(
+                              (s, i) =>
+                                (s.description || '') !==
+                                (selected[i]?.description || ''),
+                            );
+                            if (!changed) return;
+
+                            field.onChange(updated);
+
+                            if (activeName) {
+                              const active = updated.find(
+                                (x) => x.name === activeName,
+                              );
+                              if (active) {
+                                const arr = (active.description || '')
+                                  .split(',')
+                                  .map((t) => t.trim())
+                                  .filter(Boolean);
+                                setTokens(arr);
+                              }
+                            }
+                            setInputValue('');
+                            setEditingIndex(null);
+                          }}
+                        >
+                          Reset
+                        </AlertDialogAction>
+                      </AlertDialogFooter>
+                    </AlertDialogContent>
+                  </AlertDialog>
+                )}
+              />
+            </div>
+
             <Controller
               name="external"
               control={control}

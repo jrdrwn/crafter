@@ -246,6 +246,8 @@ export default function PersonaItems() {
                     },
                   )}
                   createdByMe={persona.user.id == user?.id}
+                  authorName={persona.user.name}
+                  authorEmail={persona.user.email}
                 />
               </Link>
             ))}

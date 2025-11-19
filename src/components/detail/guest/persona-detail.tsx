@@ -39,6 +39,7 @@ import {
 } from '../../ui/card';
 import { Item, ItemActions, ItemContent, ItemMedia } from '../../ui/item';
 import { Label } from '../../ui/label';
+import { Skeleton } from '../../ui/skeleton';
 import { Switch } from '../../ui/switch';
 import Persona, { PersonaResponse } from './persona';
 
@@ -254,6 +255,34 @@ function DownloadPersonaCard() {
   );
 }
 
+function PersonaDetailSkeleton() {
+  return (
+    <section className="px-2 py-3 md:px-4 md:py-4">
+      <div className="container mx-auto">
+        <div className="flex flex-row items-center justify-between gap-3">
+          <Skeleton className="h-9 w-32 rounded" />
+          <div className="flex gap-2">
+            <Skeleton className="h-9 w-20 rounded" />
+            <Skeleton className="h-9 w-20 rounded" />
+          </div>
+        </div>
+        <div className="mt-3 grid grid-cols-1 gap-4 md:mt-4 md:gap-6 lg:grid-cols-3 lg:gap-8">
+          <div className="col-span-full space-y-3 md:space-y-4 lg:col-span-2">
+            <Skeleton className="h-40 w-full rounded-xl" />
+            <Skeleton className="h-16 w-full rounded-xl" />
+            <Skeleton className="h-64 w-full rounded-xl" />
+          </div>
+          <div className="col-span-full space-y-3 md:space-y-4 lg:col-span-1">
+            <Skeleton className="h-40 w-full rounded-xl" />
+            <Skeleton className="h-32 w-full rounded-xl" />
+            <Skeleton className="h-32 w-full rounded-xl" />
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
 export default function PersonaDetail() {
   const [persona, setPersona] = useState<StoredPersona | null>(null);
   const searchParams = useSearchParams();
@@ -273,6 +302,9 @@ export default function PersonaDetail() {
       refreshFromStorage();
     }
   }, [searchParams]);
+  if (!persona) {
+    return <PersonaDetailSkeleton />;
+  }
   return (
     <section className="px-2 py-3 md:px-4 md:py-4">
       <div className="container mx-auto">

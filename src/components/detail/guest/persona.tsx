@@ -77,7 +77,7 @@ function PersonaStyleSelector({
           <h2 className="px-0 text-base font-bold text-primary md:text-xl">
             Select Naration & Structure
           </h2>
-          <div className="flex items-center justify-start gap-2 md:justify-center md:gap-4">
+          <div className="flex flex-wrap items-center justify-start gap-2 md:justify-center md:gap-4">
             <Button
               variant={'outline'}
               size={'sm'}
@@ -90,7 +90,7 @@ function PersonaStyleSelector({
               onClick={() => setPersonaStyle('mixed')}
             >
               <Text className="size-4" />
-              <span className="hidden sm:inline">Mixed</span>
+              <span className="text-xs sm:text-sm">Mixed</span>
             </Button>
             <Button
               variant={'outline'}
@@ -104,7 +104,7 @@ function PersonaStyleSelector({
               onClick={() => setPersonaStyle('bullets')}
             >
               <List className="size-4" />
-              <span className="hidden sm:inline">Bullets</span>
+              <span className="text-xs sm:text-sm">Bullets</span>
             </Button>
             <Button
               variant={'outline'}
@@ -118,7 +118,7 @@ function PersonaStyleSelector({
               onClick={() => setPersonaStyle('narative')}
             >
               <Blend className="size-4" />
-              <span className="hidden sm:inline">Narrative</span>
+              <span className="text-xs sm:text-sm">Narrative</span>
             </Button>
           </div>
         </div>

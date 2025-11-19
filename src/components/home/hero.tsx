@@ -1,7 +1,7 @@
 'use client';
 
 import { useUser } from '@/contexts/user-context';
-import { ChevronRight, Sparkles, Tags } from 'lucide-react';
+import { ChevronRight, History, Sparkles, Tags } from 'lucide-react';
 import Link from 'next/link';
 
 import { Badge } from '../ui/badge';
@@ -55,14 +55,22 @@ export default function Hero() {
             Stop guessing. Let <span className="font-medium">CRAFTER</span> that
             uncover user goals, motivations, and frustrations in seconds.
           </p>
-          <div className="mt-6 flex flex-col justify-center gap-3 sm:flex-row md:mt-8 md:gap-4 lg:gap-8">
+          <div className="mt-6 flex flex-wrap justify-center gap-3 md:mt-8 md:gap-4 lg:gap-8">
             {user ? (
-              <Link href="/history" className="w-full sm:w-auto">
-                <Button className="w-full sm:w-auto">
-                  <Sparkles />
-                  Go to History
-                </Button>
-              </Link>
+              <>
+                <Link href="/create" className="w-full sm:w-auto">
+                  <Button className="w-full sm:w-auto">
+                    <Sparkles />
+                    Start Creating Persona
+                  </Button>
+                </Link>
+                <Link href="/history" className="w-full sm:w-auto">
+                  <Button className="w-full sm:w-auto" variant={'outline'}>
+                    <History />
+                    My History
+                  </Button>
+                </Link>
+              </>
             ) : (
               <>
                 <Link href="/create" className="w-full sm:w-auto">

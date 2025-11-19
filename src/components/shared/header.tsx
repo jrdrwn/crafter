@@ -44,7 +44,7 @@ export default function Header() {
         ...baseMenus,
         { title: 'Explore', href: '/explore' },
         { title: 'History', href: '/history' },
-        { title: 'Contribution', href: '/contribution' },
+        { title: 'Knowledge Base', href: '/knowledge-base' },
       ]
     : baseMenus;
 
@@ -77,7 +77,9 @@ export default function Header() {
                   className={navigationMenuTriggerStyle({
                     className: cn(
                       'bg-transparent',
-                      pathname === menu.href ? '!text-primary' : '',
+                      pathname === menu.href
+                        ? 'border-b-2 border-primary !text-primary'
+                        : '',
                     ),
                   })}
                   active={pathname === menu.href}
@@ -130,18 +132,30 @@ export default function Header() {
                 <span className="sr-only">Toggle navigation menu</span>
               </Button>
             </SheetTrigger>
-            <SheetContent side="left" className="p-4 lg:hidden">
+            <SheetContent side="top" className="p-4 lg:hidden">
               <SheetTitle>Menu</SheetTitle>
-              <NavigationMenu className="items-start">
-                <NavigationMenuList className="grid gap-4">
+              <NavigationMenu className="w-full max-w-full flex-1 items-start [&>div]:w-full">
+                <NavigationMenuList className="grid w-full justify-stretch gap-4">
                   {menus.map((menu) => (
-                    <NavigationMenuItem key={menu.title}>
+                    <NavigationMenuItem
+                      key={menu.title}
+                      className="w-full text-right"
+                    >
                       <NavigationMenuLink
-                        className={navigationMenuTriggerStyle()}
+                        className={navigationMenuTriggerStyle({
+                          className: cn(
+                            'w-full bg-transparent',
+                            pathname === menu.href
+                              ? 'border border-primary !text-primary'
+                              : '',
+                          ),
+                        })}
                         active={pathname === menu.href}
                         asChild
                       >
-                        <Link href={menu.href}>{menu.title}</Link>
+                        <Link href={menu.href} className="w-full text-right">
+                          {menu.title}
+                        </Link>
                       </NavigationMenuLink>
                     </NavigationMenuItem>
                   ))}

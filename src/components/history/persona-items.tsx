@@ -211,7 +211,7 @@ export default function PersonaItems() {
                       year: 'numeric',
                     },
                   )}
-                  createdByMe={true}
+                  createdByMe={false}
                 />
               </Link>
             ))}
