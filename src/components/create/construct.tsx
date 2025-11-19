@@ -25,7 +25,7 @@ import {
   StickyNote,
 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
-import { Fragment, useEffect, useMemo, useState } from 'react';
+import { Fragment, useEffect, useMemo, useRef, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
 import z from 'zod';
@@ -109,6 +109,9 @@ export default function Design() {
   const { user } = useUser();
   const stepper = useStepper();
   const currentIndex = utils.getIndex(stepper.current.id);
+
+  // Ref for the multi-step form area
+  const formSectionRef = useRef<HTMLDivElement>(null);
 
   const form = useForm<CreateFormValues>({
     resolver: zodResolver(createFormSchema),
@@ -230,11 +233,34 @@ export default function Design() {
           shouldFocus: true,
         })
       : true;
-    if (ok) stepper.next();
+    if (ok) {
+      stepper.next();
+      // Scroll to the top of the multi-step form area
+      if (formSectionRef.current) {
+        formSectionRef.current.scrollIntoView({
+          behavior: 'smooth',
+          block: 'start',
+        });
+      }
+    }
+  };
+
+  // Handler for Back button with scroll
+  const handlePrev = () => {
+    stepper.prev();
+    if (formSectionRef.current) {
+      formSectionRef.current.scrollIntoView({
+        behavior: 'smooth',
+        block: 'start',
+      });
+    }
   };
 
   return (
-    <section className="px-2 py-6 sm:px-4 sm:py-8 md:px-6 md:py-10 lg:py-14 xl:py-16">
+    <section
+      ref={formSectionRef}
+      className="px-2 py-6 sm:px-4 sm:py-8 md:px-6 md:py-10 lg:py-14 xl:py-16"
+    >
       <form
         onSubmit={form.handleSubmit(onSubmit)}
         className="container mx-auto flex flex-col gap-4 sm:gap-5 md:gap-6"
@@ -457,7 +483,7 @@ export default function Design() {
         >
           {stepper.isLast ? (
             <>
-              <p className="order-2 text-xs text-muted-foreground sm:order-1">
+              <p className="order-2 text-center text-xs text-muted-foreground sm:order-1">
                 By clicking &quot;Create persona&quot;, you agree to our Terms
                 of Service and Privacy Policy.
               </p>
@@ -465,7 +491,7 @@ export default function Design() {
                 <Button
                   type="button"
                   variant="secondary"
-                  onClick={stepper.prev}
+                  onClick={handlePrev}
                   disabled={stepper.isFirst}
                   className="flex-1 sm:flex-none"
                 >
@@ -497,7 +523,7 @@ export default function Design() {
               <Button
                 type="button"
                 variant="secondary"
-                onClick={stepper.prev}
+                onClick={handlePrev}
                 disabled={stepper.isFirst}
                 className="flex-1 sm:flex-none"
               >

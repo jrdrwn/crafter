@@ -1,4 +1,5 @@
-'use client';
+"use client";
+import { useRef } from "react";
 
 import AdditionalDetailsCard from '@/components/create/cards/additional-details-card';
 import ContentLengthCard from '@/components/create/cards/content-length-card';
@@ -92,7 +93,10 @@ const { useStepper, steps, utils } = defineStepper(
   { id: 'review', label: 'Review' },
 );
 
-export default function Design({ persona }: DesignProps) {
+
+  // Ref for the multi-step form area
+  const formSectionRef = useRef<HTMLDivElement>(null);
+
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const stepper = useStepper();
@@ -183,11 +187,28 @@ export default function Design({ persona }: DesignProps) {
           shouldFocus: true,
         })
       : true;
-    if (ok) stepper.next();
+    if (ok) {
+      stepper.next();
+      // Scroll to the top of the multi-step form area
+      if (formSectionRef.current) {
+        formSectionRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    }
+  };
+
+  // Handler for Back button with scroll
+  const handlePrev = () => {
+    stepper.prev();
+    if (formSectionRef.current) {
+      formSectionRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
   };
 
   return (
-    <section className="p-2 py-8 sm:p-4 sm:py-12 lg:py-16">
+    <section
+      ref={formSectionRef}
+      className="p-2 py-8 sm:p-4 sm:py-12 lg:py-16"
+    >
       <form
         onSubmit={form.handleSubmit(onSubmit)}
         className="container mx-auto flex flex-col gap-6"
@@ -418,7 +439,7 @@ export default function Design({ persona }: DesignProps) {
                 <Button
                   type="button"
                   variant="secondary"
-                  onClick={stepper.prev}
+                  onClick={handlePrev}
                   disabled={stepper.isFirst}
                   className="w-full sm:w-auto"
                 >
@@ -450,7 +471,7 @@ export default function Design({ persona }: DesignProps) {
               <Button
                 type="button"
                 variant="secondary"
-                onClick={stepper.prev}
+                onClick={handlePrev}
                 disabled={stepper.isFirst}
                 className="w-full sm:w-auto"
               >
@@ -468,5 +489,3 @@ export default function Design({ persona }: DesignProps) {
         </div>
       </form>
     </section>
-  );
-}

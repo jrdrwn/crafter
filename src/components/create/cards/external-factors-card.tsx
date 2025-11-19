@@ -51,6 +51,16 @@ export default function ExternalFactorsCard({ control }: Props) {
   const [factors, setFactors] = useState<Factor[]>([]);
   const [query, setQuery] = useState('');
   const [activeName, setActiveName] = useState<string | null>(null);
+  const detailsRef = useRef<HTMLDivElement>(null);
+  // Scroll to details panel when activeName changes
+  useEffect(() => {
+    if (activeName && detailsRef.current) {
+      detailsRef.current.scrollIntoView({
+        behavior: 'smooth',
+        block: 'nearest',
+      });
+    }
+  }, [activeName]);
   const [tokens, setTokens] = useState<string[]>([]);
   const [inputValue, setInputValue] = useState('');
   const [editingIndex, setEditingIndex] = useState<number | null>(null);
@@ -491,7 +501,10 @@ export default function ExternalFactorsCard({ control }: Props) {
                   field.onChange(next);
                 };
                 return (
-                  <div className="h-56 rounded-md border p-2 sm:h-64 md:h-80 md:p-3">
+                  <div
+                    ref={detailsRef}
+                    className="h-56 rounded-md border p-2 sm:h-64 md:h-80 md:p-3"
+                  >
                     {!selected ? (
                       <p className="text-sm text-muted-foreground">
                         Select a factor from the middle list to edit details.

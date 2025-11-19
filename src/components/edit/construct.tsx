@@ -26,7 +26,7 @@ import {
   StickyNote,
 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
-import { Fragment, useMemo, useState } from 'react';
+import { Fragment, useMemo, useRef, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
 import z from 'zod';
@@ -114,6 +114,9 @@ export default function Design({
   const stepper = useStepper();
   const currentIndex = utils.getIndex(stepper.current.id);
 
+  // Ref for the multi-step form area
+  const formSectionRef = useRef<HTMLDivElement>(null);
+
   const { user } = useUser();
 
   const _cookies = getCookie('token');
@@ -189,11 +192,31 @@ export default function Design({
           shouldFocus: true,
         })
       : true;
-    if (ok) stepper.next();
+    if (ok) {
+      stepper.next();
+      // Scroll to the top of the multi-step form area
+      if (formSectionRef.current) {
+        formSectionRef.current.scrollIntoView({
+          behavior: 'smooth',
+          block: 'start',
+        });
+      }
+    }
+  };
+
+  // Handler for Back button with scroll
+  const handlePrev = () => {
+    stepper.prev();
+    if (formSectionRef.current) {
+      formSectionRef.current.scrollIntoView({
+        behavior: 'smooth',
+        block: 'start',
+      });
+    }
   };
 
   return (
-    <section className="p-2 py-8 sm:p-4 sm:py-12 lg:py-16">
+    <section ref={formSectionRef} className="p-2 py-8 sm:p-4 sm:py-12 lg:py-16">
       <form
         onSubmit={form.handleSubmit(onSubmit)}
         className="container mx-auto flex flex-col gap-6"
@@ -424,7 +447,7 @@ export default function Design({
                 <Button
                   type="button"
                   variant="secondary"
-                  onClick={stepper.prev}
+                  onClick={handlePrev}
                   disabled={stepper.isFirst}
                   className="w-full sm:w-auto"
                 >
@@ -456,7 +479,7 @@ export default function Design({
               <Button
                 type="button"
                 variant="secondary"
-                onClick={stepper.prev}
+                onClick={handlePrev}
                 disabled={stepper.isFirst}
                 className="w-full sm:w-auto"
               >
