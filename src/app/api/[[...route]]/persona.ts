@@ -375,6 +375,7 @@ persona.put(
         visibility: oldPersona?.visibility || visibility.private,
         llm_id: llmModel!.id,
         language_id: language!.id,
+        updated_at: new Date(),
       },
     });
 
@@ -447,6 +448,7 @@ persona.put('/:id/visibility', async (c) => {
     where: { id: Number(id) },
     data: {
       visibility: newVisibility,
+      updated_at: new Date(),
     },
   });
   return c.json({ status: true, data: updatedPersona });
@@ -683,6 +685,7 @@ persona.put('/:id/content', async (c) => {
     where: { id: Number(id) },
     data: {
       result,
+      updated_at: new Date(),
     },
   });
   return c.json({ status: true, data: updatedPersona });

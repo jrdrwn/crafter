@@ -4,7 +4,8 @@
 import { cn } from '@/lib/utils';
 import { getCookie } from 'cookies-next/client';
 import parse from 'html-react-parser';
-import { Blend, List, Text, User } from 'lucide-react';
+import { Blend, List, Pencil, Text, User } from 'lucide-react';
+import Image from 'next/image';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
@@ -12,7 +13,15 @@ import { toast } from 'sonner';
 import { Badge } from '../ui/badge';
 import { Button } from '../ui/button';
 import { Card, CardContent } from '../ui/card';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '../ui/dropdown-menu';
+import { Input } from '../ui/input';
 import { MinimalTiptap } from '../ui/shadcn-io/minimal-tiptap';
+import { Spinner } from '../ui/spinner';
 
 // Extracted type for reuse across smaller components
 export type PersonaStyle = 'mixed' | 'bullets' | 'narative';
@@ -24,6 +33,7 @@ interface PersonaMarkdown {
     mixed: string;
     bullets: string;
     narative: string;
+    image_url?: string;
   };
   taxonomy?: {
     domain?: {
@@ -31,16 +41,134 @@ interface PersonaMarkdown {
     };
   };
 }
+function PersonaHeader({
+  markdown,
+  imageUrl,
+  setImageUrl,
+}: {
+  markdown?: any;
+  imageUrl: string;
+  setImageUrl: (url: string) => void;
+}) {
+  const searchParams = useSearchParams();
+  const [uploading, setUploading] = useState(false);
 
-// Smaller component: Header/Profile card
-function PersonaHeader({ markdown }: { markdown?: any }) {
+  async function handleImageUpload(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setUploading(true);
+    const formData = new FormData();
+    formData.append('file', file);
+    try {
+      const res = await fetch('/api/upload/image', {
+        method: 'POST',
+        headers: {
+          authorization: `Bearer ${getCookie('token') || ''}`,
+        },
+        body: formData,
+      });
+      if (!res.ok) {
+        toast.error('Image upload failed');
+        return;
+      }
+      const data = await res.json();
+      if (data.status && data.url) {
+        setImageUrl(data.url);
+        toast.success('Image uploaded!');
+      } else {
+        toast.error(data.message || 'Upload failed');
+      }
+    } catch (err: any) {
+      toast.error(err.message || 'Upload failed');
+    } finally {
+      setUploading(false);
+    }
+  }
+
   return (
     <Card className="w-full border-primary bg-primary/5">
       <CardContent className="py-6 md:py-8">
         <div className="flex flex-col items-center justify-center gap-3 md:gap-4">
-          <span className="flex size-20 items-center justify-center rounded-full bg-primary text-primary-foreground md:size-30">
-            <User className="size-10 md:size-[60px]" />
-          </span>
+          {/* Image preview and dropdown edit (edit mode only) */}
+          {searchParams.get('free_edit') ? (
+            <div className="relative mb-2 flex w-full flex-col items-center">
+              {/* Dropdown button at bottom center above image */}
+              <div className="absolute -bottom-4 left-1/2 z-10 -translate-x-1/2">
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    {uploading ? (
+                      <Button size="sm" variant="outline" disabled>
+                        <Spinner />
+                        Uploading...
+                      </Button>
+                    ) : (
+                      <Button size="sm" variant="outline">
+                        <Pencil />
+                        Edit
+                      </Button>
+                    )}
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="center">
+                    <DropdownMenuItem asChild>
+                      <label
+                        htmlFor="persona-upload-input"
+                        className="w-full cursor-pointer"
+                      >
+                        Upload (max 2MB)
+                      </label>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      onClick={() => setImageUrl('')}
+                      variant="destructive"
+                    >
+                      Remove
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+                {/* Hidden file input for upload */}
+                <Input
+                  id="persona-upload-input"
+                  type="file"
+                  accept="image/*"
+                  onChange={handleImageUpload}
+                  disabled={uploading}
+                  className="hidden"
+                />
+              </div>
+              {/* Image below dropdown */}
+              <div className="flex flex-col items-center justify-center">
+                {imageUrl ? (
+                  <Image
+                    src={imageUrl}
+                    alt="Persona"
+                    width={112}
+                    height={112}
+                    className="h-28 w-28 rounded-full border border-primary object-cover"
+                    unoptimized
+                  />
+                ) : (
+                  <span className="flex size-24 items-center justify-center rounded-full bg-primary text-primary-foreground md:size-30">
+                    <User className="size-12 md:size-[60px]" />
+                  </span>
+                )}
+              </div>
+            </div>
+          ) : (
+            <span className="flex size-20 items-center justify-center rounded-full bg-primary text-primary-foreground md:size-30">
+              {imageUrl ? (
+                <Image
+                  src={imageUrl}
+                  alt="Persona"
+                  width={112}
+                  height={112}
+                  className="h-28 w-28 rounded-full border border-primary object-cover"
+                  unoptimized
+                />
+              ) : (
+                <User className="size-10 md:size-[60px]" />
+              )}
+            </span>
+          )}
           <p className="text-xl font-bold text-primary md:text-2xl">
             {markdown?.result?.full_name ?? 'Persona Name'}
           </p>
@@ -148,9 +276,11 @@ function PersonaContent({
 function PersonaContentEdit({
   personaStyle,
   markdown,
+  imageUrl,
 }: {
   personaStyle: PersonaStyle;
   markdown?: any;
+  imageUrl: string;
 }) {
   const token = getCookie('token');
   const router = useRouter();
@@ -177,6 +307,7 @@ function PersonaContentEdit({
         mixed: mixedContent,
         bullets: bulletsContent,
         narative: narativeContent,
+        image_url: imageUrl,
       }),
     });
 
@@ -220,16 +351,27 @@ function PersonaContentEdit({
 export default function Persona({ persona }: { persona?: any }) {
   const searchParams = useSearchParams();
   const [personaStyle, setPersonaStyle] = useState<PersonaStyle>('mixed');
+  const [imageUrl, setImageUrl] = useState<string>(
+    persona?.result?.image_url || '',
+  );
   return (
     <>
       <div className="col-span-full space-y-3 md:col-span-2 md:space-y-4">
-        <PersonaHeader markdown={persona} />
+        <PersonaHeader
+          markdown={persona}
+          imageUrl={imageUrl}
+          setImageUrl={setImageUrl}
+        />
         <PersonaStyleSelector
           personaStyle={personaStyle}
           setPersonaStyle={setPersonaStyle}
         />
         {searchParams.get('free_edit') ? (
-          <PersonaContentEdit personaStyle={personaStyle} markdown={persona} />
+          <PersonaContentEdit
+            personaStyle={personaStyle}
+            markdown={persona}
+            imageUrl={imageUrl}
+          />
         ) : (
           <PersonaContent personaStyle={personaStyle} markdown={persona} />
         )}

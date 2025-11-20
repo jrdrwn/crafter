@@ -58,6 +58,7 @@ interface PersonaAPIResponse {
       mixed: string;
       bullets: string;
       narative: string;
+      image_url?: string;
     };
     user: {
       id: number;
@@ -110,7 +111,9 @@ function TopActions({
         router.push('/history');
       }
     } catch (error) {
-      console.error('Error copying persona:', error);
+      toast.error('Error copying persona:', {
+        description: (error as any)?.message || 'Please try again later.',
+      });
     }
   }
   return (
@@ -140,7 +143,6 @@ function TopActions({
             <>
               <Button
                 size={'sm'}
-                className="md:size-default"
                 onClick={() => router.push(`?free_edit=true&save_edit=true`)}
               >
                 <Save className="size-4 md:size-5" />
@@ -148,7 +150,7 @@ function TopActions({
               </Button>
               <Button
                 size={'sm'}
-                className="md:size-default"
+                variant={'outline'}
                 onClick={() => {
                   router.push(`/detail/${persona.id}`);
                   fetchPersona(persona.id);
@@ -284,7 +286,9 @@ function SharePersonaCard({
         setVisibility(newVisibility ? 'public' : 'private');
       }
     } catch (error) {
-      console.error('Error updating visibility:', error);
+      toast.error('Error updating visibility:', {
+        description: (error as any)?.message || 'Please try again later.',
+      });
     }
   }
 
@@ -609,7 +613,9 @@ export default function PersonaDetail({ personaId }: { personaId: string }) {
         setPersona(data.data);
       }
     } catch (error) {
-      console.error('Error fetching persona:', error);
+      toast.error('Error fetching persona', {
+        description: (error as any)?.message || 'Please try again later.',
+      });
     }
   }
 
@@ -677,7 +683,9 @@ function DeleteConfirmationDialog({ personaId }: { personaId?: string }) {
         router.push('/history');
       }
     } catch (error) {
-      console.error('Error deleting persona:', error);
+      toast.error('Error deleting persona', {
+        description: (error as any)?.message || 'Please try again later.',
+      });
     }
   }
   return (

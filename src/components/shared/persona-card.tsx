@@ -2,12 +2,14 @@
 
 import { cn } from '@/lib/utils';
 import { User } from 'lucide-react';
+import Image from 'next/image';
 
 import { Badge } from '../ui/badge';
 import { Card, CardContent, CardFooter, CardHeader } from '../ui/card';
 
 interface PersonaCardProps {
   name: string;
+  photoUrl?: string;
   subtitle?: string;
   quote?: string;
   tag?: string;
@@ -22,6 +24,7 @@ interface PersonaCardProps {
 export function PersonaCard({
   name,
   subtitle,
+  photoUrl,
   quote,
   tag,
   date,
@@ -58,7 +61,17 @@ export function PersonaCard({
         )}
         <div className="flex items-center">
           <span className="mr-4 flex size-14 items-center justify-center rounded-full bg-primary/10 text-primary">
-            <User />
+            {photoUrl ? (
+              <Image
+                src={photoUrl}
+                alt={`${name}'s photo`}
+                className="h-14 w-14 rounded-full object-cover"
+                width={56}
+                height={56}
+              />
+            ) : (
+              <User />
+            )}
           </span>
           <div>
             <p className="text-lg font-semibold text-primary">{name}</p>

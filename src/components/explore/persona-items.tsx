@@ -232,6 +232,7 @@ export default function PersonaItems() {
             personas.map((persona: any) => (
               <Link key={persona.id} href={`/detail/${persona.id}`}>
                 <PersonaCard
+                  photoUrl={persona.result.image_url}
                   quoteClamp={2}
                   name={persona.result.full_name}
                   subtitle={''}

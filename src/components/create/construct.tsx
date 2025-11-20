@@ -189,7 +189,9 @@ export default function Design() {
         localStorage.setItem(STORAGE_KEY, JSON.stringify(entry));
         router.push(`/detail/guest`);
       } catch (err) {
-        console.error('Failed to save personas to localStorage:', err);
+        toast.error('Failed to save personas to localStorage:', {
+          description: (err as any)?.message || 'Please try again later.',
+        });
       }
     } else {
       const res = await fetch('/api/persona/generate', {
