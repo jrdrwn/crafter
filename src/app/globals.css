@@ -146,9 +146,6 @@
   --sidebar-accent-foreground: oklch(0.9423 0.0097 72.6595);
   --sidebar-border: oklch(0.3942 0.0265 142.9926);
   --sidebar-ring: oklch(0.6731 0.1624 144.2083);
-  --font-sans: Montserrat, sans-serif;
-  --font-serif: Merriweather, serif;
-  --font-mono: Source Code Pro, monospace;
   --radius: 0.5rem;
   --shadow-x: 0;
   --shadow-y: 1px;
@@ -178,25 +175,4 @@
   body {
     @apply bg-background text-foreground;
   }
-}
-
-.vertical-gradient-dashed-border {
-  position: relative;
-}
-
-.vertical-gradient-dashed-border::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  left: 0;
-  /* or right: 0 for right side */
-  width: 2px;
-  /* border thickness */
-  background: linear-gradient(to bottom, #34d399, #3b82f6);
-  /* gradient color */
-  mask-image: linear-gradient(to bottom, transparent 40%, black 40%);
-  mask-size: 100% 10px;
-  /* controls dash length and gap */
-  mask-repeat: repeat-y;
 }

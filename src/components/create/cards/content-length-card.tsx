@@ -134,7 +134,7 @@ export default function ContentLengthCard({ control }: Props) {
       </CardContent>
       <CardFooter className="border-t border-dashed px-1.5 pb-2 sm:px-2">
         <div className="flex w-full flex-col gap-2">
-          <Label className="text-xs text-gray-500">
+          <Label className="text-xs text-gray-500 dark:text-gray-400">
             Word count {isCustom ? '(drag to adjust)' : '(preset locked)'}
           </Label>
           <Controller
@@ -164,7 +164,7 @@ function ContentLengthHelperModal() {
   return (
     <ResponsiveModal>
       <ResponsiveModalTrigger asChild>
-        <CircleQuestionMark className="absolute top-0 right-0 size-5 text-gray-400 hover:text-gray-600" />
+        <CircleQuestionMark className="absolute top-0 right-0 size-4 text-gray-400 hover:text-gray-600 sm:size-5" />
       </ResponsiveModalTrigger>
       <ResponsiveModalContent>
         <ResponsiveModalHeader>

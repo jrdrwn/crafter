@@ -172,7 +172,7 @@ function PersonaHeader({
           <p className="text-xl font-bold text-primary md:text-2xl">
             {markdown?.result?.full_name ?? 'Persona Name'}
           </p>
-          <p className="text-center text-base text-gray-500 italic md:text-lg">
+          <p className="text-center text-base text-gray-500 italic md:text-lg dark:text-gray-300">
             {markdown?.result?.quote ?? '—'}
           </p>
           <div className="flex items-center justify-center gap-4 md:gap-8">

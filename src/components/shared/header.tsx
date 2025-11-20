@@ -29,6 +29,7 @@ import {
   DropdownMenuTrigger,
 } from '../ui/dropdown-menu';
 import Brand from './brand';
+import { ThemeToggle } from './theme-toggle';
 
 export default function Header() {
   const baseMenus = [
@@ -92,6 +93,7 @@ export default function Header() {
           </NavigationMenuList>
         </NavigationMenu>
         <div className="flex items-center gap-2 md:gap-4">
+          <ThemeToggle />
           {user ? (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>

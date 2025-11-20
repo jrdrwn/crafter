@@ -15,7 +15,7 @@ const SvgComponent = (props: SVGProps<SVGSVGElement>) => (
     {...props}
   >
     <g filter="url(#a)">
-      <path fill="#418945" d="M0 0h1920v435H0z" />
+      <path d="M0 0h1920v435H0z" className="fill-primary" />
     </g>
     <defs>
       <filter

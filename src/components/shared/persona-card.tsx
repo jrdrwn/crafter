@@ -76,7 +76,9 @@ export function PersonaCard({
           <div>
             <p className="text-lg font-semibold text-primary">{name}</p>
             {subtitle && (
-              <p className="font-medium text-gray-500">{subtitle}</p>
+              <p className="font-medium text-gray-500 dark:text-gray-300">
+                {subtitle}
+              </p>
             )}
             {(authorName || authorEmail) && (
               <p className="mt-0.5 text-xs text-muted-foreground">
@@ -90,7 +92,14 @@ export function PersonaCard({
       </CardHeader>
       {quote && (
         <CardContent className="px-4">
-          <p className={cn('text-gray-500 italic', clampClass)}>“{quote}”</p>
+          <p
+            className={cn(
+              'text-gray-500 italic dark:text-gray-300',
+              clampClass,
+            )}
+          >
+            “{quote}”
+          </p>
         </CardContent>
       )}
       {(tag || date) && (

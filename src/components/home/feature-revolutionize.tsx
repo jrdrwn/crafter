@@ -61,16 +61,16 @@ export default function FeatureRevolutionize() {
                     <p className="text-base font-semibold text-primary md:text-lg">
                       Ahmad Rizky
                     </p>
-                    <p className="text-sm font-medium text-gray-500 md:text-base">
+                    <p className="text-sm font-medium text-card-foreground md:text-base">
                       Product Manager, 28 years old
                     </p>
                   </div>
                 </div>
-                <p className="text-sm text-gray-500 italic md:text-base">
+                <p className="text-sm text-card-foreground italic md:text-base">
                   &ldquo;I need an efficient solution to automate business
                   processes without sacrificing quality.&rdquo;
                 </p>
-                <div className="mt-4 space-y-2 [&>div]:flex [&>div]:justify-between [&>div]:text-xs [&>div]:font-medium [&>div]:text-gray-500 [&>div]:md:text-sm [&>div>:first-child]:text-primary">
+                <div className="mt-4 space-y-2 [&>div]:flex [&>div]:justify-between [&>div]:text-xs [&>div]:font-medium [&>div]:text-card-foreground [&>div]:md:text-sm [&>div>:first-child]:text-primary">
                   <div>
                     <span>Motivation:</span>
                     <span>Operational efficiency</span>
