@@ -32,10 +32,10 @@ import { Field } from '../../ui/field';
 import { Label } from '../../ui/label';
 import { RadioGroup } from '../../ui/radio-group';
 import { Slider } from '../../ui/slider';
-import { createFormSchema } from '../construct';
+import { formSchema } from '../construct';
 
 type Props = {
-  control: Control<z.infer<typeof createFormSchema>>;
+  control: Control<z.infer<typeof formSchema>>;
 };
 
 export default function ContentLengthCard({ control }: Props) {

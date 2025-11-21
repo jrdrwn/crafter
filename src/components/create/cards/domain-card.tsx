@@ -21,10 +21,10 @@ import { Field, FieldLabel } from '../../ui/field';
 import { Input } from '../../ui/input';
 import { RadioGroup, RadioGroupItem } from '../../ui/radio-group';
 import { ScrollArea } from '../../ui/scroll-area';
-import { createFormSchema } from '../construct';
+import { formSchema } from '../construct';
 
 type Props = {
-  control: Control<z.infer<typeof createFormSchema>>;
+  control: Control<z.infer<typeof formSchema>>;
 };
 
 export default function DomainCard({ control }: Props) {

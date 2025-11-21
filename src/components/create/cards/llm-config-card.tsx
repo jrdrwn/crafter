@@ -4,7 +4,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Skeleton } from '@/components/ui/skeleton';
 import { ErrorMessageButtonRetry } from '@/helpers/error-retry';
 import { cn } from '@/lib/utils';
-import { llm } from '@prisma/client';
+import { language, llm } from '@prisma/client';
 import * as SelectPrimitive from '@radix-ui/react-select';
 import { Bot, CheckIcon } from 'lucide-react';
 import { useEffect, useState } from 'react';
@@ -26,10 +26,10 @@ import {
   SelectTrigger,
   SelectValue,
 } from '../../ui/select';
-import type { CreateFormValues } from '../types';
+import { TCreateForm } from '../construct';
 
 type Props = {
-  control: Control<CreateFormValues>;
+  control: Control<TCreateForm>;
 };
 
 export default function LLMConfigCard({ control }: Props) {
@@ -37,9 +37,7 @@ export default function LLMConfigCard({ control }: Props) {
   const [errorLlmModels, setErrorLlmModels] = useState<string | null>(null);
   const [loadingLanguages, setLoadingLanguages] = useState<boolean>(false);
   const [errorLanguages, setErrorLanguages] = useState<string | null>(null);
-  const [languages, setLanguages] = useState<CreateFormValues['language'][]>(
-    [],
-  );
+  const [languages, setLanguages] = useState<language[]>([]);
   const [llmModels, setLlmModels] = useState<llm[]>([]);
 
   async function fetchLlmModels() {

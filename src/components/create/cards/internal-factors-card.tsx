@@ -1,6 +1,8 @@
 'use client';
 
+import { Skeleton } from '@/components/ui/skeleton';
 import { ErrorMessageButtonRetry } from '@/helpers/error-retry';
+import { attribute } from '@prisma/client';
 import { Brain, RotateCcw, Users, X } from 'lucide-react';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { Control, Controller } from 'react-hook-form';
@@ -30,16 +32,16 @@ import { Field, FieldLabel } from '../../ui/field';
 import { Input } from '../../ui/input';
 import { Item, ItemContent, ItemDescription, ItemTitle } from '../../ui/item';
 import { ScrollArea } from '../../ui/scroll-area';
-import type { CreateFormValues, Factor } from '../types';
+import { TCreateForm } from '../construct';
 
 type Props = {
-  control: Control<CreateFormValues>;
+  control: Control<TCreateForm>;
 };
 
 export default function InternalFactorsCard({ control }: Props) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [factors, setFactors] = useState<Factor[]>([]);
+  const [factors, setFactors] = useState<attribute[]>([]);
   const [query, setQuery] = useState('');
   const [activeName, setActiveName] = useState<string | null>(null);
   const detailsRef = useRef<HTMLDivElement>(null);
@@ -67,7 +69,7 @@ export default function InternalFactorsCard({ control }: Props) {
       return;
     }
     const json = await res.json();
-    setFactors(json.data as Factor[]);
+    setFactors(json.data as attribute[]);
   }
   useEffect(() => {
     fetchAttributes();
@@ -96,10 +98,10 @@ export default function InternalFactorsCard({ control }: Props) {
       g.items.forEach((t) => titleToGroup.set(normalize(t), g.id)),
     );
 
-    const grouped: Array<{ id: string; label: string; factors: Factor[] }> =
+    const grouped: Array<{ id: string; label: string; factors: attribute[] }> =
       groupDefs.map((g) => ({ id: g.id, label: g.label, factors: [] }));
 
-    const unknown: Factor[] = [];
+    const unknown: attribute[] = [];
     for (const f of filtered) {
       const gid = titleToGroup.get(normalize(f.title));
       if (!gid) {
@@ -181,7 +183,7 @@ export default function InternalFactorsCard({ control }: Props) {
                         <AlertDialogCancel>Cancel</AlertDialogCancel>
                         <AlertDialogAction
                           onClick={() => {
-                            const selected = (field.value || []) as Factor[];
+                            const selected = (field.value || []) as attribute[];
                             if (!selected.length) return;
 
                             const defaultByName = new Map<string, string>(
@@ -270,7 +272,7 @@ export default function InternalFactorsCard({ control }: Props) {
                                   <Checkbox
                                     onCheckedChange={(checked) => {
                                       const selected = (field.value ||
-                                        []) as Factor[];
+                                        []) as attribute[];
                                       if (checked) {
                                         if (
                                           !selected.some(
@@ -295,7 +297,7 @@ export default function InternalFactorsCard({ control }: Props) {
                                     id={val.name}
                                     checked={
                                       (
-                                        field.value as Factor[] | undefined
+                                        field.value as attribute[] | undefined
                                       )?.some(
                                         (item) => item.name === val.name,
                                       ) || false
@@ -330,7 +332,7 @@ export default function InternalFactorsCard({ control }: Props) {
               render={({ field }) => (
                 <ScrollArea className="h-56 rounded-md border p-2 sm:h-64 md:h-80">
                   <div className="flex flex-col gap-2">
-                    {((field.value || []) as Factor[]).map((s) => {
+                    {((field.value || []) as attribute[]).map((s) => {
                       const previewArr = (s.description || '')
                         .split(',')
                         .map((t) => t.trim())
@@ -393,7 +395,7 @@ export default function InternalFactorsCard({ control }: Props) {
                                 onClick={(e) => {
                                   e.stopPropagation();
                                   const next = (
-                                    (field.value || []) as Factor[]
+                                    (field.value || []) as attribute[]
                                   ).filter((x) => x.name !== s.name);
                                   field.onChange(next);
                                   if (activeName === s.name) {
@@ -413,7 +415,7 @@ export default function InternalFactorsCard({ control }: Props) {
                         </Item>
                       );
                     })}
-                    {((field.value || []) as Factor[]).length === 0 && (
+                    {((field.value || []) as attribute[]).length === 0 && (
                       <div className="rounded-md border border-dashed p-3 text-center text-xs text-muted-foreground">
                         No selection
                       </div>
@@ -433,13 +435,13 @@ export default function InternalFactorsCard({ control }: Props) {
               name="internal"
               control={control}
               render={({ field }) => {
-                const selected = ((field.value || []) as Factor[]).find(
+                const selected = ((field.value || []) as attribute[]).find(
                   (s) => s.name === activeName,
                 );
 
                 const commitTokens = (nextTokens: string[]) => {
                   if (!selected) return;
-                  const next = ((field.value || []) as Factor[]).map((s) =>
+                  const next = ((field.value || []) as attribute[]).map((s) =>
                     s.name === selected.name
                       ? { ...s, description: nextTokens.join(', ') }
                       : s,
@@ -587,9 +589,9 @@ export default function InternalFactorsCard({ control }: Props) {
 function LayerItemSkeleton() {
   return (
     <div className="animate-pulse">
-      <div className="mb-2 h-4 w-1/2 rounded bg-gray-300" />
-      <div className="mb-1 h-3 w-full rounded bg-gray-200" />
-      <div className="mb-1 h-3 w-5/6 rounded bg-gray-200" />
+      <Skeleton className="mb-2 h-4 w-1/2 rounded" />
+      <Skeleton className="mb-1 h-3 w-full rounded" />
+      <Skeleton className="mb-1 h-3 w-5/6 rounded" />
     </div>
   );
 }

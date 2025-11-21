@@ -2,8 +2,8 @@
 
 import { Tags } from 'lucide-react';
 
-import { HeroSidesDecorator } from '../shared/hero-sides-decorator';
-import { Badge } from '../ui/badge';
+import { HeroSidesDecorator } from '../../shared/hero-sides-decorator';
+import { Badge } from '../../ui/badge';
 
 export default function Hero() {
   return (

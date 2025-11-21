@@ -7,7 +7,7 @@ import { Badge } from '../ui/badge';
 
 export default function Hero() {
   return (
-    <section className="relative border-b border-dashed border-primary px-2 py-8 sm:py-12 md:py-16">
+    <section className="relative border-b border-dashed border-primary px-2 py-8 md:py-12 lg:py-16">
       <div className="container mx-auto flex flex-col justify-center px-4 lg:flex-row lg:justify-between">
         <HeroSidesDecorator />
         <div className="z-1 mx-auto text-center">

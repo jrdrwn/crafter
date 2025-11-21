@@ -17,10 +17,10 @@ import {
   InputGroupText,
   InputGroupTextarea,
 } from '../../ui/input-group';
-import type { CreateFormValues } from '../types';
+import { TCreateForm } from '../construct';
 
 type Props = {
-  control: Control<CreateFormValues>;
+  control: Control<TCreateForm>;
 };
 
 export default function AdditionalDetailsCard({ control }: Props) {

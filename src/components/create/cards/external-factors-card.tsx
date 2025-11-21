@@ -1,6 +1,8 @@
 'use client';
 
+import { Skeleton } from '@/components/ui/skeleton';
 import { ErrorMessageButtonRetry } from '@/helpers/error-retry';
+import { attribute } from '@prisma/client';
 import { Brain, RotateCcw, Users, X } from 'lucide-react';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { Control, Controller } from 'react-hook-form';
@@ -30,10 +32,10 @@ import { Field, FieldLabel } from '../../ui/field';
 import { Input } from '../../ui/input';
 import { Item, ItemContent, ItemDescription, ItemTitle } from '../../ui/item';
 import { ScrollArea } from '../../ui/scroll-area';
-import type { CreateFormValues, Factor } from '../types';
+import { TCreateForm } from '../construct';
 
 type Props = {
-  control: Control<CreateFormValues>;
+  control: Control<TCreateForm>;
 };
 
 const defaultExplanations: Record<string, string> = {
@@ -48,7 +50,7 @@ const defaultExplanations: Record<string, string> = {
 export default function ExternalFactorsCard({ control }: Props) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [factors, setFactors] = useState<Factor[]>([]);
+  const [factors, setFactors] = useState<attribute[]>([]);
   const [query, setQuery] = useState('');
   const [activeName, setActiveName] = useState<string | null>(null);
   const detailsRef = useRef<HTMLDivElement>(null);
@@ -80,7 +82,7 @@ export default function ExternalFactorsCard({ control }: Props) {
       return;
     }
     const json = await res.json();
-    setFactors(json.data as Factor[]);
+    setFactors(json.data as attribute[]);
   }
   useEffect(() => {
     fetchAttributes();
@@ -120,10 +122,10 @@ export default function ExternalFactorsCard({ control }: Props) {
       g.items.forEach((t) => titleToGroup.set(normalize(t), g.id)),
     );
 
-    const grouped: Array<{ id: string; label: string; factors: Factor[] }> =
+    const grouped: Array<{ id: string; label: string; factors: attribute[] }> =
       groupDefs.map((g) => ({ id: g.id, label: g.label, factors: [] }));
 
-    const unknown: Factor[] = [];
+    const unknown: attribute[] = [];
     for (const f of filtered) {
       const gid = titleToGroup.get(normalize(f.title));
       if (!gid) {
@@ -151,7 +153,7 @@ export default function ExternalFactorsCard({ control }: Props) {
           />
           Human Factors — External Layer
         </CardTitle>
-        <CardDescription className="text-xs text-gray-400 sm:text-sm">
+        <CardDescription className="text-xs sm:text-sm">
           Select available external factors. Edit the description as a list of
           items.
         </CardDescription>
@@ -205,7 +207,7 @@ export default function ExternalFactorsCard({ control }: Props) {
                         <AlertDialogCancel>Cancel</AlertDialogCancel>
                         <AlertDialogAction
                           onClick={() => {
-                            const selected = (field.value || []) as Factor[];
+                            const selected = (field.value || []) as attribute[];
                             if (!selected.length) return;
 
                             const defaultByName = new Map<string, string>(
@@ -288,7 +290,7 @@ export default function ExternalFactorsCard({ control }: Props) {
                               variant="outline"
                               className={`w-full p-2 ${
                                 required.has(val.name)
-                                  ? 'border-gray-300'
+                                  ? 'border-border'
                                   : 'border-primary'
                               }`}
                             >
@@ -297,7 +299,7 @@ export default function ExternalFactorsCard({ control }: Props) {
                                   <Checkbox
                                     onCheckedChange={(checked) => {
                                       const selected = (field.value ||
-                                        []) as Factor[];
+                                        []) as attribute[];
                                       if (!checked && required.has(val.name))
                                         return;
                                       if (checked) {
@@ -324,7 +326,7 @@ export default function ExternalFactorsCard({ control }: Props) {
                                     id={val.name}
                                     checked={
                                       (
-                                        field.value as Factor[] | undefined
+                                        field.value as attribute[] | undefined
                                       )?.some(
                                         (item) => item.name === val.name,
                                       ) || false
@@ -339,9 +341,12 @@ export default function ExternalFactorsCard({ control }: Props) {
                                   />
                                   {val.title}
                                   {required.has(val.name) && (
-                                    <span className="ml-2 rounded bg-gray-200 px-1.5 py-0.5 text-[10px] font-medium text-gray-600">
+                                    <Badge
+                                      variant="secondary"
+                                      className="text-xs"
+                                    >
                                       default
-                                    </span>
+                                    </Badge>
                                   )}
                                 </ItemTitle>
                                 <ItemDescription className="ml-6 text-xs">
@@ -369,7 +374,7 @@ export default function ExternalFactorsCard({ control }: Props) {
               render={({ field }) => (
                 <ScrollArea className="h-56 rounded-md border p-2 sm:h-64 md:h-80">
                   <div className="flex flex-col gap-2">
-                    {((field.value || []) as Factor[]).map((s) => {
+                    {((field.value || []) as attribute[]).map((s) => {
                       const previewArr = (s.description || '')
                         .split(',')
                         .map((t) => t.trim())
@@ -393,13 +398,13 @@ export default function ExternalFactorsCard({ control }: Props) {
                           variant="outline"
                           className={`w-full p-2 ${
                             required.has(s.name)
-                              ? 'border-gray-300'
+                              ? 'border-gray-300 dark:border-gray-500'
                               : 'border-primary'
                           } ${
                             activeName === s.name
                               ? required.has(s.name)
-                                ? 'ring-1 ring-gray-300'
-                                : 'bg-primary/5 ring-1 ring-primary'
+                                ? 'bg-primary/5 ring-1 ring-gray-300 dark:ring-gray-500'
+                                : 'ring-1 ring-primary'
                               : ''
                           }`}
                           role="button"
@@ -444,7 +449,7 @@ export default function ExternalFactorsCard({ control }: Props) {
                                   if (required.has(s.name)) return;
                                   e.stopPropagation();
                                   const next = (
-                                    (field.value || []) as Factor[]
+                                    (field.value || []) as attribute[]
                                   ).filter((x) => x.name !== s.name);
                                   field.onChange(next);
                                   if (activeName === s.name) {
@@ -457,9 +462,9 @@ export default function ExternalFactorsCard({ control }: Props) {
                                 <X className="size-4" />
                               </Button>
                               {required.has(s.name) && (
-                                <span className="rounded bg-gray-200 px-1.5 py-0.5 text-[10px] font-medium text-gray-600">
+                                <Badge variant="secondary" className="text-xs">
                                   default
-                                </span>
+                                </Badge>
                               )}
                             </ItemTitle>
                             <ItemDescription className="text-xs text-muted-foreground">
@@ -469,7 +474,7 @@ export default function ExternalFactorsCard({ control }: Props) {
                         </Item>
                       );
                     })}
-                    {((field.value || []) as Factor[]).length === 0 && (
+                    {((field.value || []) as attribute[]).length === 0 && (
                       <div className="rounded-md border border-dashed p-3 text-center text-xs text-muted-foreground">
                         No selection
                       </div>
@@ -488,12 +493,12 @@ export default function ExternalFactorsCard({ control }: Props) {
               name="external"
               control={control}
               render={({ field }) => {
-                const selected = ((field.value || []) as Factor[]).find(
+                const selected = ((field.value || []) as attribute[]).find(
                   (s) => s.name === activeName,
                 );
                 const commitTokens = (nextTokens: string[]) => {
                   if (!selected || required.has(selected.name)) return;
-                  const next = ((field.value || []) as Factor[]).map((s) =>
+                  const next = ((field.value || []) as attribute[]).map((s) =>
                     s.name === selected.name
                       ? { ...s, description: nextTokens.join(', ') }
                       : s,
@@ -512,16 +517,17 @@ export default function ExternalFactorsCard({ control }: Props) {
                     ) : required.has(selected.name) ? (
                       <div className="flex h-full flex-col gap-3">
                         <div>
-                          <p className="text-sm font-medium text-gray-700">
+                          <p className="text-sm font-medium">
                             {selected.title} (default)
                           </p>
                           <p className="text-xs text-muted-foreground">
                             Layer explanation (read-only).
                           </p>
                         </div>
-                        <div className="h-32 w-full overflow-auto rounded border border-gray-200 bg-gray-50 p-2 text-xs leading-relaxed whitespace-pre-line text-gray-700">
+                        <div className="h-32 w-full overflow-auto rounded border border-border bg-muted p-2 text-xs leading-relaxed whitespace-pre-line text-muted-foreground">
                           {defaultExplanations[selected.name] ||
-                            (selected as any).explanation ||
+                            (selected as attribute & { explanation?: string })
+                              .explanation ||
                             'No explanation.'}
                         </div>
                         {/* no editing controls for default factors */}
@@ -657,9 +663,9 @@ export default function ExternalFactorsCard({ control }: Props) {
 function LayerItemSkeleton() {
   return (
     <div className="animate-pulse">
-      <div className="mb-2 h-4 w-1/2 rounded bg-gray-300" />
-      <div className="mb-1 h-3 w-full rounded bg-gray-200" />
-      <div className="mb-1 h-3 w-5/6 rounded bg-gray-200" />
+      <Skeleton className="mb-2 h-4 w-1/2 rounded" />
+      <Skeleton className="mb-1 h-3 w-full rounded" />
+      <Skeleton className="mb-1 h-3 w-5/6 rounded" />
     </div>
   );
 }

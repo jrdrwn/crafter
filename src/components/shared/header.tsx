@@ -28,6 +28,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '../ui/dropdown-menu';
+import { Spinner } from '../ui/spinner';
 import Brand from './brand';
 import { ThemeToggle } from './theme-toggle';
 
@@ -38,7 +39,7 @@ export default function Header() {
   ];
 
   const pathname = usePathname();
-  const { user, logout } = useUser();
+  const { user, logout, loading } = useUser();
 
   const menus = user
     ? [
@@ -94,7 +95,11 @@ export default function Header() {
         </NavigationMenu>
         <div className="flex items-center gap-2 md:gap-4">
           <ThemeToggle />
-          {user ? (
+          {loading ? (
+            <div className="flex h-9 w-9 items-center justify-center">
+              <Spinner className="size-6 text-primary" />
+            </div>
+          ) : user ? (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant="outline" size="icon" className="rounded-full">
