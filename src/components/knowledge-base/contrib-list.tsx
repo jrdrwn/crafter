@@ -20,7 +20,14 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
-import { ScrollArea } from '@/components/ui/scroll-area';
+import {
+  Pagination,
+  PaginationContent,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from '@/components/ui/pagination';
 import { useUser } from '@/contexts/user-context';
 import { getCookie } from 'cookies-next/client';
 import {
@@ -51,7 +58,10 @@ export type ContributionItem = {
 export default function ContribList() {
   const { user, loading } = useUser();
   const [items, setItems] = useState<ContributionItem[]>([]);
-  const [cursor, setCursor] = useState<number | null>(null);
+  // offset state removed, use page only
+  const [page, setPage] = useState<number>(1);
+  const [total, setTotal] = useState<number>(0);
+  const pageSize = 5;
   const [fetching, setFetching] = useState(false);
   const [editId, setEditId] = useState<number | null>(null);
   const [openEdit, setOpenEdit] = useState(false);
@@ -62,20 +72,15 @@ export default function ContribList() {
   const canFetch = !!user && !!token;
 
   const load = useCallback(
-    async (
-      mode: 'refresh' | 'more' = 'refresh',
-      explicitCursor?: number | null,
-    ) => {
+    async (pageNum: number = 1) => {
       if (!canFetch || inflightRef.current) return;
       inflightRef.current = true;
       setFetching(true);
       try {
         const url = new URL('/api/rag/contributions', window.location.origin);
-        if (mode === 'more') {
-          const cur = explicitCursor ?? cursor;
-          if (cur) url.searchParams.set('cursor', String(cur));
-        }
-        url.searchParams.set('limit', '20');
+        const useOffset = (pageNum - 1) * pageSize;
+        url.searchParams.set('limit', String(pageSize));
+        url.searchParams.set('offset', String(useOffset));
         const res = await fetch(url.toString(), {
           headers: { Authorization: `Bearer ${token}` },
         });
@@ -83,12 +88,12 @@ export default function ContribList() {
         const json = (await res.json()) as {
           status: boolean;
           items: ContributionItem[];
-          nextCursor: number | null;
+          nextOffset: number | null;
+          total?: number;
         };
-        setItems((prev) =>
-          mode === 'more' ? [...prev, ...(json.items || [])] : json.items || [],
-        );
-        setCursor(json.nextCursor ?? null);
+        setItems(json.items || []);
+        setPage(pageNum);
+        setTotal(json.total ?? 0);
       } catch (e) {
         toast.error('Failed to load', {
           description: e instanceof Error ? e.message : String(e),
@@ -98,15 +103,14 @@ export default function ContribList() {
         setFetching(false);
       }
     },
-    [canFetch, cursor, token],
+    [canFetch, token],
   );
 
   useEffect(() => {
     if (!canFetch) return;
-    // initial load only when auth ready
-    load('refresh');
+    load(page);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [canFetch]);
+  }, [canFetch, page]);
 
   function openEditDialog(id: number) {
     setEditId(id);
@@ -118,7 +122,7 @@ export default function ContribList() {
   }
 
   async function onSaved() {
-    await load('refresh');
+    await load(1);
   }
 
   if (!loading && !user) {
@@ -151,7 +155,7 @@ export default function ContribList() {
           <Button
             variant="outline"
             size="sm"
-            onClick={() => load('refresh')}
+            onClick={() => load(1)}
             disabled={fetching}
             className="w-full sm:w-auto"
           >
@@ -164,95 +168,172 @@ export default function ContribList() {
           </Button>
         </CardHeader>
         <CardContent>
-          {items.length === 0 ? (
-            <div className="text-sm text-muted-foreground">
-              No contributions yet.
-            </div>
-          ) : (
-            <ScrollArea className="max-h-[540px] pr-2 sm:pr-4">
-              <ul className="space-y-3">
-                {items.map((it) => {
-                  const meta =
-                    it.metadata && typeof it.metadata === 'object'
-                      ? (it.metadata as Record<string, unknown>)
-                      : null;
-                  const visibility =
-                    (meta?.visibility as 'public' | 'private' | undefined) ??
-                    'private';
-                  return (
-                    <li key={it.id} className="rounded-md border p-3">
-                      <div className="flex flex-wrap justify-between gap-3">
-                        <div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
+          <ul className="space-y-3">
+            {fetching && items.length === 0 ? (
+              Array.from({ length: 5 }).map((_, idx) => (
+                <li key={idx} className="rounded-md border p-3">
+                  <div className="flex flex-wrap justify-between gap-3">
+                    <div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
+                      <span className="inline-flex items-center gap-1 rounded border px-2 py-0.5">
+                        <span className="size-3 rounded bg-muted" /> Skeleton
+                      </span>
+                      <span className="inline-flex items-center gap-1 rounded border px-2 py-0.5">
+                        <span className="size-3 rounded bg-muted" /> Skeleton
+                      </span>
+                      <span className="inline-flex items-center gap-1 rounded border px-2 py-0.5">
+                        <span className="size-3 rounded bg-muted" /> Skeleton
+                      </span>
+                      <Badge variant="outline">Skeleton</Badge>
+                      <span className="inline-flex items-center gap-1 rounded border px-2 py-0.5 text-[10px] sm:text-xs">
+                        <span className="size-3 rounded bg-muted" /> Skeleton
+                      </span>
+                    </div>
+                    <div className="flex flex-1 items-stretch gap-2">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        disabled
+                        className="flex-1 opacity-50"
+                      >
+                        Skeleton
+                      </Button>
+                      <Button
+                        variant="destructive"
+                        size="sm"
+                        disabled
+                        className="flex-1 opacity-50"
+                      >
+                        Skeleton
+                      </Button>
+                    </div>
+                  </div>
+                </li>
+              ))
+            ) : items.length === 0 ? (
+              <li className="text-sm text-muted-foreground">
+                No contributions yet.
+              </li>
+            ) : (
+              items.map((it) => {
+                const meta =
+                  it.metadata && typeof it.metadata === 'object'
+                    ? (it.metadata as Record<string, unknown>)
+                    : null;
+                const visibility =
+                  (meta?.visibility as 'public' | 'private' | undefined) ??
+                  'private';
+                return (
+                  <li key={it.id} className="rounded-md border p-3">
+                    <div className="flex flex-wrap justify-between gap-3">
+                      <div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
+                        <span className="inline-flex items-center gap-1 rounded border px-2 py-0.5">
+                          <FileText className="size-3" /> {it.type}
+                        </span>
+                        {it.domain_key && (
                           <span className="inline-flex items-center gap-1 rounded border px-2 py-0.5">
-                            <FileText className="size-3" /> {it.type}
-                          </span>
-                          {it.domain_key && (
-                            <span className="inline-flex items-center gap-1 rounded border px-2 py-0.5">
-                              <Globe className="size-3" />{' '}
-                              <span className="max-w-[100px] truncate">
-                                {it.domain_key}
-                              </span>
-                            </span>
-                          )}
-                          {it.language_key && (
-                            <span className="inline-flex items-center gap-1 rounded border px-2 py-0.5">
-                              <Languages className="size-3" /> {it.language_key}
-                            </span>
-                          )}
-                          <Badge
-                            variant={
-                              visibility === 'public' ? 'secondary' : 'outline'
-                            }
-                          >
-                            {visibility === 'public' ? 'Public' : 'Private'}
-                          </Badge>
-                          <span className="inline-flex items-center gap-1 rounded border px-2 py-0.5 text-[10px] sm:text-xs">
-                            <CalendarClock className="size-3 shrink-0" />
-                            <span className="hidden sm:inline">
-                              {new Date(it.created_at).toLocaleString()}
-                            </span>
-                            <span className="sm:hidden">
-                              {new Date(it.created_at).toLocaleDateString()}
+                            <Globe className="size-3" />{' '}
+                            <span className="max-w-[100px] truncate">
+                              {it.domain_key}
                             </span>
                           </span>
-                        </div>
-                        <div className="flex flex-1 items-stretch gap-2">
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => openEditDialog(it.id)}
-                            className="flex-1"
-                          >
-                            <Pencil className="mr-2 size-4" /> Edit
-                          </Button>
-                          <DeleteButton
-                            id={it.id}
-                            token={token!}
-                            onDeleted={onDeleted}
-                          />
-                        </div>
+                        )}
+                        {it.language_key && (
+                          <span className="inline-flex items-center gap-1 rounded border px-2 py-0.5">
+                            <Languages className="size-3" /> {it.language_key}
+                          </span>
+                        )}
+                        <Badge
+                          variant={
+                            visibility === 'public' ? 'secondary' : 'outline'
+                          }
+                        >
+                          {visibility === 'public' ? 'Public' : 'Private'}
+                        </Badge>
+                        <span className="inline-flex items-center gap-1 rounded border px-2 py-0.5 text-[10px] sm:text-xs">
+                          <CalendarClock className="size-3 shrink-0" />
+                          <span className="hidden sm:inline">
+                            {new Date(it.created_at).toLocaleString()}
+                          </span>
+                          <span className="sm:hidden">
+                            {new Date(it.created_at).toLocaleDateString()}
+                          </span>
+                        </span>
                       </div>
-                    </li>
-                  );
-                })}
-              </ul>
-              {cursor ? (
-                <div className="mt-4 flex justify-center">
-                  <Button
-                    variant="ghost"
-                    onClick={() => load('more', cursor)}
-                    disabled={fetching}
-                    className="w-full sm:w-auto"
-                  >
-                    {fetching ? (
-                      <Loader2 className="mr-2 size-4 animate-spin" />
-                    ) : null}
-                    Load more
-                  </Button>
-                </div>
-              ) : null}
-            </ScrollArea>
-          )}
+                      <div className="flex flex-1 items-stretch gap-2">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => openEditDialog(it.id)}
+                          className="flex-1"
+                        >
+                          <Pencil className="mr-2 size-4" /> Edit
+                        </Button>
+                        <DeleteButton
+                          id={it.id}
+                          token={token!}
+                          onDeleted={onDeleted}
+                        />
+                      </div>
+                    </div>
+                  </li>
+                );
+              })
+            )}
+          </ul>
+          {/* Pagination controls - always show */}
+          <div className="mt-4 flex justify-center">
+            <Pagination>
+              <PaginationContent>
+                <PaginationItem>
+                  <PaginationPrevious
+                    href="#"
+                    onClick={(e: React.MouseEvent) => {
+                      e.preventDefault();
+                      if (page > 1) load(page - 1);
+                    }}
+                    aria-disabled={page === 1}
+                    style={
+                      page === 1 ? { pointerEvents: 'none', opacity: 0.5 } : {}
+                    }
+                  />
+                </PaginationItem>
+                {Array.from({
+                  length: Math.max(1, Math.ceil(total / pageSize)),
+                }).map((_, idx) => (
+                  <PaginationItem key={idx}>
+                    <PaginationLink
+                      href="#"
+                      isActive={page === idx + 1}
+                      onClick={(e: React.MouseEvent) => {
+                        e.preventDefault();
+                        load(idx + 1);
+                      }}
+                    >
+                      {idx + 1}
+                    </PaginationLink>
+                  </PaginationItem>
+                ))}
+                <PaginationItem>
+                  <PaginationNext
+                    href="#"
+                    onClick={(e: React.MouseEvent) => {
+                      e.preventDefault();
+                      if (page < Math.max(1, Math.ceil(total / pageSize)))
+                        load(page + 1);
+                    }}
+                    aria-disabled={
+                      page === Math.max(1, Math.ceil(total / pageSize))
+                    }
+                    style={
+                      page === Math.max(1, Math.ceil(total / pageSize))
+                        ? { pointerEvents: 'none', opacity: 0.5 }
+                        : {}
+                    }
+                  />
+                </PaginationItem>
+              </PaginationContent>
+            </Pagination>
+          </div>
         </CardContent>
       </Card>
 

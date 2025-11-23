@@ -104,11 +104,35 @@ export async function normalizeToRAGNote(
   const lang = meta?.language ?? 'en';
   const llm = new ChatGoogleGenerativeAI({
     model: 'gemini-2.5-flash',
-    apiKey: API_KEY!,
+    apiKey: process.env.GEMINI_RAG_API_KEY!,
     temperature: 0.2,
   });
 
-  const sys = `You are a data cleaning assistant. Normalize messy user-provided content into a consistent RAG knowledge note in Markdown. Keep facts faithful. If the input is tabular (CSV/Excel), convert to a clean Markdown table and include a short summary.
+  const sys =
+    lang === 'id'
+      ? `Anda adalah asisten pembersihan data. Normalisasikan konten yang diberikan pengguna menjadi catatan pengetahuan RAG yang konsisten dalam format Markdown. Pastikan fakta tetap akurat. Jika input berupa data tabel (CSV/Excel), ubah menjadi tabel Markdown yang rapi dan sertakan ringkasan singkat.
+
+Keluaran HARUS mengikuti struktur Markdown berikut:
+
+# Judul
+
+- Sumber: <sumber atau nama file>
+- Domain: <domain atau ->
+- Bahasa: <id|en>
+- Format: <format>
+
+## Ringkasan
+<3-6 poin penting yang merangkum konten>
+
+## Wawasan Utama
+- <poin>
+- <poin>
+
+## Detail
+<paragraf yang sudah dibersihkan atau tabel>
+
+Jangan tambahkan komentar tambahan.`
+      : `You are a data cleaning assistant. Normalize messy user-provided content into a consistent RAG knowledge note in Markdown. Keep facts faithful. If the input is tabular (CSV/Excel), convert to a clean Markdown table and include a short summary.
 
 Output strictly in this Markdown structure:
 

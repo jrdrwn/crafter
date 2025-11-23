@@ -109,28 +109,32 @@ export async function ingestContribution(payload: ContributionPayload) {
 // READ: list contributions milik user (pagination sederhana)
 export async function listUserContributions(
   authorId: number | string | bigint,
-  opts?: { limit?: number; cursor?: number },
+  opts?: { limit?: number; offset?: number },
 ) {
   const limit = Math.min(Math.max(opts?.limit ?? 20, 1), 100);
-  const cursor = opts?.cursor;
+  const offset = Math.max(opts?.offset ?? 0, 0);
   const where = { author_id: BigInt(String(authorId)) } as const;
-  const items = await prisma.rag_documents.findMany({
-    where,
-    take: limit,
-    ...(cursor ? { skip: 1, cursor: { id: cursor } } : {}),
-    orderBy: { id: 'asc' },
-    select: {
-      id: true,
-      type: true,
-      domain_key: true,
-      language_key: true,
-      source: true,
-      metadata: true,
-      created_at: true,
-    },
-  });
-  const nextCursor = items.length === limit ? items[items.length - 1].id : null;
-  return { items, nextCursor };
+  const [items, total] = await Promise.all([
+    prisma.rag_documents.findMany({
+      where,
+      take: limit,
+      skip: offset,
+      orderBy: { id: 'asc' },
+      select: {
+        id: true,
+        type: true,
+        domain_key: true,
+        language_key: true,
+        source: true,
+        metadata: true,
+        created_at: true,
+      },
+    }),
+    prisma.rag_documents.count({ where }),
+  ]);
+  // For offset pagination, return nextOffset if more items exist
+  const nextOffset = items.length === limit ? offset + limit : null;
+  return { items, nextOffset, total };
 }
 
 // READ: detail milik user

@@ -53,10 +53,8 @@ rag.get('/contributions', async (c) => {
   const jwt = c.get('jwtPayload') as JWTPayload | undefined;
   if (!jwt?.sub) return c.json({ status: false, message: 'Unauthorized' }, 401);
   const limit = Number(c.req.query('limit') ?? '20');
-  const cursor = c.req.query('cursor')
-    ? Number(c.req.query('cursor'))
-    : undefined;
-  const result = await listUserContributions(jwt.sub, { limit, cursor });
+  const offset = Number(c.req.query('offset') ?? '0');
+  const result = await listUserContributions(jwt.sub, { limit, offset });
   return c.json({ status: true, ...result });
 });
 

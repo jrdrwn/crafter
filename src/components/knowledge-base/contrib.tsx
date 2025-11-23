@@ -53,6 +53,8 @@ import { Controller, useForm } from 'react-hook-form';
 import { toast } from 'sonner';
 import { z } from 'zod';
 
+import { Spinner } from '../ui/spinner';
+
 const ContributionSchema = z.object({
   text: z.string().optional().default(''),
   type: z.enum(['survey', 'interview', 'review', 'doc'], {
@@ -264,7 +266,7 @@ export default function Contrib() {
   });
 
   const textValue = watch('text');
-  const TOKEN_LIMIT = Number(process.env.NEXT_PUBLIC_RAG_TOKEN_LIMIT ?? 10000);
+  const TOKEN_LIMIT = Number(process.env.NEXT_PUBLIC_RAG_TOKEN_LIMIT ?? 30000);
 
   const rawText = (textValue ?? '').trim();
   const textTokens = Math.ceil((rawText.length || 0) / 4);
@@ -729,7 +731,7 @@ export default function Contrib() {
                 className="w-full sm:w-auto"
               >
                 {submitting ? (
-                  <Upload className="mr-2 size-4 animate-pulse" />
+                  <Spinner className="mr-2 size-4" />
                 ) : (
                   <Upload className="mr-2 size-4" />
                 )}
