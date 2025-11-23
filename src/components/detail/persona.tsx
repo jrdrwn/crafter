@@ -263,12 +263,27 @@ function PersonaContent({
   markdown?: PersonaMarkdown;
 }) {
   if (!markdown) return null;
+  let content = '';
+  if (personaStyle === 'mixed') content = markdown.result.mixed || '';
+  if (personaStyle === 'bullets') content = markdown.result.bullets || '';
+  if (personaStyle === 'narative') content = markdown.result.narative || '';
+  // Simple word count (strip HTML tags, split by whitespace)
+  const wordCount = content
+    ? content
+        .replace(/<[^>]+>/g, '')
+        .trim()
+        .split(/\s+/)
+        .filter(Boolean).length
+    : 0;
   return (
     <Card className="w-full border-primary p-0">
       <div className="prose prose-sm max-w-full p-3 md:prose-lg md:p-4 dark:prose-invert prose-h2:mb-2 prose-h2:text-primary prose-h3:text-primary prose-h4:text-primary">
         {personaStyle === 'mixed' && parse(markdown.result.mixed)}
         {personaStyle === 'bullets' && parse(markdown.result.bullets)}
         {personaStyle === 'narative' && parse(markdown.result.narative)}
+      </div>
+      <div className="px-3 pb-2 text-right text-xs text-muted-foreground md:px-4">
+        Word count: <span className="font-semibold">{wordCount}</span>
       </div>
     </Card>
   );

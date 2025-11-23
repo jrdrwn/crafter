@@ -34,10 +34,7 @@ persona.post(
           }),
         )
         .min(1, 'Select at least one external factor'),
-      contentLength: z
-        .number()
-        .min(50)
-        .max(2000, 'Content length must be between 50 and 2000 words'),
+      contentLengthRange: z.array(z.number()).length(2),
       llmModel: z.object({ key: z.string(), label: z.string() }).required(),
       language: z
         .object({ key: z.enum(['en', 'id']), label: z.string() })
@@ -53,7 +50,10 @@ persona.post(
       expected_output_structure: {
         json_schema: {
           language: json.language.label,
-          persona_result_max_length: json.contentLength,
+          content_length_range: {
+            min: `${json.contentLengthRange[0]} words`,
+            max: `${json.contentLengthRange[1]} words`,
+          },
           result: {
             narative: '...',
             bullets: '...',
@@ -87,6 +87,7 @@ persona.post(
         language_key: json.language.key,
       },
       queryTerms,
+      contentLengthRange: json.contentLengthRange,
     });
 
     return c.json(result);
@@ -117,10 +118,7 @@ persona.post(
           }),
         )
         .min(1, 'Select at least one external factor'),
-      contentLength: z
-        .number()
-        .min(50)
-        .max(2000, 'Content length must be between 50 and 2000 words'),
+      contentLengthRange: z.array(z.number()).length(2),
       llmModel: z.object({ key: z.string(), label: z.string() }).required(),
       language: z
         .object({ key: z.enum(['en', 'id']), label: z.string() })
@@ -137,7 +135,10 @@ persona.post(
       expected_output_structure: {
         json_schema: {
           language: json.language.label,
-          persona_result_max_length: `${json.contentLength} words`,
+          content_length_range: {
+            min: `${json.contentLengthRange[0]} words`,
+            max: `${json.contentLengthRange[1]} words`,
+          },
           result: {
             narative: '...',
             bullets: '...',
@@ -172,6 +173,7 @@ persona.post(
         author_id: jwtPayload.sub,
       },
       queryTerms,
+      contentLengthRange: json.contentLengthRange,
     });
 
     let domain = await prisma.domain.findUnique({
@@ -199,7 +201,7 @@ persona.post(
       data: {
         owner_id: jwtPayload.sub,
         result: result.result,
-        max_length: json.contentLength,
+        content_length_range: json.contentLengthRange,
         detail: json.detail,
         domain_id: domain.id,
         visibility: visibility.private,
@@ -281,10 +283,7 @@ persona.put(
           }),
         )
         .min(1, 'Select at least one external factor'),
-      contentLength: z
-        .number()
-        .min(50)
-        .max(2000, 'Content length must be between 50 and 2000 words'),
+      contentLengthRange: z.array(z.number()).length(2),
       llmModel: z.object({ key: z.string(), label: z.string() }).required(),
       language: z
         .object({ key: z.enum(['en', 'id']), label: z.string() })
@@ -302,7 +301,10 @@ persona.put(
       expected_output_structure: {
         json_schema: {
           language: json.language.label,
-          persona_result_max_length: `${json.contentLength} words`,
+          content_length_range: {
+            min: `${json.contentLengthRange[0]} words`,
+            max: `${json.contentLengthRange[1]} words`,
+          },
           result: {
             narative: '...',
             bullets: '...',
@@ -341,6 +343,7 @@ persona.put(
         author_id: jwtPayload.sub,
       },
       queryTerms,
+      contentLengthRange: json.contentLengthRange,
     });
 
     const domain = await prisma.domain.findUnique({
@@ -369,7 +372,7 @@ persona.put(
       data: {
         owner_id: jwtPayload.sub,
         result: result.result,
-        max_length: json.contentLength,
+        content_length_range: json.contentLengthRange,
         detail: json.detail,
         domain_id: domain!.id,
         visibility: oldPersona?.visibility || visibility.private,
@@ -519,7 +522,7 @@ persona.get('/', zValidator('query', listQuerySchema), async (c) => {
     select: {
       id: true,
       result: true,
-      max_length: true,
+      content_length_range: true,
       detail: true,
       visibility: true,
       created_at: true,
@@ -572,7 +575,7 @@ persona.get('/me', zValidator('query', listQuerySchema), async (c) => {
     select: {
       id: true,
       result: true,
-      max_length: true,
+      content_length_range: true,
       detail: true,
       visibility: true,
       created_at: true,
@@ -599,7 +602,7 @@ persona.get('/:id', async (c) => {
     select: {
       id: true,
       result: true,
-      max_length: true,
+      content_length_range: true,
       detail: true,
       visibility: true,
       created_at: true,
@@ -652,7 +655,7 @@ persona.post('/copy/:id', async (c) => {
     data: {
       owner_id: jwtPayload.sub,
       result: persona.result || {},
-      max_length: persona.max_length,
+      content_length_range: persona.content_length_range,
       detail: persona.detail,
       domain_id: persona.domain_id,
       visibility: visibility.private,

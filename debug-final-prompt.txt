@@ -1,0 +1,204 @@
+thefirstone: 'Output must be JSON first, not Markdown at the top. Do not change the attribute titles. Follow the persona_format. Use the requested output language.'
+role: persona researcher
+description: 'You act as a persona researcher who constructs personas using the Preliminary Persona Taxonomy technique from Karolita et al. (2023) ENASE 2023.'
+reference: "Karolita, D., Grundy, J., Kanij, T., Obie, H., & McIntosh, J. (2023). What's in a Persona? A Preliminary Taxonomy from Persona Use in Requirements Engineering. ENASE 2023, 39-51. https://doi.org/10.5220/0011708500003464"
+
+output_specifications:
+  presentation_order:
+    - 'Narrative (paragraph)'
+    - 'Bullet points'
+    - 'Mixed (paragraph + points)'
+  post_versions: 'After the three versions, display JSON for the persona taxonomy and domain.'
+  layer_translation: 'Layer attributes are not translated.'
+  html_rules:
+    no_bold_or_italic: true
+    paragraph_wrap: 'p'
+    linebreak_tag: '<br/>'
+    no_extra_headings: true
+    indentation: '2 spaces at sub-levels'
+    no_three_lines_symbol_at_top: true
+
+writing_style:
+  description: 'Descriptive, concise, and terminologically consistent.'
+  rules:
+    - 'Avoid unexplained jargon.'
+    - "Do not add phrases like 'aligned with the taxonomy'."
+    - 'Do not use hyphens or bullets other than those in the official format.'
+    - 'Ensure HTML format is consistent across versions.'
+
+persona_format:
+  narative:
+    type: html
+    structure:
+      - '<p>[PARAGRAPH]</p>'
+      - '<p>[PARAGRAPH]</p>'
+      - '[OPTIONAL TO ADD MORE]'
+  bullet:
+    type: html
+    structure:
+      - '<h4>[LAYER-TITLE]</h4>'
+      - |
+        <ul>
+        <li>[BULLET LIST 1]</li>
+        <li>[BULLET LIST 2]</li>
+        <li>[BULLET LIST N]</li>
+        </ul>
+      - '<h4>[LAYER-TITLE]</h4>'
+      - |
+        <ul>
+        <li>[BULLET LIST 1]</li>
+        <li>[BULLET LIST 2]</li>
+        <li>[BULLET LIST N]</li>
+        </ul>
+      - '<hr/>'
+      - '<h4>[LAYER-TITLE]</h4>'
+      - |
+        <ul>
+        <li>[BULLET LIST 1]</li>
+        <li>[BULLET LIST 2]</li>
+        <li>[BULLET LIST N]</li>
+        </ul>
+      - '<h4>[LAYER-TITLE]</h4>'
+      - |
+        <ul>
+        <li>[BULLET LIST 1]</li>
+        <li>[BULLET LIST 2]</li>
+        <li>[BULLET LIST N]</li>
+        </ul>
+  mixed:
+    type: html
+    structure:
+      - '<p>[DESCRIPTION]</p>'
+      - '<h3>[LAYER-TITLE]</h3>'
+      - |
+        <ul>
+        <li>[SUB-ATTRIBUTE or BULLET 1]</li>
+        <li>[SUB-ATTRIBUTE or BULLET 2]</li>
+        <li>[SUB-ATTRIBUTE or BULLET N]</li>
+        </ul>
+      - '<p>[DESCRIPTION]</p>'
+  notes:
+    - 'If using paragraphs, do not display [ATTRIBUTE-TITLE].'
+    - 'Each version result must be wrapped in a consistent HTML container.'
+    - 'The number of [ATTRIBUTE-TITLE] items matches the number of attributes requested by the user.'
+    - 'In "mixed", do not change the titles to "Internal layer" or "External Profile".'
+    - 'You must follow the format specified above, but you may add content not present in the one-shot example as long as you do not change the defined structure and format.'
+    - '<br/> may only be used inside paragraphs, not outside.'
+    - '<hr/> must not appear twice within a single version result.'
+    - 'Do not leave any attribute empty even when using RAG.'
+
+task:
+  instruction: 'Create 1 new persona in JSON format that differs from the One-Shot example above, following the same order and format (Narrative → Bullet → Mixed → JSON).'
+  guidelines:
+    - 'Be creative, but stay consistent with the taxonomy.'
+    - 'Do not copy the example content.'
+    - 'The final output must be JSON only.'
+    - 'The result key must contain 3 uniform HTML blocks.'
+    - 'Do not add any text outside the JSON structure.'
+    - 'Conform to the expected_output_structure.'
+    - 'In the taxonomy section, nothing should be changed; it must align with the previous input.'
+
+[Retrieval For knowledge]
+[#1] contribution
+# Physical Health User Personas
+
+- Source: -
+- Domain: physical-health
+- Language: en
+- Format: xlsx
+
+## Summary
+*   The dataset outlines 10 distinct user personas, each with varying demographic, professional, and health-related attributes.
+*   Profiles include individuals facing significant health challenges (e.g., spinal cord injury, biking accident, chronic pain) as well as those with generally healthy lifestyles.
+*   Occupations are diverse, ranging from construction workers and campaign managers to musicologists and various medical professionals (anesthetists, surgical coordinators).
+*   Common pain points identified include confusion over available options (e.g., insurance), difficulty with health-related applications, and the need for effective search mechanisms.
+*   The personas represent a mix of ages (20 to 65), family structures (married, single, with children, no children), and financial backgrounds, highlighting varied life circumstances.
+
+[#2] contribution
+| Persona ID | Name Placeholder | Description         | Occupation                                                               | Age | Gender | Family Structure            | Living Arrangement           | Location  | Health Challenges                                  | Health Status                                                               | Pain Points                                  | Goals                       | Motivations | Work Experience                                                               | Skills                                        | Activities                               | Financial Situation              | Social Interaction             | Computer Usage | Internet Usage | Technology Usage | Health Literacy | Technology Literacy | Body Measurement | Preferences       | Photograph |
+
+[#3] contribution
+## Key Insights
+*   **Diverse User Needs**: The personas demonstrate a broad spectrum of user needs, from managing severe physical disabilities and seeking medical information to career transitions and improving software usability.
+*   **Health-Centric Focus**: A significant portion of the profiles are characterized by their health status, challenges, or professional involvement in healthcare, indicating a strong emphasis on health-related contexts.
+*   **Technology Interaction Spectrum**: User interactions with technology range from finding health apps "horrible" to needing effective search mechanisms, suggesting varying levels of digital literacy and specific technological requirements.
+*   **Professional and Personal Contexts**: The data integrates both professional roles (e.g., medical coordinators) and personal life details (e.g., family structure, living arrangements), providing a holistic view of each persona.
+
+## Details
+
+[#4] contribution
+| Persona 1  | First name       | Insurance seeker    | previously employed as a construction worker                             | &lt;NA&gt; | &lt;NA&gt; | married, two children       | &lt;NA&gt;                     | &lt;NA&gt;    | biking accident, unable to work full-time          | &lt;NA&gt;                                                                    | confused by the options available to him...  | &lt;NA&gt;                      | &lt;NA&gt;      | &lt;NA&gt;                                                                        | &lt;NA&gt;                                          | spends much of his time watching television | his wife has only a low-paying job | &lt;NA&gt;                         | &lt;NA&gt;         | &lt;NA&gt;           | &lt;NA&gt;             | &lt;NA&gt;            | &lt;NA&gt;                | &lt;NA&gt;             | &lt;NA&gt;              | Yes        |
+
+[#5] contribution
+# Physical Health User Personas
+
+- Source: -
+- Domain: physical-health
+- Language: en
+- Format: xlsx
+
+## Summary
+*   The dataset outlines 10 distinct user personas, each with varying demographic, professional, and health-related attributes.
+*   Profiles include individuals facing significant health challenges (e.g., spinal cord injury, biking accident, chronic pain) as well as those with generally healthy lifestyles.
+*   Occupations are diverse, ranging from construction workers and campaign managers to musicologists and various medical professionals (anesthetists, surgical coordinators).
+*   Common pain points identified include confusion over available options (e.g., insurance), difficulty with health-related applications, and the need for effective search mechanisms.
+*   The personas represent a mix of ages (20 to 65), family structures (married, single, with children, no children), and financial backgrounds, highlighting varied life circumstances.
+
+[#6] contribution
+| Persona ID | Name Placeholder | Description         | Occupation                                                               | Age | Gender | Family Structure            | Living Arrangement           | Location  | Health Challenges                                  | Health Status                                                               | Pain Points                                  | Goals                       | Motivations | Work Experience                                                               | Skills                                        | Activities                               | Financial Situation              | Social Interaction             | Computer Usage | Internet Usage | Technology Usage | Health Literacy | Technology Literacy | Body Measurement | Preferences       | Photograph |
+
+[#7] contribution
+## Key Insights
+*   **Diverse User Needs**: The personas demonstrate a broad spectrum of user needs, from managing severe physical disabilities and seeking medical information to career transitions and improving software usability.
+*   **Health-Centric Focus**: A significant portion of the profiles are characterized by their health status, challenges, or professional involvement in healthcare, indicating a strong emphasis on health-related contexts.
+*   **Technology Interaction Spectrum**: User interactions with technology range from finding health apps "horrible" to needing effective search mechanisms, suggesting varying levels of digital literacy and specific technological requirements.
+*   **Professional and Personal Contexts**: The data integrates both professional roles (e.g., medical coordinators) and personal life details (e.g., family structure, living arrangements), providing a holistic view of each persona.
+
+## Details
+
+[#8] contribution
+| Persona 1  | First name       | Insurance seeker    | previously employed as a construction worker                             | &lt;NA&gt; | &lt;NA&gt; | married, two children       | &lt;NA&gt;                     | &lt;NA&gt;    | biking accident, unable to work full-time          | &lt;NA&gt;                                                                    | confused by the options available to him...  | &lt;NA&gt;                      | &lt;NA&gt;      | &lt;NA&gt;                                                                        | &lt;NA&gt;                                          | spends much of his time watching television | his wife has only a low-paying job | &lt;NA&gt;                         | &lt;NA&gt;         | &lt;NA&gt;           | &lt;NA&gt;             | &lt;NA&gt;            | &lt;NA&gt;                | &lt;NA&gt;             | &lt;NA&gt;              | Yes        |
+
+[User Construct For Primary Prompting And Language]
+expected_output_structure:
+  json_schema:
+    language: English
+    content_length_range:
+      min: 50 words
+      max: 2000 words
+    result:
+      narative: ...
+      bullets: ...
+      mixed: ...
+      quote: ...
+      full_name: ...
+    taxonomy:
+      domain:
+        key: physical-health
+        label: Physical health
+      detail: ""
+      internal:
+        - name: demographic-information
+          title: Demographic information
+          description: age, name, and gender
+        - name: personal-attributes
+          title: Personal attributes
+          description: attitude, behaviour, personality, preference, interest, and hobby
+      external:
+        - name: motivation
+          title: Motivation
+          description: Primary reasons for using the system
+        - name: goals
+          title: Goals
+          description: Objectives the user wants to achieve
+        - name: pain-points
+          title: Pain Points
+          description: Key challenges & frustrations
+        - name: personal-story
+          title: Personal story
+          description: activity, achievement, memorable incident, life experience, and
+            life value
+        - name: interaction-with-technology
+          title: Interaction with technology
+          description: ICT usage, ICT literacy, adaptation to technology, possessions of
+            gadgets, and wearable device usage

@@ -1,0 +1,22 @@
+output_specifications:
+  presentation_order:
+    - 'Narative (paragraf)'
+    - 'Bullet-points'
+    - 'Mixed (paragraf + poin)'
+  post_versions: 'Setelah ketiga versi, tampilkan JSON untuk persona taxonomy dan domain.'
+  layer_translation: 'Atribut layer tidak diterjemahkan.'
+  html_rules:
+  no_bold_or_italic: true
+  paragraph_wrap: 'p'
+  linebreak_tag: '<br/>'
+  no_extra_headings: true
+  indentation: '2 spasi pada sub-level'
+  no_three_lines_symbol_at_top: true
+
+writing_style:
+  description: 'Deskriptif, padat, dan konsisten secara terminologis.'
+  rules:
+    - 'Hindari jargon yang tidak dijelaskan.'
+    - "Tidak menambahkan kata seperti 'selaras dengan taxonomy'."
+    - 'Tidak menggunakan tanda penghubung atau bullet selain sesuai format resmi.'
+    - 'Pastikan format HTML konsisten antar versi.'

@@ -60,10 +60,7 @@ export const formSchema = z.object({
       }),
     )
     .min(1, 'Select at least one external factor'),
-  contentLength: z
-    .number()
-    .min(50)
-    .max(2000, 'Content length must be between 50 and 2000 words'),
+  contentLengthRange: z.array(z.number()).length(2),
   llmModel: z
     .object({
       key: z.string(),
@@ -132,7 +129,7 @@ export default function Design() {
           description: 'Key challenges & frustrations',
         },
       ],
-      contentLength: 1000,
+      contentLengthRange: [100, 200],
       llmModel: {
         key: 'gemini-2.5-flash-lite',
         label: 'Gemini 2.5 Flash Lite',
@@ -225,7 +222,13 @@ export default function Design() {
       domain: ['domain'],
       internal: ['internal'],
       external: ['external'],
-      additional: ['contentLength', 'llmModel', 'language', 'useRAG', 'detail'],
+      additional: [
+        'contentLengthRange',
+        'llmModel',
+        'language',
+        'useRAG',
+        'detail',
+      ],
       review: [] as (keyof TCreateForm)[],
     }),
     [],
@@ -381,7 +384,10 @@ export default function Design() {
                     <div className="flex items-center gap-2">
                       <Ruler className="h-4 w-4 text-muted-foreground" />
                       <span className="font-medium">Content length:</span>
-                      <span>{form.getValues('contentLength')} words</span>
+                      <span>
+                        {form.getValues('contentLengthRange')[0]} -{' '}
+                        {form.getValues('contentLengthRange')[1]} words
+                      </span>
                     </div>
                     <div className="flex items-center gap-2">
                       <Database className="h-4 w-4 text-muted-foreground" />

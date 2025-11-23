@@ -3,6 +3,7 @@ import path from 'path';
 
 import { PGVectorStore } from '@langchain/community/vectorstores/pgvector';
 import { Document } from '@langchain/core/documents';
+import { HumanMessage, SystemMessage } from '@langchain/core/messages';
 import {
   ChatGoogleGenerativeAI,
   GoogleGenerativeAIEmbeddings,
@@ -106,6 +107,7 @@ export async function normalizeToRAGNote(
     model: 'gemini-2.5-flash',
     apiKey: process.env.GEMINI_RAG_API_KEY!,
     temperature: 0.2,
+    cache: true,
   });
 
   const sys =
@@ -188,6 +190,7 @@ export async function runPersonaRAG(
     filters?: RagFilters;
     queryTerms?: string[];
     skipRAG?: boolean;
+    contentLengthRange?: number[];
   },
 ) {
   const vs = await ensureStore();
@@ -232,42 +235,53 @@ export async function runPersonaRAG(
     docs = [...personal, ...general];
   }
 
-  const context = docs.length
-    ? `\n\n[Retrieval For knowledge]\n${joinDocs(docs)}`
-    : '';
-
-  // Choose prompt file based on requested language; fall back gracefully
   const langKey = opts?.filters?.language_key;
-  const preferredPrompt =
-    langKey === 'id' ? 'prompt-id.yaml' : 'prompt-en.yaml';
-  const candidates = [
-    path.join(process.cwd(), preferredPrompt),
-    path.join(process.cwd(), 'prompt.yaml'),
-    path.join(process.cwd(), 'public', 'prompt.yaml'),
-  ];
 
-  let promptMd: string | null = null;
-  for (const candidate of candidates) {
-    try {
-      // Attempt to read the candidate file; if not found, try next
-      promptMd = await fs.readFile(candidate, 'utf-8');
-      if (promptMd) break;
-    } catch {
-      // continue
-    }
-  }
-  if (!promptMd) {
-    throw new Error(
-      'Prompt template not found (prompt-en.yaml / prompt-id.yaml / prompt.yaml)',
-    );
-  }
+  const systemMessage = await fs.readFile(
+    path.join(process.cwd(), `prompt/${langKey}/system/system_message.txt`),
+    'utf-8',
+  );
 
+  const task = await fs.readFile(
+    path.join(process.cwd(), `prompt/${langKey}/user/task_instruction.txt`),
+    'utf-8',
+  );
+
+  const outputSpec = await fs.readFile(
+    path.join(
+      process.cwd(),
+      `prompt/${langKey}/user/output_specifications.txt`,
+    ),
+    'utf-8',
+  );
+  const personaFormat = await fs.readFile(
+    path.join(process.cwd(), `prompt/${langKey}/user/persona_format.txt`),
+    'utf-8',
+  );
+  const contextTitle = await fs.readFile(
+    path.join(process.cwd(), `prompt/${langKey}/user/context_title.txt`),
+    'utf-8',
+  );
+  const contructTitle = await fs.readFile(
+    path.join(process.cwd(), `prompt/${langKey}/user/construct_title.txt`),
+    'utf-8',
+  );
+
+  const contentLengthRangePrompt =
+    langKey === 'id'
+      ? `Sesuaikan panjang persona sesuai dengan rentang jumlah kata berikut untuk mixed, narative, dan bullets: minimal ${opts?.contentLengthRange?.[0] ?? 0} kata dan maksimal ${opts?.contentLengthRange?.[1] ?? 1000} kata.`
+      : `Additional Instruction: Adjust the persona length according to the following word count range for mixed, narative, and bullets: minimum ${opts?.contentLengthRange?.[0] ?? 0} words and maximum ${opts?.contentLengthRange?.[1] ?? 1000} words.`;
+
+  const context = docs.length ? `\n\n${contextTitle}\n${joinDocs(docs)}` : '';
   const finalPrompt = [
-    promptMd.trim(),
-    context,
-    '\n\n[User Construct For Primary Prompting And Language]\n',
-    construct,
-  ].join('');
+    new SystemMessage(systemMessage),
+    new HumanMessage(task),
+    new HumanMessage(contentLengthRangePrompt),
+    new HumanMessage(outputSpec),
+    new HumanMessage(personaFormat),
+    new HumanMessage(context),
+    new HumanMessage(`${contructTitle}\n\n${construct}`),
+  ];
 
   const llm = new ChatGoogleGenerativeAI({
     model,

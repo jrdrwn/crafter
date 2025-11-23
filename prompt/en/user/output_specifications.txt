@@ -1,0 +1,22 @@
+output_specifications:
+  presentation_order:
+    - Narrative (paragraph)
+    - Bullet points
+    - Mixed (paragraph + points)
+  post_versions: After the three versions, display JSON for the persona taxonomy and domain.
+  layer_translation: Layer attributes are not translated.
+  html_rules:
+    no_bold_or_italic: true
+    paragraph_wrap: p
+    linebreak_tag: <br/>
+    no_extra_headings: true
+    indentation: 2 spaces at sub-levels
+    no_three_lines_symbol_at_top: true
+
+writing_style:
+  description: Descriptive, concise, and terminologically consistent.
+  rules:
+    - Avoid unexplained jargon.
+    - Do not add phrases like "aligned with the taxonomy".
+    - Do not use hyphens or bullets other than those in the official format.
+    - Ensure HTML format is consistent across versions.

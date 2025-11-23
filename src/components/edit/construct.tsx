@@ -56,10 +56,7 @@ const formSchema = z.object({
       }),
     )
     .min(1, 'Select at least one external factor'),
-  contentLength: z
-    .number()
-    .min(50)
-    .max(2000, 'Content length must be between 50 and 2000 words'),
+  contentLengthRange: z.array(z.number()).length(2),
   llmModel: z.object({ key: z.string(), label: z.string() }).required(),
   language: z.object({ key: z.string(), label: z.string() }).required(),
   useRAG: z.boolean(),
@@ -70,7 +67,7 @@ export interface PersonaData {
   id: number;
   detail: string;
   domain: { key: string; label: string };
-  max_length: number;
+  content_length_range: number[];
   persona_attribute: {
     attribute: {
       id: number;
@@ -135,7 +132,7 @@ export default function Design({
           title: attr.attribute.title,
           description: attr.attribute.description,
         })),
-      contentLength: persona?.max_length,
+      contentLengthRange: persona.content_length_range ?? [300, 1000],
       llmModel: persona?.llm,
       language: persona?.language,
       useRAG: persona?.useRAG ?? false,
@@ -148,7 +145,13 @@ export default function Design({
       domain: ['domain'],
       internal: ['internal'],
       external: ['external'],
-      additional: ['contentLength', 'llmModel', 'language', 'useRAG', 'detail'],
+      additional: [
+        'contentLengthRange',
+        'llmModel',
+        'language',
+        'useRAG',
+        'detail',
+      ],
       review: [] as (keyof TCreateForm)[],
     }),
     [],
@@ -328,7 +331,10 @@ export default function Design({
                     <div className="flex items-center gap-2">
                       <Ruler className="h-4 w-4 text-muted-foreground" />
                       <span className="font-medium">Content length:</span>
-                      <span>{form.getValues('contentLength')}</span>
+                      <span>
+                        {form.getValues('contentLengthRange')[0]} -{' '}
+                        {form.getValues('contentLengthRange')[1]} words
+                      </span>
                     </div>
                     <div className="flex items-center gap-2">
                       <Database className="h-4 w-4 text-muted-foreground" />

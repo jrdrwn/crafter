@@ -1,5 +1,6 @@
 'use client';
 
+import { Label } from '@/components/ui/label';
 import {
   ResponsiveModal,
   ResponsiveModalContent,
@@ -24,12 +25,10 @@ import {
   Card,
   CardContent,
   CardDescription,
-  CardFooter,
   CardHeader,
   CardTitle,
 } from '../../ui/card';
 import { Field } from '../../ui/field';
-import { Label } from '../../ui/label';
 import { RadioGroup } from '../../ui/radio-group';
 import { Slider } from '../../ui/slider';
 import { formSchema } from '../construct';
@@ -39,17 +38,37 @@ type Props = {
 };
 
 export default function ContentLengthCard({ control }: Props) {
-  // Determine initial values
-  const initialLength = control._formValues.contentLength || 300;
-  const presetValues = [300, 600, 1000];
-  const initialIsPreset = presetValues.includes(initialLength);
-  const [radioValue, setRadioValue] = useState<string>(
-    initialIsPreset ? String(initialLength) : 'custom',
-  );
-  const [sliderValue, setSliderValue] = useState<number>(
-    initialIsPreset ? initialLength : Math.max(initialLength, 1100),
-  );
-  const isCustom = radioValue === 'custom';
+  // Range state: min-max from contentLengthRange array
+  const presets = {
+    short: [0, 100],
+    medium: [100, 200],
+    long: [200, 300],
+  };
+  const initialRange = Array.isArray(control._formValues.contentLengthRange)
+    ? control._formValues.contentLengthRange
+    : [100, 200];
+  // Determine initial radio value
+  let initialRadio = 'medium';
+  if (
+    initialRange[0] === presets.short[0] &&
+    initialRange[1] === presets.short[1]
+  )
+    initialRadio = 'short';
+  else if (
+    initialRange[0] === presets.medium[0] &&
+    initialRange[1] === presets.medium[1]
+  )
+    initialRadio = 'medium';
+  else if (
+    initialRange[0] === presets.long[0] &&
+    initialRange[1] === presets.long[1]
+  )
+    initialRadio = 'long';
+  const [radioValue, setRadioValue] = useState<string>(initialRadio);
+  const [range, setRange] = useState<[number, number]>([
+    initialRange[0],
+    initialRange[1],
+  ]);
 
   return (
     <Card className="col-span-1 w-full border border-primary p-1.5 sm:p-2">
@@ -79,42 +98,44 @@ export default function ContentLengthCard({ control }: Props) {
       </CardHeader>
       <CardContent className="px-1.5 sm:px-2">
         <Controller
-          name="contentLength"
+          name="contentLengthRange"
           control={control}
           render={({ field, fieldState }) => (
             <Field data-invalid={fieldState.invalid}>
               <RadioGroup
                 value={radioValue}
-                className="flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:gap-3"
                 onValueChange={(value) => {
                   setRadioValue(value);
-                  if (value === 'custom') {
-                    const next = field.value > 1000 ? field.value : 1100;
-                    setSliderValue(next);
-                    field.onChange(next);
-                  } else {
-                    const length = parseInt(value, 10);
-                    setSliderValue(length);
-                    field.onChange(length);
+                  if (value === 'short') {
+                    setRange(presets.short as [number, number]);
+                    field.onChange(presets.short);
+                  } else if (value === 'medium') {
+                    setRange(presets.medium as [number, number]);
+                    field.onChange(presets.medium);
+                  } else if (value === 'long') {
+                    setRange(presets.long as [number, number]);
+                    field.onChange(presets.long);
                   }
+                  // custom: do not change range, let slider handle
                 }}
+                className="mb-2 flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:gap-3"
               >
                 <RadioBoxItem
-                  value="300"
+                  value="short"
                   id="short"
                   className="text-xs sm:text-sm"
                 >
                   Short
                 </RadioBoxItem>
                 <RadioBoxItem
-                  value="600"
+                  value="medium"
                   id="medium"
                   className="text-xs sm:text-sm"
                 >
                   Medium
                 </RadioBoxItem>
                 <RadioBoxItem
-                  value="1000"
+                  value="long"
                   id="long"
                   className="text-xs sm:text-sm"
                 >
@@ -125,37 +146,33 @@ export default function ContentLengthCard({ control }: Props) {
                   id="custom"
                   className="w-full text-xs sm:flex-1 sm:text-sm"
                 >
-                  Custom ({sliderValue} words)
+                  Custom
                 </RadioBoxItem>
               </RadioGroup>
+              <Label className="mb-2 flex justify-between border-t border-dashed pt-2 text-xs text-gray-500 dark:text-gray-400">
+                <span>
+                  Min: <span className="font-semibold">{range[0]}</span> words
+                </span>
+                <span>
+                  Max: <span className="font-semibold">{range[1]}</span> words
+                </span>
+              </Label>
+              <Slider
+                min={0}
+                max={600}
+                step={50}
+                value={range}
+                disabled={radioValue !== 'custom'}
+                onValueChange={(value) => {
+                  setRange([value[0], value[1]]);
+                  field.onChange([value[0], value[1]]);
+                }}
+                className="my-2"
+              />
             </Field>
           )}
         />
       </CardContent>
-      <CardFooter className="border-t border-dashed px-1.5 pb-2 sm:px-2">
-        <div className="flex w-full flex-col gap-2">
-          <Label className="text-xs text-gray-500 dark:text-gray-400">
-            Word count {isCustom ? '(drag to adjust)' : '(preset locked)'}
-          </Label>
-          <Controller
-            name="contentLength"
-            control={control}
-            render={({ field }) => (
-              <Slider
-                max={2000}
-                step={50}
-                disabled={!isCustom}
-                value={[sliderValue]}
-                onValueChange={(value) => {
-                  const next = value[0];
-                  setSliderValue(next);
-                  field.onChange(next);
-                }}
-              />
-            )}
-          />
-        </div>
-      </CardFooter>
     </Card>
   );
 }
@@ -180,36 +197,38 @@ function ContentLengthHelperModal() {
           <ul className="space-y-2">
             <li>
               <span className="font-medium text-primary">
-                Short (±100-200 kata)
+                Short (±0-100 words)
               </span>
               <br />
               <span>
-                Cocok untuk brainstorming; berisi inti seperti demografi, tujuan
-                utama, dan 1-2 pain points
+                Suitable for brainstorming; contains essentials like
+                demographics, main goal, and 1-2 pain points.
               </span>
             </li>
             <li>
               <span className="font-medium text-primary">
-                Medium (±200-400 kata)
+                Medium (±100-200 words)
               </span>
               <br />
               <span>
-                Seimbang untuk workshop; memuat motivasi, beberapa tujuan, pain
-                points, dan interaksi dengan teknologi
+                Balanced for workshops; includes motivation, several goals, pain
+                points, and interaction with technology.
               </span>
             </li>
             <li>
-              <span className="font-medium text-primary">Long (≥400 kata)</span>
+              <span className="font-medium text-primary">
+                Long (≥200 words)
+              </span>
               <br />
               <span>
-                Mendalam; menambahkan cerita personal, konteks domain, serta
-                faktor manusia lebih lengkap
+                In-depth; adds personal stories, domain context, and more
+                complete human factors.
               </span>
             </li>
             <li>
               <span className="font-medium text-primary">Custom</span>
               <br />
-              <span>Pengguna dapat mengatur jumlah kata sesuai kebutuhan</span>
+              <span>Users can set the word count as needed.</span>
             </li>
           </ul>
         </div>

@@ -1,0 +1,10 @@
+task:
+  instruction: 'Create 1 new persona in JSON format that differs from the One-Shot example above, following the same order and format (Narrative → Bullet → Mixed → JSON).'
+  guidelines:
+    - 'Be creative, but stay consistent with the taxonomy.'
+    - 'Do not copy the example content.'
+    - 'The final output must be JSON only.'
+    - 'The result key must contain 3 uniform HTML blocks.'
+    - 'Do not add any text outside the JSON structure.'
+    - 'Conform to the expected_output_structure.'
+    - 'In the taxonomy section, nothing should be changed; it must align with the previous input.'

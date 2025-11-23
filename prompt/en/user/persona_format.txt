@@ -1,0 +1,42 @@
+persona_format:
+  narative:
+    type: html
+    main_structure:
+      - <p>[PARAGRAPH]</p>
+    notes:
+     - You can add more paragraphs yourself if you want.
+     - must be varied based on the number of internal+external layers
+  bullet:
+    type: html
+    mainstructure:
+      - <h4>[LAYER-TITLE]</h4>
+      - <ul>
+        <li>[BULLET LIST 1]</li>
+        <li>[BULLET LIST 2]</li>
+        <li>[BULLET LIST N]</li>
+        </ul>
+    notes:
+      - must be equal to the total internal+external layers
+  mixed:
+    type: html
+    structure:
+      - <p>[DESCRIPTION]</p>
+      - <h3>[LAYER-TITLE]</h3>
+      - <ul>
+        <li>[SUB-ATTRIBUTE or BULLET 1]</li>
+        <li>[SUB-ATTRIBUTE or BULLET 2]</li>
+        <li>[SUB-ATTRIBUTE or BULLET N]</li>
+        </ul>
+      - <p>[DESCRIPTION]</p>
+    notes:
+      - you must be varied based on the number of internal+external layers
+
+notes:
+    - 'If using paragraphs, do not display [ATTRIBUTE-TITLE].'
+    - 'Each version result must be wrapped in a consistent HTML container.'
+    - 'The number of [ATTRIBUTE-TITLE] items matches the number of attributes requested by the user.'
+    - 'In "mixed", do not change the titles to "Internal layer" or "External Profile".'
+    - 'You must follow the format specified above, but you may add content not present in the one-shot example as long as you do not change the defined structure and format.'
+    - '<br/> may only be used inside paragraphs, not outside.'
+    - '<hr/> must not appear twice within a single version result.'
+    - 'Do not leave any attribute empty even when using RAG.'
