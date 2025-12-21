@@ -1,3 +1,4 @@
+/* eslint-disable prefer-const */
 'use client';
 
 import AdditionalDetailsCard from '@/components/create/cards/additional-details-card';
@@ -19,6 +20,7 @@ import {
   FileText,
   Languages,
   Layers,
+  LucideMessageSquareWarning,
   Ruler,
   SlidersHorizontal,
   Sparkles,
@@ -149,71 +151,116 @@ export default function Design() {
   async function onSubmit(data: TCreateForm) {
     if (loading) return;
     setLoading(true);
-    if (!_cookies) {
-      const res = await fetch('/api/persona/generate/guest', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(data),
-      });
-      setLoading(false);
-      if (!res.ok) {
-        toast.error('Failed to create persona: Unknown error');
-        return;
-      }
-      const json = await res.json();
-      toast.success('Persona created successfully!');
-      try {
-        const STORAGE_KEY = 'crafter:personas';
-        const entry = {
-          created_at: new Date().toISOString(),
-          updated_at: new Date().toISOString(),
-          request: data,
-          response: json,
-        };
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(entry));
-        router.push(`/detail/guest`);
-      } catch (err: unknown) {
-        let description = 'Please try again later.';
-        if (isErrorWithMessage(err)) {
-          description = err.message;
-        }
-        toast.error('Failed to save personas to localStorage:', {
-          description,
-        });
-      }
 
-      function isErrorWithMessage(
-        error: unknown,
-      ): error is { message: string } {
-        return (
-          typeof error === 'object' &&
-          error !== null &&
-          'message' in error &&
-          typeof (error as { message: unknown }).message === 'string'
+    // Progressive toast timers
+    let toast10: number | undefined,
+      toast20: number | undefined,
+      toast30: number | undefined,
+      toast60: number | undefined;
+    let finished = false;
+    function clearTimers() {
+      finished = true;
+      if (toast10) clearTimeout(toast10);
+      if (toast20) clearTimeout(toast20);
+      if (toast30) clearTimeout(toast30);
+      if (toast60) clearTimeout(toast60);
+    }
+    toast10 = window.setTimeout(() => {
+      if (!finished)
+        toast.info(
+          'Still working... Persona generation is taking longer than usual (10s).',
         );
-      }
-    } else {
-      const res = await fetch('/api/persona/generate', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${_cookies}`,
-        },
-        body: JSON.stringify(data),
-      });
-      setLoading(false);
-      if (!res.ok) {
+    }, 10000);
+    toast20 = window.setTimeout(() => {
+      if (!finished)
+        toast.info(
+          'Still working... Persona generation is taking over 20 seconds.',
+        );
+    }, 20000);
+    toast30 = window.setTimeout(() => {
+      if (!finished)
+        toast.warning(
+          'This is taking a while (30s+). Please wait or try again later.',
+        );
+    }, 30000);
+    toast60 = window.setTimeout(() => {
+      if (!finished)
         toast.error(
-          `Failed to create persona: ${user ? 'Unknown error' : 'Please login again'}`,
+          'Generation is taking more than 1 minute. You may want to refresh or check your connection.',
         );
-        return;
-      }
-      const json = await res.json();
+    }, 60000);
 
-      toast.success('Persona created successfully!');
-      router.push(`/detail/${json.personaId}`);
+    try {
+      if (!_cookies) {
+        const res = await fetch('/api/persona/generate/guest', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(data),
+        });
+        setLoading(false);
+        clearTimers();
+        if (!res.ok) {
+          toast.error('Failed to create persona: Unknown error');
+          return;
+        }
+        const json = await res.json();
+        toast.success('Persona created successfully!');
+        try {
+          const STORAGE_KEY = 'crafter:personas';
+          const entry = {
+            created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString(),
+            request: data,
+            response: json,
+          };
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(entry));
+          router.push(`/detail/guest`);
+        } catch (err: unknown) {
+          let description = 'Please try again later.';
+          if (isErrorWithMessage(err)) {
+            description = err.message;
+          }
+          toast.error('Failed to save personas to localStorage:', {
+            description,
+          });
+        }
+
+        function isErrorWithMessage(
+          error: unknown,
+        ): error is { message: string } {
+          return (
+            typeof error === 'object' &&
+            error !== null &&
+            'message' in error &&
+            typeof (error as { message: unknown }).message === 'string'
+          );
+        }
+      } else {
+        const res = await fetch('/api/persona/generate', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${_cookies}`,
+          },
+          body: JSON.stringify(data),
+        });
+        setLoading(false);
+        clearTimers();
+        if (!res.ok) {
+          toast.error(
+            `Failed to create persona: ${user ? 'Unknown error' : 'Please login again'}`,
+          );
+          return;
+        }
+        const json = await res.json();
+
+        toast.success('Persona created successfully!');
+        router.push(`/detail/${json.personaId}`);
+      }
+    } finally {
+      clearTimers();
     }
   }
 
@@ -329,6 +376,24 @@ export default function Design() {
                       <Languages className="h-4 w-4 text-muted-foreground" />
                       <span className="font-medium">Language:</span>
                       <span>{form.getValues('language')?.label}</span>
+                    </div>
+                    <div className="flex gap-2">
+                      <LucideMessageSquareWarning className="h-4 w-4 text-muted-foreground" />
+                      <span className="font-medium">Note:</span>
+                      <span>
+                        {form.getValues('useRAG') &&
+                        form.getValues('internal').length +
+                          form.getValues('external').length >
+                          5
+                          ? 'RAG is enabled and you have selected many factors. Generation may take up to a minute.'
+                          : form.getValues('useRAG')
+                            ? 'RAG is enabled. Generation may take a bit longer than usual.'
+                            : form.getValues('internal').length +
+                                  form.getValues('external').length >
+                                5
+                              ? 'You have selected many factors. Generation may take longer.'
+                              : 'No special notes.'}
+                      </span>
                     </div>
                   </CardContent>
                 </Card>

@@ -1,3 +1,4 @@
+/* eslint-disable prefer-const */
 'use client';
 
 import { Button, Button as UIButton } from '@/components/ui/button';
@@ -317,6 +318,44 @@ export default function Contrib() {
       return;
     }
 
+    // Progressive toast timers for long-running RAG creation
+    let toast10: number | undefined,
+      toast20: number | undefined,
+      toast30: number | undefined,
+      toast60: number | undefined;
+    let finished = false;
+    function clearTimers() {
+      finished = true;
+      if (toast10) clearTimeout(toast10);
+      if (toast20) clearTimeout(toast20);
+      if (toast30) clearTimeout(toast30);
+      if (toast60) clearTimeout(toast60);
+    }
+    toast10 = window.setTimeout(() => {
+      if (!finished)
+        toast.info(
+          'Still working... RAG contribution is taking longer than usual (10s).',
+        );
+    }, 10000);
+    toast20 = window.setTimeout(() => {
+      if (!finished)
+        toast.info(
+          'Still working... RAG contribution is taking over 20 seconds.',
+        );
+    }, 20000);
+    toast30 = window.setTimeout(() => {
+      if (!finished)
+        toast.warning(
+          'This is taking a while (30s+). Please wait or try again later.',
+        );
+    }, 30000);
+    toast60 = window.setTimeout(() => {
+      if (!finished)
+        toast.error(
+          'Contribution is taking more than 1 minute. You may want to refresh or check your connection.',
+        );
+    }, 60000);
+
     const visibility = values.visibility || 'private';
 
     // File upload flow
@@ -326,6 +365,7 @@ export default function Contrib() {
         toast.error('Unsupported format', {
           description: 'Only .txt, .docx, or .xlsx',
         });
+        clearTimers();
         return;
       }
 
@@ -350,6 +390,7 @@ export default function Contrib() {
           headers: { Authorization: `Bearer ${token}` },
           body: fd,
         });
+        clearTimers();
         if (!res.ok) {
           const payload = (await res.json().catch(() => ({}))) as {
             message?: string;
@@ -367,6 +408,7 @@ export default function Contrib() {
         setFile(null);
         return;
       } catch (e) {
+        clearTimers();
         toast.error('Failed', {
           description: e instanceof Error ? e.message : 'An error occurred',
           icon: <AlertCircle className="size-4 text-red-600" />,
@@ -401,7 +443,7 @@ export default function Contrib() {
             extra: { ...metaObj, visibility },
           }),
         });
-
+        clearTimers();
         if (!res.ok) {
           const payload = await res.json().catch(() => ({}));
           throw new Error(
@@ -429,6 +471,7 @@ export default function Contrib() {
         });
         setMetaObj({});
       } catch (e) {
+        clearTimers();
         const message = e instanceof Error ? e.message : 'An error occurred';
         toast.error('Failed', {
           description: message,
@@ -443,6 +486,7 @@ export default function Contrib() {
         if (fileInput) fileInput.value = '';
       }
     }
+    clearTimers();
   }
 
   return (
