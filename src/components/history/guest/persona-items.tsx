@@ -30,14 +30,14 @@ export default function PersonaItems() {
     setPersona(data);
   }, []);
   return (
-    <section className="p-4 py-8">
+    <section className="p-2 py-6 md:p-4 md:py-8">
       <div className="container mx-auto">
         {!persona && (
-          <p className="text-center text-muted-foreground">
+          <p className="text-center text-sm text-muted-foreground md:text-base">
             No personas found. Create your first persona!
           </p>
         )}
-        <div className="mt-4 grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">
+        <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2 md:gap-6 lg:grid-cols-3 lg:gap-8">
           {persona && (
             <Link href={'/detail/guest'}>
               <PersonaCard

@@ -4,14 +4,19 @@ import {
   ChevronLeft,
   ChevronRight,
   Edit,
+  Eye,
   FileJson,
   FileText,
   LockKeyhole,
+  Recycle,
+  Save,
   Trash,
   Wifi,
 } from 'lucide-react';
 import Link from 'next/link';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
+import { toast } from 'sonner';
 
 import {
   AlertDialog,
@@ -34,6 +39,7 @@ import {
 } from '../../ui/card';
 import { Item, ItemActions, ItemContent, ItemMedia } from '../../ui/item';
 import { Label } from '../../ui/label';
+import { Skeleton } from '../../ui/skeleton';
 import { Switch } from '../../ui/switch';
 import Persona, { PersonaResponse } from './persona';
 
@@ -56,20 +62,64 @@ function BackToHistory() {
   );
 }
 
-function TopActions() {
+function TopActions({ refresh }: { refresh: () => void }) {
+  const searchParams = useSearchParams();
+  const router = useRouter();
   return (
-    <div className="flex items-center justify-center gap-4">
-      <Button variant={'ghost'} className="text-green-500">
-        <Wifi />
-        Online
+    <div className="flex flex-wrap items-center justify-center gap-2 md:gap-4">
+      <Button
+        variant={'ghost'}
+        size={'sm'}
+        className="md:size-default text-green-500"
+      >
+        <Wifi className="size-4 md:size-5" />
+        <span className="hidden sm:inline">Online</span>
       </Button>
-      <Link href={'/edit/guest'}>
-        <Button>
-          <Edit />
-          Edit
-        </Button>
-      </Link>
-      <DeleteConfirmationDialog />
+      {!searchParams.get('free_edit') ? (
+        <>
+          <Link href={`?free_edit=true`}>
+            <Button
+              variant={'outline'}
+              size={'sm'}
+              className="md:size-default border-primary text-primary hover:bg-primary/10 hover:text-primary"
+            >
+              <Edit className="size-4 md:size-5" />
+              <span className="hidden sm:inline">Edit Result</span>
+            </Button>
+          </Link>
+          <Link href={'/edit/guest'}>
+            <Button size={'sm'} className="md:size-default">
+              <Recycle className="size-4 md:size-5" />
+              <span className="hidden sm:inline">Regenerate</span>
+            </Button>
+          </Link>
+          <DeleteConfirmationDialog />
+        </>
+      ) : (
+        <>
+          <Button
+            size={'sm'}
+            className="md:size-default"
+            onClick={() => router.push(`?free_edit=true&save_edit=true`)}
+          >
+            <Save className="size-4 md:size-5" />
+            <span className="hidden sm:inline">Save</span>
+          </Button>
+          <Button
+            size={'sm'}
+            className="md:size-default"
+            onClick={() => {
+              router.push(`/detail/guest`);
+              // ensure state reloads from localStorage
+              setTimeout(() => refresh(), 0);
+              toast.success('Saved');
+            }}
+          >
+            <Eye className="size-4 md:size-5" />
+            <span className="hidden sm:inline">View Mode</span>
+          </Button>
+        </>
+      )}
     </div>
   );
 }
@@ -98,18 +148,20 @@ function QuickInfoCard({
       })
     : '-';
   return (
-    <Card className="w-full gap-2 border-foreground py-4">
-      <CardHeader className="px-4">
-        <CardTitle className="text-2xl text-primary">Quick Info</CardTitle>
+    <Card className="w-full gap-2 border-foreground py-3 md:py-4">
+      <CardHeader className="px-3 md:px-4">
+        <CardTitle className="text-xl text-primary md:text-2xl">
+          Quick Info
+        </CardTitle>
       </CardHeader>
-      <CardContent className="px-4">
-        <div className="mb-4">
-          <h3 className="mb-2 font-medium">Created</h3>
-          <p>{created}</p>
+      <CardContent className="px-3 md:px-4">
+        <div className="mb-3 md:mb-4">
+          <h3 className="mb-2 text-sm font-medium md:text-base">Created</h3>
+          <p className="text-sm md:text-base">{created}</p>
         </div>
         <div>
-          <h3 className="mb-2 font-medium">Updated</h3>
-          <p>{updated}</p>
+          <h3 className="mb-2 text-sm font-medium md:text-base">Updated</h3>
+          <p className="text-sm md:text-base">{updated}</p>
         </div>
       </CardContent>
     </Card>
@@ -118,20 +170,25 @@ function QuickInfoCard({
 
 function SharePersonaCard() {
   return (
-    <Card className="relative w-full py-4">
+    <Card className="relative w-full py-3 md:py-4">
       <div className="absolute inset-0 z-1 flex items-center justify-center rounded-2xl backdrop-blur-xs">
-        <p className="p-4 text-center text-sm">
+        <p className="p-3 text-center text-xs md:p-4 md:text-sm">
           You need to log in to access all Share Persona features.
         </p>
       </div>
-      <CardHeader className="px-4">
-        <CardTitle className="text-2xl text-primary">Share Persona</CardTitle>
-        <CardDescription>Make this persona publicly accessible</CardDescription>
+      <CardHeader className="px-3 md:px-4">
+        <CardTitle className="text-xl text-primary md:text-2xl">
+          Share Persona
+        </CardTitle>
+        <CardDescription className="text-xs md:text-sm">
+          Make this persona publicly accessible
+        </CardDescription>
       </CardHeader>
-      <CardContent className="px-4">
+      <CardContent className="px-3 md:px-4">
         <Label htmlFor="private" className="flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <LockKeyhole className="text-primary" /> Private
+            <LockKeyhole className="size-4 text-primary md:size-5" />{' '}
+            <span className="text-sm md:text-base">Private</span>
           </div>
           <Switch id="private" />
         </Label>
@@ -142,19 +199,21 @@ function SharePersonaCard() {
 
 function DownloadPersonaCard() {
   return (
-    <Card className="relative w-full py-4">
+    <Card className="relative w-full py-3 md:py-4">
       <div className="absolute inset-0 z-1 flex items-center justify-center rounded-2xl backdrop-blur-xs">
-        <p className="p-4 text-center text-sm">
+        <p className="p-3 text-center text-xs md:p-4 md:text-sm">
           You need to log in to access all Share Persona features.
         </p>
       </div>
-      <CardHeader className="px-4">
-        <CardTitle className="text-2xl text-primary">
+      <CardHeader className="px-3 md:px-4">
+        <CardTitle className="text-xl text-primary md:text-2xl">
           Download Persona
         </CardTitle>
-        <CardDescription>Save persona in multiple formats</CardDescription>
+        <CardDescription className="text-xs md:text-sm">
+          Save persona in multiple formats
+        </CardDescription>
       </CardHeader>
-      <CardContent className="space-y-2 px-4">
+      <CardContent className="space-y-2 px-3 md:px-4">
         <Item
           size={'sm'}
           variant={'outline'}
@@ -163,9 +222,11 @@ function DownloadPersonaCard() {
         >
           <Link href={'#'}>
             <ItemMedia>
-              <FileText className="text-primary" />
+              <FileText className="size-4 text-primary md:size-5" />
             </ItemMedia>
-            <ItemContent>Download as PDF</ItemContent>
+            <ItemContent className="text-sm md:text-base">
+              Download as PDF
+            </ItemContent>
             <ItemActions>
               <ChevronRight className="size-4" />
             </ItemActions>
@@ -179,9 +240,11 @@ function DownloadPersonaCard() {
         >
           <Link href={'#'}>
             <ItemMedia>
-              <FileJson className="text-primary" />
+              <FileJson className="size-4 text-primary md:size-5" />
             </ItemMedia>
-            <ItemContent>Download as JSON</ItemContent>
+            <ItemContent className="text-sm md:text-base">
+              Download as JSON
+            </ItemContent>
             <ItemActions>
               <ChevronRight className="size-4" />
             </ItemActions>
@@ -192,25 +255,66 @@ function DownloadPersonaCard() {
   );
 }
 
+function PersonaDetailSkeleton() {
+  return (
+    <section className="px-2 py-3 md:px-4 md:py-4">
+      <div className="container mx-auto">
+        <div className="flex flex-row items-center justify-between gap-3">
+          <Skeleton className="h-9 w-32 rounded" />
+          <div className="flex gap-2">
+            <Skeleton className="h-9 w-20 rounded" />
+            <Skeleton className="h-9 w-20 rounded" />
+          </div>
+        </div>
+        <div className="mt-3 grid grid-cols-1 gap-4 md:mt-4 md:gap-6 lg:grid-cols-3 lg:gap-8">
+          <div className="col-span-full space-y-3 md:space-y-4 lg:col-span-2">
+            <Skeleton className="h-40 w-full rounded-xl" />
+            <Skeleton className="h-16 w-full rounded-xl" />
+            <Skeleton className="h-64 w-full rounded-xl" />
+          </div>
+          <div className="col-span-full space-y-3 md:space-y-4 lg:col-span-1">
+            <Skeleton className="h-40 w-full rounded-xl" />
+            <Skeleton className="h-32 w-full rounded-xl" />
+            <Skeleton className="h-32 w-full rounded-xl" />
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
 export default function PersonaDetail() {
   const [persona, setPersona] = useState<StoredPersona | null>(null);
-  useEffect(() => {
+  const searchParams = useSearchParams();
+  function refreshFromStorage() {
     const STORAGE_KEY = 'crafter:personas';
     const data = JSON.parse(
       localStorage.getItem(STORAGE_KEY) || 'null',
     ) as StoredPersona | null;
     setPersona(data ?? null);
+  }
+  useEffect(() => {
+    refreshFromStorage();
   }, []);
+  useEffect(() => {
+    // When exiting free edit, reload data
+    if (!searchParams.get('free_edit')) {
+      refreshFromStorage();
+    }
+  }, [searchParams]);
+  if (!persona) {
+    return <PersonaDetailSkeleton />;
+  }
   return (
-    <section className="px-4 py-4">
+    <section className="px-2 py-3 md:px-4 md:py-4">
       <div className="container mx-auto">
-        <div className="flex items-center justify-between">
+        <div className="flex flex-row items-center justify-between gap-3">
           <BackToHistory />
-          <TopActions />
+          <TopActions refresh={refreshFromStorage} />
         </div>
-        <div className="mt-4 grid grid-cols-3 gap-8">
+        <div className="mt-3 grid grid-cols-1 gap-4 md:mt-4 md:gap-6 lg:grid-cols-3 lg:gap-8">
           {persona && <Persona markdown={persona?.response} />}
-          <div className="col-span-1 space-y-4">
+          <div className="col-span-full space-y-3 md:space-y-4 lg:col-span-1">
             <QuickInfoCard
               createdAt={
                 persona?.created_at ? new Date(persona.created_at) : undefined
@@ -232,15 +336,17 @@ function DeleteConfirmationDialog() {
   return (
     <AlertDialog>
       <AlertDialogTrigger asChild>
-        <Button variant={'destructive'}>
-          <Trash />
-          Delete
+        <Button variant={'destructive'} size={'sm'} className="md:size-default">
+          <Trash className="size-4 md:size-5" />
+          <span className="hidden sm:inline">Delete</span>
         </Button>
       </AlertDialogTrigger>
-      <AlertDialogContent>
+      <AlertDialogContent className="mx-4 max-w-md">
         <AlertDialogHeader>
-          <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
-          <AlertDialogDescription>
+          <AlertDialogTitle className="text-base md:text-lg">
+            Are you absolutely sure?
+          </AlertDialogTitle>
+          <AlertDialogDescription className="text-sm md:text-base">
             This action cannot be undone. This will permanently delete your
             persona and remove your data from our servers.
           </AlertDialogDescription>
@@ -249,11 +355,7 @@ function DeleteConfirmationDialog() {
           <AlertDialogCancel>Cancel</AlertDialogCancel>
           <AlertDialogAction
             onClick={() => {
-              // delete persona from local storage
-              const STORAGE_KEY = 'crafter:personas';
-              localStorage.removeItem(STORAGE_KEY);
-              // redirect to history page
-              window.location.href = '/history/guest';
+              window.location.href = '/create';
             }}
           >
             Continue

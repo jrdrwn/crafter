@@ -11,30 +11,59 @@ import {
 import {
   DomainFilterCombobox,
   OrderFilterCombobox,
+  type OrderValue,
 } from './domain-order-filters';
 
 interface PersonasToolbarProps {
   placeholder?: string;
   className?: string;
+  searchValue: string;
+  onSearchChangeAction: (value: string) => void;
+  domainValue?: string;
+  onDomainChangeAction?: (value?: string) => void;
+  orderValue?: OrderValue;
+  onOrderChangeAction?: (value: OrderValue) => void;
 }
 
 export function PersonasToolbar({
   placeholder = 'Search persona or tag...',
   className,
+  searchValue,
+  onSearchChangeAction,
+  domainValue,
+  onDomainChangeAction,
+  orderValue,
+  onOrderChangeAction,
 }: PersonasToolbarProps) {
   return (
-    <div className={cn('flex items-center justify-between', className)}>
-      <div>
-        <InputGroup className="min-w-xs border-primary">
-          <InputGroupInput type="search" placeholder={placeholder} />
+    <div
+      className={cn(
+        'flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between',
+        className,
+      )}
+    >
+      <div className="w-full sm:max-w-md">
+        <InputGroup className="border-primary md:min-w-xs">
+          <InputGroupInput
+            type="search"
+            placeholder={placeholder}
+            value={searchValue}
+            onChange={(e) => onSearchChangeAction(e.target.value)}
+          />
           <InputGroupAddon>
             <SearchIcon />
           </InputGroupAddon>
         </InputGroup>
       </div>
-      <div className="flex items-center justify-center gap-4">
-        <DomainFilterCombobox />
-        <OrderFilterCombobox />
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-center">
+        <DomainFilterCombobox
+          value={domainValue}
+          onChangeAction={onDomainChangeAction}
+        />
+        <OrderFilterCombobox
+          value={orderValue}
+          onChangeAction={onOrderChangeAction}
+        />
       </div>
     </div>
   );

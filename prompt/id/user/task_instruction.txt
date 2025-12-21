@@ -1,0 +1,10 @@
+task:
+  instruction: 'Buat 1 persona baru dalam format JSON yang berbeda dari contoh One-Shot di atas, mengikuti urutan dan format yang sama (Narative → Bullet → Mixed → JSON).'
+  guidelines:
+    - 'Gunakan kreativitas, tetapi tetap konsisten dengan taxonomy.'
+    - 'Jangan menyalin isi contoh.'
+    - 'Output akhir hanya berupa JSON.'
+    - 'Key result harus berisi 3 blok HTML yang seragam.'
+    - 'Jangan menambahkan teks lain di luar struktur JSON.'
+    - 'Menyesuaikan expected_output_structure.'
+    - di bagian taxonomy jangan ada yang diubah, harus menyesuaikan input sebelumnya.

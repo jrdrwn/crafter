@@ -1,15 +1,9 @@
 'use client';
 
+import { useUser } from '@/contexts/user-context';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { setCookie } from 'cookies-next/client';
-import {
-  BadgeAlert,
-  BadgeCheck,
-  Eye,
-  EyeOff,
-  LockKeyhole,
-  MailIcon,
-} from 'lucide-react';
+import { Eye, EyeOff, LockKeyhole, MailIcon } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
@@ -40,6 +34,7 @@ const formSchema = z.object({
 });
 
 export default function LoginForm() {
+  const { refresh } = useUser();
   const router = useRouter();
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -69,34 +64,31 @@ export default function LoginForm() {
     };
     if (res.status === 200) {
       setCookie('token', json.data.token);
-      toast('Login Berhasil', {
-        icon: <BadgeCheck />,
-      });
+      toast.success('Login Successful');
+      refresh();
       router.push('/');
-      router.refresh();
     } else {
-      toast('Login Gagal', {
+      toast.error('Login Failed', {
         description: json.message,
-        icon: <BadgeAlert />,
       });
     }
     setLoading(false);
   }
 
   return (
-    <section className="py-20">
-      <div className="container">
+    <section className="px-2 py-12 sm:py-16 lg:py-20">
+      <div className="container mx-auto">
         <form onSubmit={form.handleSubmit(onSubmit)}>
-          <Card className="mx-auto max-w-sm border-primary">
+          <Card className="mx-auto w-full max-w-md border-primary">
             <CardHeader>
-              <CardTitle className="text-center text-2xl text-primary">
+              <CardTitle className="text-center text-xl text-primary sm:text-2xl">
                 Login to Your Account
               </CardTitle>
-              <CardDescription className="text-center">
+              <CardDescription className="text-center text-xs sm:text-sm">
                 Log in to access your persona history and advanced features.
               </CardDescription>
             </CardHeader>
-            <CardContent>
+            <CardContent className="space-y-4 sm:space-y-5">
               <Controller
                 name="identifier"
                 control={form.control}

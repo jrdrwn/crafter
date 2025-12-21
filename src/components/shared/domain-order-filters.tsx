@@ -1,8 +1,9 @@
 'use client';
 
 import { cn } from '@/lib/utils';
+import { getCookie } from 'cookies-next/client';
 import { Check, ChevronsUpDown, Filter, ListFilter } from 'lucide-react';
-import { useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 
 import { Button } from '../ui/button';
 import {
@@ -15,16 +16,46 @@ import {
 } from '../ui/command';
 import { Popover, PopoverContent, PopoverTrigger } from '../ui/popover';
 
-export const domainOptions = [
-  { value: 'marketing', label: 'Marketing' },
-  { value: 'sales', label: 'Sales' },
-  { value: 'product', label: 'Product' },
-  { value: 'engineering', label: 'Engineering' },
-];
+type DomainOption = { value: string; label: string };
 
-export function DomainFilterCombobox() {
+type DomainFromApi = { key: string; label: string };
+
+export function DomainFilterCombobox({
+  value,
+  onChangeAction,
+}: {
+  value?: string;
+  onChangeAction?: (value?: string) => void;
+}) {
   const [open, setOpen] = useState(false);
-  const [value, setValue] = useState('');
+  const [options, setOptions] = useState<DomainOption[]>([]);
+  const token = getCookie('token');
+
+  useEffect(() => {
+    async function fetchDomains() {
+      try {
+        const res = await fetch('/api/persona/helper/domain', {
+          headers: token ? { Authorization: `Bearer ${token}` } : undefined,
+        });
+        const json = await res.json();
+        const items: DomainFromApi[] = (json?.data || []) as DomainFromApi[];
+        const opts: DomainOption[] = items.map((d) => ({
+          value: d.key,
+          label: d.label,
+        }));
+        setOptions(opts);
+      } catch {
+        // ignore
+      }
+    }
+    fetchDomains();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const selectedLabel = useMemo(
+    () => options.find((d) => d.value === value)?.label,
+    [options, value],
+  );
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
@@ -33,29 +64,29 @@ export function DomainFilterCombobox() {
           variant={'outline'}
           role="combobox"
           aria-expanded={open}
-          className="w-48 justify-between border-primary"
+          className="justify-between border-primary"
         >
           <div className="flex items-center gap-2">
             <Filter className="text-primary" />
-            {value
-              ? domainOptions.find((d) => d.value === value)?.label
-              : 'Filter by Domain'}
+            {selectedLabel || 'Filter by Domain'}
           </div>
           <ChevronsUpDown className="opacity-50" />
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="w-48 p-0">
+      <PopoverContent className="p-0">
         <Command>
           <CommandInput placeholder="Search domains..." className="h-9" />
           <CommandList>
             <CommandEmpty>No domain found.</CommandEmpty>
             <CommandGroup>
-              {domainOptions.map((domain) => (
+              {options.map((domain) => (
                 <CommandItem
                   key={domain.value}
                   value={domain.value}
                   onSelect={(currentValue) => {
-                    setValue(currentValue === value ? '' : currentValue);
+                    const next =
+                      currentValue === value ? undefined : currentValue;
+                    onChangeAction?.(next);
                     setOpen(false);
                   }}
                 >
@@ -77,17 +108,25 @@ export function DomainFilterCombobox() {
 }
 
 export const orderOptions = [
-  { value: 'popular', label: 'Popular' },
-  { value: 'date', label: 'Date' },
-  { value: 'alphabetical', label: 'Alphabetical' },
   { value: 'recent', label: 'Recently Added' },
   { value: 'updated', label: 'Recently Updated' },
-  { value: 'relevance', label: 'Relevance' },
-];
+  { value: 'alphabetical', label: 'Alphabetical' },
+] as const;
+export type OrderValue = (typeof orderOptions)[number]['value'];
 
-export function OrderFilterCombobox() {
+export function OrderFilterCombobox({
+  value,
+  onChangeAction,
+}: {
+  value?: OrderValue;
+  onChangeAction?: (value: OrderValue) => void;
+}) {
   const [open, setOpen] = useState(false);
-  const [value, setValue] = useState('');
+
+  const currentLabel = useMemo(
+    () => orderOptions.find((i) => i.value === value)?.label || 'Order by',
+    [value],
+  );
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
@@ -96,18 +135,16 @@ export function OrderFilterCombobox() {
           variant={'outline'}
           role="combobox"
           aria-expanded={open}
-          className="w-40 justify-between border-primary"
+          className="justify-between border-primary"
         >
           <div className="flex items-center gap-2">
             <ListFilter className="text-primary" />
-            {value
-              ? orderOptions.find((i) => i.value === value)?.label
-              : 'Order by'}
+            {currentLabel}
           </div>
           <ChevronsUpDown className="opacity-50" />
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="w-40 p-0">
+      <PopoverContent className="p-0">
         <Command>
           <CommandInput placeholder="Search order..." className="h-9" />
           <CommandList>
@@ -118,7 +155,8 @@ export function OrderFilterCombobox() {
                   key={item.value}
                   value={item.value}
                   onSelect={(currentValue) => {
-                    setValue(currentValue === value ? '' : currentValue);
+                    const next = (currentValue as OrderValue) || 'recent';
+                    onChangeAction?.(next);
                     setOpen(false);
                   }}
                 >

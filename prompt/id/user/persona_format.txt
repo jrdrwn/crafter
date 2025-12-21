@@ -1,0 +1,41 @@
+persona_format:
+  narative:
+    type: html
+    main_structure:
+      - <p>[PARAGRAPH]</p>
+    notes:
+     - Kamu bisa menambahkan paragraf lebih banyak jika diinginkan.
+     - Kamu harus memvariasiakan berdasarkan jumlah layer internal+eksternal
+  bullet:
+    type: html
+    mainstructure:
+      - <h4>[LAYER-TITLE]</h4>
+      - <ul>
+        <li>[BULLET LIST 1]</li>
+        <li>[BULLET LIST 2]</li>
+        <li>[BULLET LIST N]</li>
+        </ul>
+    notes:
+      - Kamu harus menyamakan dengan total layer internal+eksternal
+  mixed:
+    type: html
+    structure:
+      - <p>[DESCRIPTION]</p>
+      - <h3>[LAYER-TITLE]</h3>
+      - <ul>
+        <li>[SUB-ATTRIBUTE or BULLET 1]</li>
+        <li>[SUB-ATTRIBUTE or BULLET 2]</li>
+        <li>[SUB-ATTRIBUTE or BULLET N]</li>
+        </ul>
+      - <p>[DESCRIPTION]</p>
+    notes:
+      - Kamu harus memvariasiakan berdasarkan jumlah layer internal+eksternal
+notes:
+    - 'Jika menggunakan paragraf, maka tidak perlu menampilkan [ATTRIBUTE-TITLE].'
+    - 'Setiap versi result wajib dibungkus dalam container HTML yang konsisten'
+    - 'Jumlah [ATTRIBUTE-TITLE] menyesuaikan jumlah atribut yang diminta oleh pengguna.'
+    - 'Di "mixed" jangan sampai titlenya diganti jadi "Internal layer" atau "External Profile".'
+    - 'Intinya Anda harus mengikuti format yang sudah ditentukan di atas tapi boleh menambahkan sesuatu yang tidak ada di contoh one-shot asal tidak mengubah struktur dan format yang sudah ditentukan.'
+    - '<br/> hanya boleh digunakan di dalam paragraf, tidak boleh di luar paragraf.'
+    - '<hr/> tidak boleh double di dalam satu versi result.'
+    - 'jangan ada atribut yang tidak terisi meskipun memakai RAG'

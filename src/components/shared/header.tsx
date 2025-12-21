@@ -14,12 +14,11 @@ import {
   SheetTitle,
   SheetTrigger,
 } from '@/components/ui/sheet';
+import { useUser } from '@/contexts/user-context';
 import { cn } from '@/lib/utils';
-import { deleteCookie, getCookie } from 'cookies-next/client';
 import { LogOut, Menu } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { useEffect, useState } from 'react';
 
 import {
   DropdownMenu,
@@ -29,77 +28,47 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '../ui/dropdown-menu';
+import { Spinner } from '../ui/spinner';
 import Brand from './brand';
-
-export interface UserProfile {
-  id: string;
-  name: string;
-  email: string;
-  created_at: string;
-}
+import { ThemeToggle } from './theme-toggle';
 
 export default function Header() {
-  const _menus = [
-    {
-      title: 'Home',
-      href: '/',
-    },
-    {
-      title: 'Create',
-      href: '/create',
-    },
+  const baseMenus = [
+    { title: 'Home', href: '/' },
+    { title: 'Create', href: '/create' },
   ];
-  const [menus, setMenus] = useState(_menus);
 
   const pathname = usePathname();
+  const { user, logout, loading } = useUser();
 
-  const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
-  const jwtToken = getCookie('token');
+  const menus = user
+    ? [
+        ...baseMenus,
+        { title: 'Explore', href: '/explore' },
+        { title: 'History', href: '/history' },
+        { title: 'Knowledge Base', href: '/knowledge-base' },
+      ]
+    : baseMenus;
 
-  async function fetchUserProfile(token: string) {
-    const res = await fetch('/api/user/profile', {
-      method: 'GET',
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
-    if (res.ok) {
-      const json = await res.json();
-      setUserProfile(json.data);
-      setMenus([
-        ..._menus,
-        {
-          title: 'Explore',
-          href: '/explore',
-        },
-        {
-          title: 'History',
-          href: '/history',
-        },
-      ]);
-    } else {
-      console.log('Failed to fetch user profile');
-    }
-  }
-
-  useEffect(() => {
-    if (jwtToken) {
-      fetchUserProfile(jwtToken.toString());
-    }
-  }, [jwtToken]);
+  const userInitial = (user?.name ?? user?.email ?? '?')
+    .charAt(0)
+    .toUpperCase();
 
   return (
     <header className="w-full border-b border-dashed border-primary">
-      <div className="container mx-auto flex h-16 items-center justify-between rounded-none px-2">
+      <div className="container mx-auto flex h-14 items-center justify-between rounded-none px-2 md:h-16 md:px-4">
         <Link
           href="/"
           scroll={false}
           className="flex items-center gap-2"
           prefetch={false}
         >
-          <Button variant={'ghost'} className="rounded-full">
+          <Button variant={'ghost'} className="rounded-full px-2 md:px-4">
             <Brand className="text-muted-foreground" />
-            <span className="font-bold text-primary">CRAFTER 2.0</span>
+            <span className="hidden font-bold text-primary sm:inline">
+              CRAFTER 2.0
+            </span>
+            <span className="font-bold text-primary sm:hidden">CRAFTER</span>
           </Button>
         </Link>
         <NavigationMenu>
@@ -110,7 +79,9 @@ export default function Header() {
                   className={navigationMenuTriggerStyle({
                     className: cn(
                       'bg-transparent',
-                      pathname === menu.href ? '!text-primary' : '',
+                      pathname === menu.href
+                        ? 'border-b-2 border-primary !text-primary'
+                        : '',
                     ),
                   })}
                   active={pathname === menu.href}
@@ -122,37 +93,39 @@ export default function Header() {
             ))}
           </NavigationMenuList>
         </NavigationMenu>
-        <div className="flex items-center gap-4">
-          {userProfile ? (
+        <div className="flex items-center gap-2 md:gap-4">
+          <ThemeToggle />
+          {loading ? (
+            <div className="flex h-9 w-9 items-center justify-center">
+              <Spinner className="size-6 text-primary" />
+            </div>
+          ) : user ? (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant="outline" size="icon" className="rounded-full">
-                  {userProfile.name.charAt(0).toUpperCase()}
+                  {userInitial}
                   <span className="sr-only">User menu</span>
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent>
                 <DropdownMenuLabel>My Profile</DropdownMenuLabel>
-                <DropdownMenuItem>{userProfile.name}</DropdownMenuItem>
-                <DropdownMenuItem>{userProfile.email}</DropdownMenuItem>
+                {user.name && <DropdownMenuItem>{user.name}</DropdownMenuItem>}
+                <DropdownMenuItem>{user.email}</DropdownMenuItem>
                 <DropdownMenuItem>
-                  {`Member since: ${new Date(userProfile.created_at).toLocaleDateString()}`}
+                  {`Member since: ${new Date(user.created_at).toLocaleDateString()}`}
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem
-                  onClick={() => {
-                    deleteCookie('token');
-                    location.reload();
-                  }}
-                >
+                <DropdownMenuItem onClick={logout}>
                   <LogOut />
                   Log out
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
           ) : (
-            <Button className="shadow-md shadow-primary/35" asChild>
-              <Link href="/login">Login</Link>
+            <Button className="shadow-md shadow-primary/35" size="sm" asChild>
+              <Link href="/login" className="text-xs md:text-sm">
+                Login
+              </Link>
             </Button>
           )}
           <Sheet>
@@ -166,18 +139,30 @@ export default function Header() {
                 <span className="sr-only">Toggle navigation menu</span>
               </Button>
             </SheetTrigger>
-            <SheetContent side="left" className="p-4 lg:hidden">
+            <SheetContent side="top" className="p-4 lg:hidden">
               <SheetTitle>Menu</SheetTitle>
-              <NavigationMenu className="items-start">
-                <NavigationMenuList className="grid gap-4">
+              <NavigationMenu className="w-full max-w-full flex-1 items-start [&>div]:w-full">
+                <NavigationMenuList className="grid w-full justify-stretch gap-4">
                   {menus.map((menu) => (
-                    <NavigationMenuItem key={menu.title}>
+                    <NavigationMenuItem
+                      key={menu.title}
+                      className="w-full text-right"
+                    >
                       <NavigationMenuLink
-                        className={navigationMenuTriggerStyle()}
+                        className={navigationMenuTriggerStyle({
+                          className: cn(
+                            'w-full bg-transparent',
+                            pathname === menu.href
+                              ? 'border border-primary !text-primary'
+                              : '',
+                          ),
+                        })}
                         active={pathname === menu.href}
                         asChild
                       >
-                        <Link href={menu.href}>{menu.title}</Link>
+                        <Link href={menu.href} className="w-full text-right">
+                          {menu.title}
+                        </Link>
                       </NavigationMenuLink>
                     </NavigationMenuItem>
                   ))}
