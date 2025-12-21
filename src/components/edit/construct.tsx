@@ -191,13 +191,13 @@ export default function Design({
     toast30 = window.setTimeout(() => {
       if (!finished)
         toast.warning(
-          'This is taking a while (30s+). Please wait or try again later.',
+          'This is taking a while (30s+). Please wait.',
         );
     }, 30000);
     toast60 = window.setTimeout(() => {
       if (!finished)
         toast.error(
-          'Editing is taking more than 1 minute. You may want to refresh or check your connection.',
+          'Editing is taking more than 1 minute.',
         );
     }, 60000);
 

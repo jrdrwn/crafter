@@ -346,13 +346,13 @@ export default function Contrib() {
     toast30 = window.setTimeout(() => {
       if (!finished)
         toast.warning(
-          'This is taking a while (30s+). Please wait or try again later.',
+          'This is taking a while (30s+). Please wait.',
         );
     }, 30000);
     toast60 = window.setTimeout(() => {
       if (!finished)
         toast.error(
-          'Contribution is taking more than 1 minute. You may want to refresh or check your connection.',
+          'Contribution is taking more than 1 minute.',
         );
     }, 60000);
 
