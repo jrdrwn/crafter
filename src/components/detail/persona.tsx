@@ -143,7 +143,7 @@ function PersonaHeader({
                     alt="Persona"
                     width={112}
                     height={112}
-                    className="h-28 w-28 rounded-full border border-primary object-cover"
+                    className="size-19 rounded-full border border-primary object-cover md:h-28 md:w-28"
                     unoptimized
                   />
                 ) : (
@@ -161,7 +161,7 @@ function PersonaHeader({
                   alt="Persona"
                   width={112}
                   height={112}
-                  className="h-28 w-28 rounded-full border border-primary object-cover"
+                  className="size-19 rounded-full border border-primary object-cover md:h-28 md:w-28"
                   unoptimized
                 />
               ) : (
