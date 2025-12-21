@@ -27,6 +27,7 @@ app.use(
       '*/*/helper/attribute',
       '*/*/helper/language',
       '*/*/helper/llm',
+      '*/*/contributions/check',
     ],
     async (c, next) => {
       const { JWT_SECRET } = env<{ JWT_SECRET: string }>(c);

@@ -266,7 +266,7 @@ export default function Contrib() {
   });
 
   const textValue = watch('text');
-  const TOKEN_LIMIT = Number(process.env.NEXT_PUBLIC_RAG_TOKEN_LIMIT ?? 30000);
+  const TOKEN_LIMIT = Number(process.env.NEXT_PUBLIC_RAG_TOKEN_LIMIT ?? 40000);
 
   const rawText = (textValue ?? '').trim();
   const textTokens = Math.ceil((rawText.length || 0) / 4);

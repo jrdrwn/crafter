@@ -6,6 +6,7 @@ import {
   updateContribution,
 } from '@/lib/ingestion';
 import { normalizeToRAGNote } from '@/lib/persona.service';
+import prisma from '@db';
 import { zValidator } from '@hono/zod-validator';
 import { Hono } from 'hono';
 import mammoth from 'mammoth';
@@ -15,6 +16,35 @@ import { z } from 'zod';
 import type { JWTPayload } from './types';
 
 export const rag = new Hono().basePath('/rag');
+
+rag.get('/contributions/check', async (c) => {
+  // Query params: domain_key, language_key, visibility
+  const domain_key = c.req.query('domain_key');
+  const language_key = c.req.query('language_key');
+  const visibility = c.req.query('visibility'); // 'public' | 'private' | undefined
+
+  // Build Prisma filter
+  const where: Record<string, string | undefined> = {};
+  if (domain_key) where.domain_key = domain_key;
+  if (language_key) where.language_key = language_key;
+  if (visibility === 'public' || visibility === 'private')
+    where.visibility = visibility;
+
+  // Count matching contributions
+  const count = await prisma.rag_documents.count({ where });
+
+  // Check availability
+  const available = count > 0;
+
+  return c.json({
+    status: true,
+    available,
+    count,
+    domain_key,
+    language_key,
+    visibility,
+  });
+});
 
 rag.post(
   '/contributions',

@@ -39,6 +39,7 @@ export default function LLMConfigCard({ control }: Props) {
   const [errorLanguages, setErrorLanguages] = useState<string | null>(null);
   const [languages, setLanguages] = useState<language[]>([]);
   const [llmModels, setLlmModels] = useState<llm[]>([]);
+  const [ragAvailable, setRagAvailable] = useState<boolean>(false);
 
   async function fetchLlmModels() {
     setErrorLlmModels(null);
@@ -71,6 +72,29 @@ export default function LLMConfigCard({ control }: Props) {
     fetchLanguages();
     fetchLlmModels();
   }, []);
+
+  // for check avaibility rag based on language selection and domain key
+  async function checkRagAvailability() {
+    const selectedLanguageKey = control._formValues.language?.key;
+    const domainKey = control._formValues.domain?.key || null;
+    if (!selectedLanguageKey) return false;
+
+    const response = await fetch(
+      `/api/rag/contributions/check?language_key=${selectedLanguageKey}&domain_key=${domainKey}`,
+    );
+    if (!response.ok) return false;
+    const json = await response.json();
+    if (json.available) {
+      setRagAvailable(true);
+    } else {
+      setRagAvailable(false);
+      control._formValues.useRAG = false;
+    }
+  }
+
+  useEffect(() => {
+    checkRagAvailability();
+  }, [languages]);
 
   return (
     <div className="space-y-3 sm:space-y-4">
@@ -162,12 +186,22 @@ export default function LLMConfigCard({ control }: Props) {
                 <FieldLabel className="flex items-center">
                   <Checkbox
                     id={field.name}
-                    checked={field.value}
+                    checked={ragAvailable ? field.value : false}
                     aria-invalid={fieldState.invalid}
                     onCheckedChange={(checked) => field.onChange(checked)}
+                    disabled={!ragAvailable}
                   />
-                  <span className="text-xs text-muted-foreground">
-                    Use RAG (Retrieval-Augmented Generation)
+                  <span
+                    className={cn(
+                      'text-xs',
+                      ragAvailable
+                        ? 'text-muted-foreground'
+                        : 'text-muted-foreground/50',
+                    )}
+                  >
+                    {ragAvailable
+                      ? `Use RAG (Retrieval-Augmented Generation)`
+                      : `RAG not available for selected language/domain`}
                   </span>
                 </FieldLabel>
               </Field>
@@ -191,14 +225,15 @@ export default function LLMConfigCard({ control }: Props) {
                     <Select
                       name={field.name}
                       value={field.value.key}
-                      onValueChange={(value) =>
+                      onValueChange={(value) => {
                         field.onChange({
                           key: value,
                           label:
                             languages.find((lang) => lang.key === value)
                               ?.label || value,
-                        })
-                      }
+                        });
+                        checkRagAvailability();
+                      }}
                     >
                       <SelectTrigger className="w-full border-primary sm:w-42">
                         <SelectValue
