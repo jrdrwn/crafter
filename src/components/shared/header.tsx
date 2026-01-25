@@ -39,6 +39,7 @@ export default function Header() {
   const baseMenus = [
     { title: t('home'), href: '/' },
     { title: t('create'), href: '/create' },
+    { title: 'Tutorial', href: '/panduan.pdf' },
   ];
 
   const pathname = usePathname();
