@@ -30,6 +30,7 @@ import {
 } from '../ui/dropdown-menu';
 import { Spinner } from '../ui/spinner';
 import Brand from './brand';
+import ChangeLanguage from './change-language';
 import { ThemeToggle } from './theme-toggle';
 
 export default function Header() {
@@ -94,7 +95,10 @@ export default function Header() {
           </NavigationMenuList>
         </NavigationMenu>
         <div className="flex items-center gap-2 md:gap-4">
-          <ThemeToggle />
+          <div className="flex gap-2">
+            <ThemeToggle />
+            <ChangeLanguage />
+          </div>
           {loading ? (
             <div className="flex h-9 w-9 items-center justify-center">
               <Spinner className="size-6 text-primary" />

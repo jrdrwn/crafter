@@ -2,6 +2,7 @@ import { ThemeProvider } from '@/components/shared/theme-provider';
 import { Toaster } from '@/components/ui/sonner';
 import { UserProvider } from '@/contexts/user-context';
 import type { Metadata } from 'next';
+import { NextIntlClientProvider } from 'next-intl';
 import { Geist_Mono, Plus_Jakarta_Sans } from 'next/font/google';
 
 import './globals.css';
@@ -39,7 +40,9 @@ export default function RootLayout({
           disableTransitionOnChange
         >
           <UserProvider>
-            <div className="flex min-h-screen flex-col">{children}</div>
+            <div className="flex min-h-screen flex-col">
+              <NextIntlClientProvider>{children}</NextIntlClientProvider>
+            </div>
           </UserProvider>
           <Toaster />
         </ThemeProvider>

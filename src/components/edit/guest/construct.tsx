@@ -176,16 +176,10 @@ export default function Design({ persona }: { persona: PersonaData | null }) {
         );
     }, 20000);
     toast30 = window.setTimeout(() => {
-      if (!finished)
-        toast.warning(
-          'This is taking a while (30s+).',
-        );
+      if (!finished) toast.warning('This is taking a while (30s+).');
     }, 30000);
     toast60 = window.setTimeout(() => {
-      if (!finished)
-        toast.error(
-          'Editing is taking more than 1 minute.',
-        );
+      if (!finished) toast.error('Editing is taking more than 1 minute.');
     }, 60000);
 
     try {

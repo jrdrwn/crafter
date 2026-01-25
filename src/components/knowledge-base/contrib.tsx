@@ -345,15 +345,10 @@ export default function Contrib() {
     }, 20000);
     toast30 = window.setTimeout(() => {
       if (!finished)
-        toast.warning(
-          'This is taking a while (30s+). Please wait.',
-        );
+        toast.warning('This is taking a while (30s+). Please wait.');
     }, 30000);
     toast60 = window.setTimeout(() => {
-      if (!finished)
-        toast.error(
-          'Contribution is taking more than 1 minute.',
-        );
+      if (!finished) toast.error('Contribution is taking more than 1 minute.');
     }, 60000);
 
     const visibility = values.visibility || 'private';
