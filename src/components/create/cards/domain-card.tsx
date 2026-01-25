@@ -4,6 +4,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { ErrorMessageButtonRetry } from '@/helpers/error-retry';
 import { slugify } from '@/lib/utils';
 import { Plus, Target } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 import { useEffect, useRef, useState } from 'react';
 import { Control, Controller } from 'react-hook-form';
 import z from 'zod';
@@ -28,6 +29,7 @@ type Props = {
 };
 
 export default function DomainCard({ control }: Props) {
+  const t = useTranslations('create');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [domains, setDomains] = useState<{ key: string; label: string }[]>([]);
@@ -42,7 +44,7 @@ export default function DomainCard({ control }: Props) {
     const res = await fetch('/api/persona/helper/domain');
     setLoading(false);
     if (!res.ok) {
-      setError('Failed to fetch domains.');
+      setError(t('domain-fetch-error'));
       return;
     }
     const json = await res.json();
@@ -61,10 +63,10 @@ export default function DomainCard({ control }: Props) {
             size={16}
             className="text-foreground sm:size-[18px] md:size-5"
           />
-          Choose Domain
+          {t('domain-title')}
         </CardTitle>
         <CardDescription className="text-xs text-gray-400 sm:text-sm">
-          Select the domain or industry for the persona you want to create.
+          {t('domain-desc')}
         </CardDescription>
       </CardHeader>
       <CardContent className="px-1.5 sm:px-2">
@@ -77,7 +79,7 @@ export default function DomainCard({ control }: Props) {
                 <Input
                   ref={searchInputRef}
                   type="search"
-                  placeholder="Search..."
+                  placeholder={t('domain-search-placeholder')}
                   className="w-full border-primary sm:max-w-xs"
                   onChange={(e) => setSearchQuery(e.target.value)}
                 />
@@ -85,7 +87,7 @@ export default function DomainCard({ control }: Props) {
                   <Input
                     ref={newDomainInputRef}
                     type="text"
-                    placeholder="Add a new domain..."
+                    placeholder={t('domain-add-placeholder')}
                     value={newDomain}
                     className="flex-1 border-primary"
                     onChange={(e) => setNewDomain(e.target.value)}
@@ -173,10 +175,12 @@ export default function DomainCard({ control }: Props) {
                                   {d.label}
                                 </span>
                                 <span className="text-xs text-muted-foreground">
-                                  Key: {d.key}
+                                  {t('domain-key-label', { key: d.key })}
                                 </span>
                               </div>
-                              {selected && <Badge>Selected</Badge>}
+                              {selected && (
+                                <Badge>{t('domain-selected')}</Badge>
+                              )}
                             </div>
                           </FieldLabel>
                         );
@@ -190,7 +194,7 @@ export default function DomainCard({ control }: Props) {
                   (d) => d.label.toLowerCase() === searchQuery.toLowerCase(),
                 ) && (
                   <p className="mt-2 text-center text-xs text-gray-500">
-                    Add &quot;{searchQuery}&quot; as a new domain if not listed.
+                    {t('domain-add-suggestion', { query: searchQuery })}
                   </p>
                 )}
               {fieldState.error?.message && (

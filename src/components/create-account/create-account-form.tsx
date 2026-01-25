@@ -2,6 +2,7 @@
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Eye, EyeOff, LockKeyhole, MailIcon, User } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
@@ -40,6 +41,7 @@ const formSchema = z.object({
 });
 
 export default function CreateAccountForm() {
+  const t = useTranslations('create-account.form');
   const router = useRouter();
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -61,7 +63,7 @@ export default function CreateAccountForm() {
     if (data.password !== data.confirmPassword) {
       form.setError('confirmPassword', {
         type: 'manual',
-        message: 'Passwords do not match',
+        message: t('error-password-mismatch'),
       });
       return;
     }
@@ -80,11 +82,11 @@ export default function CreateAccountForm() {
     const json = await res.json();
     setLoading(false);
     if (!res.ok) {
-      toast.error(json.message || 'Something went wrong. Please try again.');
+      toast.error(json.message || t('error-generic'));
       return;
     }
 
-    toast.success('Account created successfully! Please log in.');
+    toast.success(t('success'));
     router.push('/login');
     form.reset();
   }
@@ -96,11 +98,10 @@ export default function CreateAccountForm() {
           <Card className="mx-auto w-full max-w-md border-primary">
             <CardHeader>
               <CardTitle className="text-center text-xl text-primary sm:text-2xl">
-                Create a New Account
+                {t('title')}
               </CardTitle>
               <CardDescription className="text-center text-xs sm:text-sm">
-                Sign up to save your persona history and access advanced
-                features.
+                {t('description')}
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4 sm:space-y-5">
@@ -112,13 +113,13 @@ export default function CreateAccountForm() {
                     data-invalid={fieldState.invalid}
                     className="mb-4 w-full gap-2"
                   >
-                    <FieldLabel htmlFor={field.name}>Name</FieldLabel>
+                    <FieldLabel htmlFor={field.name}>{t('name')}</FieldLabel>
                     <InputGroup className="border-primary">
                       <InputGroupInput
                         {...field}
                         id={field.name}
                         aria-invalid={fieldState.invalid}
-                        placeholder="John Doe"
+                        placeholder={t('name-placeholder')}
                         type="text"
                         autoComplete="off"
                       />
@@ -140,13 +141,13 @@ export default function CreateAccountForm() {
                     data-invalid={fieldState.invalid}
                     className="mb-4 w-full gap-2"
                   >
-                    <FieldLabel htmlFor={field.name}>Email</FieldLabel>
+                    <FieldLabel htmlFor={field.name}>{t('email')}</FieldLabel>
                     <InputGroup className="border-primary">
                       <InputGroupInput
                         {...field}
                         id={field.name}
                         aria-invalid={fieldState.invalid}
-                        placeholder="name@email.com"
+                        placeholder={t('email-placeholder')}
                         type="email"
                         autoComplete="off"
                       />
@@ -169,13 +170,15 @@ export default function CreateAccountForm() {
                     data-invalid={fieldState.invalid}
                     className="mb-4 w-full gap-2"
                   >
-                    <FieldLabel htmlFor={field.name}>Password</FieldLabel>
+                    <FieldLabel htmlFor={field.name}>
+                      {t('password')}
+                    </FieldLabel>
                     <InputGroup className="border-primary">
                       <InputGroupInput
                         {...field}
                         id={field.name}
                         aria-invalid={fieldState.invalid}
-                        placeholder="Enter your password"
+                        placeholder={t('password-placeholder')}
                         type={passwordVisible ? 'text' : 'password'}
                         autoComplete="off"
                       />
@@ -211,14 +214,14 @@ export default function CreateAccountForm() {
                     className="mb-4 w-full gap-2"
                   >
                     <FieldLabel htmlFor={field.name}>
-                      Confirm Password
+                      {t('confirm-password')}
                     </FieldLabel>
                     <InputGroup className="border-primary">
                       <InputGroupInput
                         {...field}
                         id={field.name}
                         aria-invalid={fieldState.invalid}
-                        placeholder="Enter your password"
+                        placeholder={t('password-placeholder')}
                         type={passwordVisible ? 'text' : 'password'}
                         autoComplete="off"
                       />
@@ -257,9 +260,9 @@ export default function CreateAccountForm() {
                         onCheckedChange={(checked) => field.onChange(checked)}
                       />
                       <span className="text-sm text-muted-foreground">
-                        I agree to the{' '}
+                        {t('terms-prefix')}{' '}
                         <Link href="#" className="text-primary hover:underline">
-                          Terms and Conditions
+                          {t('terms-link')}
                         </Link>
                         .
                       </span>
@@ -272,12 +275,12 @@ export default function CreateAccountForm() {
               />
               <Button className="w-full" type="submit" disabled={loading}>
                 {loading && <Spinner />}
-                Create Account
+                {t('button')}
               </Button>
               <p className="mt-4 text-center text-sm text-muted-foreground">
-                Already have an account?{' '}
+                {t('already-account')}{' '}
                 <Link href="/login" className="text-primary hover:underline">
-                  Login.
+                  {t('login-link')}
                 </Link>
               </p>
             </CardContent>

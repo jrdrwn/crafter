@@ -26,6 +26,7 @@ import {
   Sparkles,
   StickyNote,
 } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 import { useRouter } from 'next/navigation';
 import { useMemo, useState } from 'react';
 import { useForm } from 'react-hook-form';
@@ -147,6 +148,7 @@ export default function Design() {
   const _cookies = getCookie('token');
   const router = useRouter();
   const [loading, setLoading] = useState(false);
+  const t = useTranslations('create');
 
   async function onSubmit(data: TCreateForm) {
     if (loading) return;
@@ -166,23 +168,16 @@ export default function Design() {
       if (toast60) clearTimeout(toast60);
     }
     toast10 = window.setTimeout(() => {
-      if (!finished)
-        toast.info(
-          'Still working... Persona generation is taking longer than usual (10s).',
-        );
+      if (!finished) toast.info(t('construct-toast-10s'));
     }, 10000);
     toast20 = window.setTimeout(() => {
-      if (!finished)
-        toast.info(
-          'Still working... Persona generation is taking over 20 seconds.',
-        );
+      if (!finished) toast.info(t('construct-toast-20s'));
     }, 20000);
     toast30 = window.setTimeout(() => {
-      if (!finished)
-        toast.warning('This is taking a while (30s+). Please wait.');
+      if (!finished) toast.warning(t('construct-toast-30s'));
     }, 30000);
     toast60 = window.setTimeout(() => {
-      if (!finished) toast.error('Generation is taking more than 1 minute.');
+      if (!finished) toast.error(t('construct-toast-60s'));
     }, 60000);
 
     try {
@@ -197,11 +192,11 @@ export default function Design() {
         setLoading(false);
         clearTimers();
         if (!res.ok) {
-          toast.error('Failed to create persona: Unknown error');
+          toast.error(t('construct-toast-failed'));
           return;
         }
         const json = await res.json();
-        toast.success('Persona created successfully!');
+        toast.success(t('construct-toast-success'));
         try {
           const STORAGE_KEY = 'crafter:personas';
           const entry = {
@@ -213,11 +208,11 @@ export default function Design() {
           localStorage.setItem(STORAGE_KEY, JSON.stringify(entry));
           router.push(`/detail/guest`);
         } catch (err: unknown) {
-          let description = 'Please try again later.';
+          let description = t('construct-toast-localstorage-desc');
           if (isErrorWithMessage(err)) {
             description = err.message;
           }
-          toast.error('Failed to save personas to localStorage:', {
+          toast.error(t('construct-toast-localstorage'), {
             description,
           });
         }
@@ -245,13 +240,13 @@ export default function Design() {
         clearTimers();
         if (!res.ok) {
           toast.error(
-            `Failed to create persona: ${user ? 'Unknown error' : 'Please login again'}`,
+            user ? t('construct-toast-failed') : t('construct-toast-login'),
           );
           return;
         }
         const json = await res.json();
 
-        toast.success('Persona created successfully!');
+        toast.success(t('construct-toast-success'));
         router.push(`/detail/${json.personaId}`);
       }
     } finally {
@@ -289,16 +284,11 @@ export default function Design() {
       form={form}
       onSubmit={onSubmit}
       loading={loading}
-      submitLabel="Create persona"
+      submitLabel={t('construct-submit')}
       submitIcon={<Sparkles />}
-      loadingLabel="Creating..."
+      loadingLabel={t('construct-loading')}
       loadingIcon={<Spinner />}
-      agreementText={
-        <>
-          By clicking &quot;Create persona&quot;, you agree to our Terms of
-          Service and Privacy Policy.
-        </>
-      }
+      agreementText={<>{t('construct-agreement')}</>}
       renderStep={(stepId) => {
         switch (stepId) {
           case 'domain':
@@ -340,54 +330,60 @@ export default function Design() {
                   <div className="mb-1 flex items-center gap-2">
                     <CheckCircle2 className="h-4 w-4 text-primary sm:h-5 sm:w-5" />
                     <h3 className="text-base font-semibold sm:text-lg">
-                      Review your inputs
+                      {t('construct-review-title')}
                     </h3>
                   </div>
                   <p className="text-xs text-muted-foreground sm:text-sm">
-                    Make sure everything looks correct before creating.
+                    {t('construct-review-desc')}
                   </p>
                 </div>
                 <Card>
                   <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                     <CardTitle className="text-sm font-medium">
-                      Overview
+                      {t('construct-overview')}
                     </CardTitle>
                     <FileText className="h-4 w-4 text-primary" />
                   </CardHeader>
                   <CardContent className="space-y-3 text-sm">
                     <div className="flex items-center gap-2">
                       <Building2 className="h-4 w-4 text-muted-foreground" />
-                      <span className="font-medium">Domain:</span>
+                      <span className="font-medium">
+                        {t('construct-domain')}
+                      </span>
                       <Badge variant="secondary">
                         {form.getValues('domain')?.label || '-'}
                       </Badge>
                     </div>
                     <div className="flex items-center gap-2">
                       <Cpu className="h-4 w-4 text-muted-foreground" />
-                      <span className="font-medium">Model:</span>
+                      <span className="font-medium">
+                        {t('construct-model')}
+                      </span>
                       <span>{form.getValues('llmModel')?.label}</span>
                     </div>
                     <div className="flex items-center gap-2">
                       <Languages className="h-4 w-4 text-muted-foreground" />
-                      <span className="font-medium">Language:</span>
+                      <span className="font-medium">
+                        {t('construct-language')}
+                      </span>
                       <span>{form.getValues('language')?.label}</span>
                     </div>
                     <div className="flex gap-2">
                       <LucideMessageSquareWarning className="h-4 w-4 text-muted-foreground" />
-                      <span className="font-medium">Note:</span>
+                      <span className="font-medium">{t('construct-note')}</span>
                       <span>
                         {form.getValues('useRAG') &&
                         form.getValues('internal').length +
                           form.getValues('external').length >
                           5
-                          ? 'RAG is enabled and you have selected many factors. Generation may take up to a minute.'
+                          ? t('construct-note-rag-many')
                           : form.getValues('useRAG')
-                            ? 'RAG is enabled. Generation may take a bit longer than usual.'
+                            ? t('construct-note-rag')
                             : form.getValues('internal').length +
                                   form.getValues('external').length >
                                 5
-                              ? 'You have selected many factors. Generation may take longer.'
-                              : 'No special notes.'}
+                              ? t('construct-note-many')
+                              : t('construct-note-none')}
                       </span>
                     </div>
                   </CardContent>
@@ -395,14 +391,16 @@ export default function Design() {
                 <Card>
                   <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                     <CardTitle className="text-sm font-medium">
-                      Factors
+                      {t('construct-factors')}
                     </CardTitle>
                     <Layers className="h-4 w-4 text-primary" />
                   </CardHeader>
                   <CardContent className="space-y-4 text-sm">
                     <div>
                       <div className="mb-2 flex items-center gap-2">
-                        <span className="font-medium">Internal</span>
+                        <span className="font-medium">
+                          {t('construct-internal')}
+                        </span>
                         <span className="text-xs text-muted-foreground">
                           ({form.getValues('internal')?.length || 0})
                         </span>
@@ -418,7 +416,9 @@ export default function Design() {
                     <Separator />
                     <div>
                       <div className="mb-2 flex items-center gap-2">
-                        <span className="font-medium">External</span>
+                        <span className="font-medium">
+                          {t('construct-external')}
+                        </span>
                         <span className="text-xs text-muted-foreground">
                           ({form.getValues('external')?.length || 0})
                         </span>
@@ -436,34 +436,43 @@ export default function Design() {
                 <Card className="md:col-span-2 lg:col-span-1">
                   <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                     <CardTitle className="text-sm font-medium">
-                      Generation Settings
+                      {t('construct-generation-settings')}
                     </CardTitle>
                     <SlidersHorizontal className="h-4 w-4 text-primary" />
                   </CardHeader>
                   <CardContent className="space-y-3 text-sm">
                     <div className="flex items-center gap-2">
                       <Ruler className="h-4 w-4 text-muted-foreground" />
-                      <span className="font-medium">Content length:</span>
+                      <span className="font-medium">
+                        {t('construct-content-length')}
+                      </span>
                       <span>
                         {form.getValues('contentLengthRange')[0]} -{' '}
-                        {form.getValues('contentLengthRange')[1]} words
+                        {form.getValues('contentLengthRange')[1]}{' '}
+                        {t('construct-words')}
                       </span>
                     </div>
                     <div className="flex items-center gap-2">
                       <Database className="h-4 w-4 text-muted-foreground" />
-                      <span className="font-medium">Use RAG:</span>
+                      <span className="font-medium">
+                        {t('construct-use-rag')}
+                      </span>
                       <Badge
                         variant={
                           form.getValues('useRAG') ? 'default' : 'secondary'
                         }
                       >
-                        {form.getValues('useRAG') ? 'Enabled' : 'Disabled'}
+                        {form.getValues('useRAG')
+                          ? t('construct-enabled')
+                          : t('construct-disabled')}
                       </Badge>
                     </div>
                     <div className="flex items-start gap-2">
                       <StickyNote className="mt-0.5 h-4 w-4 text-muted-foreground" />
                       <div className="w-full">
-                        <span className="font-medium">Detail</span>
+                        <span className="font-medium">
+                          {t('construct-detail')}
+                        </span>
                         <p className="mt-1 max-h-15 overflow-auto rounded bg-muted/40 p-2 text-xs whitespace-pre-line text-muted-foreground">
                           {form.getValues('detail') || '-'}
                         </p>

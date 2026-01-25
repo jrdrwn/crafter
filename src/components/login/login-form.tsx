@@ -4,6 +4,7 @@ import { useUser } from '@/contexts/user-context';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { setCookie } from 'cookies-next/client';
 import { Eye, EyeOff, LockKeyhole, MailIcon } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
@@ -34,6 +35,7 @@ const formSchema = z.object({
 });
 
 export default function LoginForm() {
+  const t = useTranslations('login.form');
   const { refresh } = useUser();
   const router = useRouter();
   const form = useForm<z.infer<typeof formSchema>>({
@@ -64,11 +66,11 @@ export default function LoginForm() {
     };
     if (res.status === 200) {
       setCookie('token', json.data.token);
-      toast.success('Login Successful');
+      toast.success(t('success'));
       refresh();
       router.push('/');
     } else {
-      toast.error('Login Failed', {
+      toast.error(t('failed'), {
         description: json.message,
       });
     }
@@ -82,10 +84,10 @@ export default function LoginForm() {
           <Card className="mx-auto w-full max-w-md border-primary">
             <CardHeader>
               <CardTitle className="text-center text-xl text-primary sm:text-2xl">
-                Login to Your Account
+                {t('title')}
               </CardTitle>
               <CardDescription className="text-center text-xs sm:text-sm">
-                Log in to access your persona history and advanced features.
+                {t('description')}
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4 sm:space-y-5">
@@ -97,13 +99,13 @@ export default function LoginForm() {
                     data-invalid={fieldState.invalid}
                     className="mb-4 w-full gap-2"
                   >
-                    <FieldLabel htmlFor={field.name}>Email</FieldLabel>
+                    <FieldLabel htmlFor={field.name}>{t('email')}</FieldLabel>
                     <InputGroup className="border-primary">
                       <InputGroupInput
                         {...field}
                         id={field.name}
                         aria-invalid={fieldState.invalid}
-                        placeholder="name@email.com"
+                        placeholder={t('emailPlaceholder')}
                         type="email"
                         autoComplete="off"
                       />
@@ -126,13 +128,15 @@ export default function LoginForm() {
                     data-invalid={fieldState.invalid}
                     className="mb-4 w-full gap-2"
                   >
-                    <FieldLabel htmlFor={field.name}>Password</FieldLabel>
+                    <FieldLabel htmlFor={field.name}>
+                      {t('password')}
+                    </FieldLabel>
                     <InputGroup className="border-primary">
                       <InputGroupInput
                         {...field}
                         id={field.name}
                         aria-invalid={fieldState.invalid}
-                        placeholder="Enter your password"
+                        placeholder={t('passwordPlaceholder')}
                         type={passwordVisible ? 'text' : 'password'}
                         autoComplete="off"
                       />
@@ -160,15 +164,15 @@ export default function LoginForm() {
               />
               <Button className="w-full" type="submit" disabled={loading}>
                 {loading && <Spinner />}
-                Login
+                {t('button')}
               </Button>
               <p className="mt-4 text-center text-sm text-muted-foreground">
-                Don&apos;t have an account?{' '}
+                {t('noAccount')}{' '}
                 <Link
                   href="/create-account"
                   className="text-primary hover:underline"
                 >
-                  Create now.
+                  {t('createNow')}
                 </Link>
               </p>
             </CardContent>

@@ -3,6 +3,7 @@
 
 import { useUser } from '@/contexts/user-context';
 import { getCookie } from 'cookies-next/client';
+import { useTranslations } from 'next-intl';
 import Link from 'next/link';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { useEffect, useMemo, useState } from 'react';
@@ -29,6 +30,7 @@ export default function PersonaItems() {
   const searchParams = useSearchParams();
   const pathname = usePathname();
   const router = useRouter();
+  const t = useTranslations();
 
   const [personas, setPersonas] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
@@ -189,7 +191,7 @@ export default function PersonaItems() {
         </Card>
         <div className="mt-4 flex flex-row flex-wrap items-center justify-between gap-3">
           <p className="text-xs text-muted-foreground md:text-sm">
-            Viewing {personas.length} out of {total} personas
+            {t('explore.persona-viewing', { count: personas.length, total })}
           </p>
           <div className="flex items-center gap-2">
             <Switch
@@ -201,16 +203,18 @@ export default function PersonaItems() {
               htmlFor="show-my-persona"
               className="text-xs text-muted-foreground md:text-sm"
             >
-              Show My Personas Only
+              {t('explore.persona-show-mine')}
             </Label>
           </div>
         </div>
 
         {error && !loading && (
           <div className="mt-6 flex flex-col items-center justify-center gap-3">
-            <p className="text-sm text-destructive">{error}</p>
+            <p className="text-sm text-destructive">
+              {t('explore.persona-error')}
+            </p>
             <Button variant="outline" onClick={() => fetchPersonas()}>
-              Refresh
+              {t('explore.persona-refresh')}
             </Button>
           </div>
         )}
@@ -223,7 +227,7 @@ export default function PersonaItems() {
 
           {!loading && !error && personas.length === 0 && (
             <p className="col-span-full text-center text-sm text-muted-foreground md:text-base">
-              No personas found.
+              {t('explore.persona-empty')}
             </p>
           )}
           {!loading &&

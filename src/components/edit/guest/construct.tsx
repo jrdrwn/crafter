@@ -25,6 +25,7 @@ import {
   Sparkles,
   StickyNote,
 } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 import { useRouter } from 'next/navigation';
 import { useMemo, useState } from 'react';
 import { useForm } from 'react-hook-form';
@@ -36,42 +37,43 @@ import { Card, CardContent, CardHeader, CardTitle } from '../../ui/card';
 import { Separator } from '../../ui/separator';
 import { Spinner } from '../../ui/spinner';
 
-const formSchema = z.object({
-  domain: z
-    .object({
-      key: z.string(),
-      label: z.string(),
-    })
-    .required(),
-  internal: z
-    .array(
-      z.object({
-        name: z.string(),
-        title: z.string(),
-        description: z.string(),
-      }),
-    )
-    .min(1, 'Select at least one internal factor'),
-  external: z
-    .array(
-      z.object({
-        name: z.string(),
-        title: z.string(),
-        description: z.string(),
-      }),
-    )
-    .min(1, 'Select at least one external factor'),
-  contentLengthRange: z.array(z.number()).length(2),
-  llmModel: z.object({ key: z.string(), label: z.string() }).required(),
-  language: z
-    .object({
-      key: z.string(),
-      label: z.string(),
-    })
-    .required(),
-  useRAG: z.boolean(),
-  detail: z.string().optional(),
-});
+const formSchema = (t: (key: string) => string) =>
+  z.object({
+    domain: z
+      .object({
+        key: z.string(),
+        label: z.string(),
+      })
+      .required(),
+    internal: z
+      .array(
+        z.object({
+          name: z.string(),
+          title: z.string(),
+          description: z.string(),
+        }),
+      )
+      .min(1, t('select-internal-factor')),
+    external: z
+      .array(
+        z.object({
+          name: z.string(),
+          title: z.string(),
+          description: z.string(),
+        }),
+      )
+      .min(1, t('select-external-factor')),
+    contentLengthRange: z.array(z.number()).length(2),
+    llmModel: z.object({ key: z.string(), label: z.string() }).required(),
+    language: z
+      .object({
+        key: z.string(),
+        label: z.string(),
+      })
+      .required(),
+    useRAG: z.boolean(),
+    detail: z.string().optional(),
+  });
 
 const { useStepper, steps, utils } = defineStepper(
   { id: 'domain', label: 'Domain' },
@@ -89,12 +91,14 @@ export interface PersonaData {
 }
 
 export default function Design({ persona }: { persona: PersonaData | null }) {
+  const t = useTranslations('edit');
+  const tCreate = useTranslations('create');
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const stepper = useStepper();
   const currentIndex = utils.getIndex(stepper.current.id);
   const form = useForm<TCreateForm>({
-    resolver: zodResolver(formSchema),
+    resolver: zodResolver(formSchema(t)),
     mode: 'onChange',
     defaultValues: {
       domain: persona?.request?.domain ?? { key: 'health', label: 'Health' },
@@ -164,22 +168,16 @@ export default function Design({ persona }: { persona: PersonaData | null }) {
       if (toast60) clearTimeout(toast60);
     }
     toast10 = window.setTimeout(() => {
-      if (!finished)
-        toast.info(
-          'Still working... Persona editing is taking longer than usual (10s).',
-        );
+      if (!finished) toast.info(t('toast-10s'));
     }, 10000);
     toast20 = window.setTimeout(() => {
-      if (!finished)
-        toast.info(
-          'Still working... Persona editing is taking over 20 seconds.',
-        );
+      if (!finished) toast.info(t('toast-20s'));
     }, 20000);
     toast30 = window.setTimeout(() => {
-      if (!finished) toast.warning('This is taking a while (30s+).');
+      if (!finished) toast.warning(t('toast-30s'));
     }, 30000);
     toast60 = window.setTimeout(() => {
-      if (!finished) toast.error('Editing is taking more than 1 minute.');
+      if (!finished) toast.error(t('toast-60s'));
     }, 60000);
 
     try {
@@ -191,11 +189,11 @@ export default function Design({ persona }: { persona: PersonaData | null }) {
       setLoading(false);
       clearTimers();
       if (!res.ok) {
-        toast.error('Failed to edit persona: Unknown error');
+        toast.error(t('failed-edit-persona'));
         return;
       }
       const json = await res.json();
-      toast.success('Persona edited successfully!');
+      toast.success(t('persona-edited-successfully'));
       try {
         const STORAGE_KEY = 'crafter:personas';
         const entry = {
@@ -207,11 +205,11 @@ export default function Design({ persona }: { persona: PersonaData | null }) {
         localStorage.setItem(STORAGE_KEY, JSON.stringify(entry));
         router.push(`/detail/guest`);
       } catch (err: unknown) {
-        let description = 'Please try again later.';
+        let description = tCreate('construct-toast-localstorage-desc');
         if (isErrorWithMessage(err)) {
           description = err.message;
         }
-        toast.error('Failed to save personas to localStorage:', {
+        toast.error(tCreate('construct-toast-localstorage'), {
           description,
         });
       }
@@ -244,16 +242,11 @@ export default function Design({ persona }: { persona: PersonaData | null }) {
       form={form}
       onSubmit={onSubmit}
       loading={loading}
-      submitLabel="Edit persona"
+      submitLabel={t('submit-label')}
       submitIcon={<Sparkles />}
-      loadingLabel="Editing..."
+      loadingLabel={t('loading-label')}
       loadingIcon={<Spinner />}
-      agreementText={
-        <>
-          By clicking &quot;Edit persona&quot;, you agree to our Terms of
-          Service and Privacy Policy.
-        </>
-      }
+      agreementText={t('agreement-text')}
       renderStep={(stepId) => {
         switch (stepId) {
           case 'domain':
@@ -295,54 +288,62 @@ export default function Design({ persona }: { persona: PersonaData | null }) {
                   <div className="mb-1 flex items-center gap-2">
                     <CheckCircle2 className="h-5 w-5 text-primary" />
                     <h3 className="text-lg font-semibold">
-                      Review your inputs
+                      {t('review-inputs-title')}
                     </h3>
                   </div>
                   <p className="text-sm text-muted-foreground">
-                    Make sure everything looks correct before editing.
+                    {t('review-inputs-desc')}
                   </p>
                 </div>
                 <Card>
                   <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                     <CardTitle className="text-sm font-medium">
-                      Overview
+                      {t('overview')}
                     </CardTitle>
                     <FileText className="h-4 w-4 text-primary" />
                   </CardHeader>
                   <CardContent className="space-y-3 text-sm">
                     <div className="flex items-center gap-2">
                       <Building2 className="h-4 w-4 text-muted-foreground" />
-                      <span className="font-medium">Domain:</span>
+                      <span className="font-medium">
+                        {tCreate('construct-domain')}
+                      </span>
                       <Badge variant="secondary">
                         {form.getValues('domain')?.label || '-'}
                       </Badge>
                     </div>
                     <div className="flex items-center gap-2">
                       <Cpu className="h-4 w-4 text-muted-foreground" />
-                      <span className="font-medium">Model:</span>
+                      <span className="font-medium">
+                        {tCreate('construct-model')}
+                      </span>
                       <span>{form.getValues('llmModel')?.label}</span>
                     </div>
                     <div className="flex items-center gap-2">
                       <Languages className="h-4 w-4 text-muted-foreground" />
-                      <span className="font-medium">Language:</span>
+                      <span className="font-medium">
+                        {tCreate('construct-language')}
+                      </span>
                       <span>{form.getValues('language')?.label}</span>
                     </div>
                     <div className="flex gap-2">
                       <LucideMessageSquareWarning className="h-4 w-4 text-muted-foreground" />
-                      <span className="font-medium">Note:</span>
+                      <span className="font-medium">
+                        {tCreate('construct-note')}
+                      </span>
                       <span>
                         {form.getValues('useRAG') &&
                         form.getValues('internal').length +
                           form.getValues('external').length >
                           5
-                          ? 'RAG is enabled and you have selected many factors. Generation may take up to a minute.'
+                          ? tCreate('construct-note-rag-many')
                           : form.getValues('useRAG')
-                            ? 'RAG is enabled. Generation may take a bit longer than usual.'
+                            ? tCreate('construct-note-rag')
                             : form.getValues('internal').length +
                                   form.getValues('external').length >
                                 5
-                              ? 'You have selected many factors. Generation may take longer.'
-                              : 'No special notes.'}
+                              ? tCreate('construct-note-many')
+                              : tCreate('construct-note-none')}
                       </span>
                     </div>
                   </CardContent>
@@ -350,14 +351,16 @@ export default function Design({ persona }: { persona: PersonaData | null }) {
                 <Card>
                   <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                     <CardTitle className="text-sm font-medium">
-                      Factors
+                      {t('factors')}
                     </CardTitle>
                     <Layers className="h-4 w-4 text-primary" />
                   </CardHeader>
                   <CardContent className="space-y-4 text-sm">
                     <div>
                       <div className="mb-2 flex items-center gap-2">
-                        <span className="font-medium">Internal</span>
+                        <span className="font-medium">
+                          {tCreate('construct-internal')}
+                        </span>
                         <span className="text-xs text-muted-foreground">
                           ({form.getValues('internal')?.length || 0})
                         </span>
@@ -373,7 +376,9 @@ export default function Design({ persona }: { persona: PersonaData | null }) {
                     <Separator />
                     <div>
                       <div className="mb-2 flex items-center gap-2">
-                        <span className="font-medium">External</span>
+                        <span className="font-medium">
+                          {tCreate('construct-external')}
+                        </span>
                         <span className="text-xs text-muted-foreground">
                           ({form.getValues('external')?.length || 0})
                         </span>
@@ -391,34 +396,43 @@ export default function Design({ persona }: { persona: PersonaData | null }) {
                 <Card>
                   <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                     <CardTitle className="text-sm font-medium">
-                      Generation Settings
+                      {t('generation-settings')}
                     </CardTitle>
                     <SlidersHorizontal className="h-4 w-4 text-primary" />
                   </CardHeader>
                   <CardContent className="space-y-3 text-sm">
                     <div className="flex items-center gap-2">
                       <Ruler className="h-4 w-4 text-muted-foreground" />
-                      <span className="font-medium">Content length:</span>
+                      <span className="font-medium">
+                        {tCreate('construct-content-length')}
+                      </span>
                       <span>
                         {form.getValues('contentLengthRange')[0]} -{' '}
-                        {form.getValues('contentLengthRange')[1]} words
+                        {form.getValues('contentLengthRange')[1]}{' '}
+                        {tCreate('construct-words')}
                       </span>
                     </div>
                     <div className="flex items-center gap-2">
                       <Database className="h-4 w-4 text-muted-foreground" />
-                      <span className="font-medium">Use RAG:</span>
+                      <span className="font-medium">
+                        {tCreate('construct-use-rag')}
+                      </span>
                       <Badge
                         variant={
                           form.getValues('useRAG') ? 'default' : 'secondary'
                         }
                       >
-                        {form.getValues('useRAG') ? 'Enabled' : 'Disabled'}
+                        {form.getValues('useRAG')
+                          ? tCreate('construct-enabled')
+                          : tCreate('construct-disabled')}
                       </Badge>
                     </div>
                     <div className="flex items-start gap-2">
                       <StickyNote className="mt-0.5 h-4 w-4 text-muted-foreground" />
                       <div className="w-full">
-                        <span className="font-medium">Detail</span>
+                        <span className="font-medium">
+                          {tCreate('construct-detail')}
+                        </span>
                         <p className="mt-1 max-h-28 overflow-auto rounded bg-muted/40 p-2 text-xs whitespace-pre-line text-muted-foreground">
                           {form.getValues('detail') || '-'}
                         </p>

@@ -52,17 +52,19 @@ type StoredPersona = {
 
 // Subcomponents
 function BackToHistory() {
+  const t = useTranslations('detail');
   return (
     <Link href={'/history/guest'}>
       <Button variant={'outline'} className="border-primary">
         <ChevronLeft />
-        Back to history
+        {t('back-to-history')}
       </Button>
     </Link>
   );
 }
 
 function TopActions({ refresh }: { refresh: () => void }) {
+  const t = useTranslations('detail');
   const searchParams = useSearchParams();
   const router = useRouter();
   return (
@@ -73,7 +75,7 @@ function TopActions({ refresh }: { refresh: () => void }) {
         className="md:size-default text-green-500"
       >
         <Wifi className="size-4 md:size-5" />
-        <span className="hidden sm:inline">Online</span>
+        <span className="hidden sm:inline">{t('online')}</span>
       </Button>
       {!searchParams.get('free_edit') ? (
         <>
@@ -84,13 +86,13 @@ function TopActions({ refresh }: { refresh: () => void }) {
               className="md:size-default border-primary text-primary hover:bg-primary/10 hover:text-primary"
             >
               <Edit className="size-4 md:size-5" />
-              <span className="hidden sm:inline">Edit Result</span>
+              <span className="hidden sm:inline">{t('edit-result')}</span>
             </Button>
           </Link>
           <Link href={'/edit/guest'}>
             <Button size={'sm'} className="md:size-default">
               <Recycle className="size-4 md:size-5" />
-              <span className="hidden sm:inline">Regenerate</span>
+              <span className="hidden sm:inline">{t('regenerate')}</span>
             </Button>
           </Link>
           <DeleteConfirmationDialog />
@@ -103,7 +105,7 @@ function TopActions({ refresh }: { refresh: () => void }) {
             onClick={() => router.push(`?free_edit=true&save_edit=true`)}
           >
             <Save className="size-4 md:size-5" />
-            <span className="hidden sm:inline">Save</span>
+            <span className="hidden sm:inline">{t('save')}</span>
           </Button>
           <Button
             size={'sm'}
@@ -112,11 +114,11 @@ function TopActions({ refresh }: { refresh: () => void }) {
               router.push(`/detail/guest`);
               // ensure state reloads from localStorage
               setTimeout(() => refresh(), 0);
-              toast.success('Saved');
+              toast.success(t('saved'));
             }}
           >
             <Eye className="size-4 md:size-5" />
-            <span className="hidden sm:inline">View Mode</span>
+            <span className="hidden sm:inline">{t('view-mode')}</span>
           </Button>
         </>
       )}
@@ -131,6 +133,7 @@ function QuickInfoCard({
   createdAt?: Date;
   updatedAt?: Date;
 }) {
+  const t = useTranslations('detail');
   const created = createdAt
     ? new Date(createdAt).toLocaleString('EN-en', {
         weekday: 'long',
@@ -151,16 +154,20 @@ function QuickInfoCard({
     <Card className="w-full gap-2 border-foreground py-3 md:py-4">
       <CardHeader className="px-3 md:px-4">
         <CardTitle className="text-xl text-primary md:text-2xl">
-          Quick Info
+          {t('quick-info')}
         </CardTitle>
       </CardHeader>
       <CardContent className="px-3 md:px-4">
         <div className="mb-3 md:mb-4">
-          <h3 className="mb-2 text-sm font-medium md:text-base">Created</h3>
+          <h3 className="mb-2 text-sm font-medium md:text-base">
+            {t('created')}
+          </h3>
           <p className="text-sm md:text-base">{created}</p>
         </div>
         <div>
-          <h3 className="mb-2 text-sm font-medium md:text-base">Updated</h3>
+          <h3 className="mb-2 text-sm font-medium md:text-base">
+            {t('updated')}
+          </h3>
           <p className="text-sm md:text-base">{updated}</p>
         </div>
       </CardContent>
@@ -169,26 +176,27 @@ function QuickInfoCard({
 }
 
 function SharePersonaCard() {
+  const t = useTranslations('detail');
   return (
     <Card className="relative w-full py-3 md:py-4">
       <div className="absolute inset-0 z-1 flex items-center justify-center rounded-2xl backdrop-blur-xs">
         <p className="p-3 text-center text-xs md:p-4 md:text-sm">
-          You need to log in to access all Share Persona features.
+          {t('you-need-login-share')}
         </p>
       </div>
       <CardHeader className="px-3 md:px-4">
         <CardTitle className="text-xl text-primary md:text-2xl">
-          Share Persona
+          {t('share-persona')}
         </CardTitle>
         <CardDescription className="text-xs md:text-sm">
-          Make this persona publicly accessible
+          {t('share-persona-desc')}
         </CardDescription>
       </CardHeader>
       <CardContent className="px-3 md:px-4">
         <Label htmlFor="private" className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <LockKeyhole className="size-4 text-primary md:size-5" />{' '}
-            <span className="text-sm md:text-base">Private</span>
+            <span className="text-sm md:text-base">{t('private')}</span>
           </div>
           <Switch id="private" />
         </Label>
@@ -198,19 +206,20 @@ function SharePersonaCard() {
 }
 
 function DownloadPersonaCard() {
+  const t = useTranslations('detail');
   return (
     <Card className="relative w-full py-3 md:py-4">
       <div className="absolute inset-0 z-1 flex items-center justify-center rounded-2xl backdrop-blur-xs">
         <p className="p-3 text-center text-xs md:p-4 md:text-sm">
-          You need to log in to access all Share Persona features.
+          {t('you-need-login-share')}
         </p>
       </div>
       <CardHeader className="px-3 md:px-4">
         <CardTitle className="text-xl text-primary md:text-2xl">
-          Download Persona
+          {t('download-persona')}
         </CardTitle>
         <CardDescription className="text-xs md:text-sm">
-          Save persona in multiple formats
+          {t('download-persona-desc')}
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-2 px-3 md:px-4">
@@ -225,7 +234,7 @@ function DownloadPersonaCard() {
               <FileText className="size-4 text-primary md:size-5" />
             </ItemMedia>
             <ItemContent className="text-sm md:text-base">
-              Download as PDF
+              {t('download-as-pdf')}
             </ItemContent>
             <ItemActions>
               <ChevronRight className="size-4" />
@@ -243,7 +252,7 @@ function DownloadPersonaCard() {
               <FileJson className="size-4 text-primary md:size-5" />
             </ItemMedia>
             <ItemContent className="text-sm md:text-base">
-              Download as JSON
+              {t('download-as-json')}
             </ItemContent>
             <ItemActions>
               <ChevronRight className="size-4" />
@@ -333,32 +342,32 @@ export default function PersonaDetail() {
 }
 
 function DeleteConfirmationDialog() {
+  const t = useTranslations('detail');
   return (
     <AlertDialog>
       <AlertDialogTrigger asChild>
         <Button variant={'destructive'} size={'sm'} className="md:size-default">
           <Trash className="size-4 md:size-5" />
-          <span className="hidden sm:inline">Delete</span>
+          <span className="hidden sm:inline">{t('delete')}</span>
         </Button>
       </AlertDialogTrigger>
       <AlertDialogContent className="mx-4 max-w-md">
         <AlertDialogHeader>
           <AlertDialogTitle className="text-base md:text-lg">
-            Are you absolutely sure?
+            {t('delete-confirmation-title')}
           </AlertDialogTitle>
           <AlertDialogDescription className="text-sm md:text-base">
-            This action cannot be undone. This will permanently delete your
-            persona and remove your data from our servers.
+            {t('delete-confirmation-desc')}
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
-          <AlertDialogCancel>Cancel</AlertDialogCancel>
+          <AlertDialogCancel>{t('cancel')}</AlertDialogCancel>
           <AlertDialogAction
             onClick={() => {
               window.location.href = '/create';
             }}
           >
-            Continue
+            {t('continue')}
           </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>

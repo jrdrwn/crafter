@@ -1,12 +1,14 @@
 'use client';
 
 import { Plus } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 import Link from 'next/link';
 
 import { HeroSidesDecorator } from '../shared/hero-sides-decorator';
 import { Button } from '../ui/button';
 
 export default function Hero() {
+  const t = useTranslations('history');
   return (
     <section className="relative border-b border-dashed border-primary px-2 py-8 md:py-12 lg:py-16">
       <div className="container mx-auto flex flex-col justify-center lg:flex-row lg:justify-between">
@@ -23,21 +25,21 @@ export default function Hero() {
                 WebkitTextFillColor: 'transparent',
               }}
             >
-              Persona History
+              {t('hero-title')}
             </h1>
             <p className="max-w-3xl text-base text-muted-foreground sm:text-lg md:text-xl">
-              Manage all the personas you have created
+              {t('hero-desc')}
             </p>
           </div>
           <div className="w-full md:w-auto">
             <Link href="/create" className="block md:w-auto">
               <Button size={'lg'} className="hidden md:flex md:w-auto">
                 <Plus />
-                <span className="sm:inline">Create New Persona</span>
+                <span className="sm:inline">{t('create')}</span>
               </Button>
               <Button className="flex md:hidden md:w-auto">
                 <Plus />
-                <span className="sm:inline">Create New Persona</span>
+                <span className="sm:inline">{t('create')}</span>
               </Button>
             </Link>
           </div>

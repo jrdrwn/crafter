@@ -49,6 +49,7 @@ import {
   Upload,
   X,
 } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 import { useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { toast } from 'sonner';
@@ -65,6 +66,7 @@ const ContributionSchema = z.object({
   domain_key: z.string().optional().or(z.literal('')),
   language_key: z.enum(['en', 'id']).optional(),
   source: z.string().optional().or(z.literal('')),
+
   extra: z
     .string()
     .optional()
@@ -232,6 +234,7 @@ function DomainCombobox({
 }
 
 export default function Contrib() {
+  const t = useTranslations('contrib');
   const { user, loading } = useUser();
   const [submitting, setSubmitting] = useState(false);
   const [file, setFile] = useState<File | null>(null);
@@ -490,14 +493,8 @@ export default function Contrib() {
         <CardHeader className="border-b">
           <div className="flex flex-col items-start justify-between gap-4 sm:flex-row">
             <div>
-              <CardTitle className="text-lg sm:text-xl">
-                RAG Knowledge Management
-              </CardTitle>
-              <CardDescription className="text-sm">
-                Manage knowledge by uploading research, interviews, reviews, or
-                documents. Data will be chunked and indexed into the vector
-                store.
-              </CardDescription>
+              <CardTitle className="text-lg sm:text-xl">{t('title')}</CardTitle>
+              <CardDescription className="text-sm">{t('desc')}</CardDescription>
             </div>
           </div>
         </CardHeader>
@@ -505,9 +502,7 @@ export default function Contrib() {
           {!loading && !user ? (
             <div className="flex flex-col items-start gap-3 rounded-md border p-4 text-sm sm:flex-row sm:items-center">
               <AlertCircle className="size-4 shrink-0 text-amber-600" />
-              <p>
-                You are not signed in. Please login to upload contributions.
-              </p>
+              <p>{t('not-signed-in')}</p>
             </div>
           ) : null}
 
@@ -515,25 +510,27 @@ export default function Contrib() {
           <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
             <div className="flex items-center justify-between rounded-md border p-3">
               <div className="text-sm">
-                <p className="font-medium">Text input</p>
+                <p className="font-medium">{t('toggle.text.title')}</p>
                 <p className="text-xs text-muted-foreground">
-                  Write/Paste content manually
+                  {t('toggle.text.desc')}
                 </p>
               </div>
               <Switch checked={showText} onCheckedChange={setShowText} />
             </div>
             <div className="flex items-center justify-between rounded-md border p-3">
               <div className="text-sm">
-                <p className="font-medium">Upload file</p>
-                <p className="text-xs text-muted-foreground">TXT/DOCX/XLSX</p>
+                <p className="font-medium">{t('toggle.file.title')}</p>
+                <p className="text-xs text-muted-foreground">
+                  {t('toggle.file.desc')}
+                </p>
               </div>
               <Switch checked={showFile} onCheckedChange={setShowFile} />
             </div>
             <div className="flex items-center justify-between rounded-md border p-3 sm:col-span-2 lg:col-span-1">
               <div className="text-sm">
-                <p className="font-medium">Add metadata</p>
+                <p className="font-medium">{t('toggle.meta.title')}</p>
                 <p className="text-xs text-muted-foreground">
-                  Key-Value for context
+                  {t('toggle.meta.desc')}
                 </p>
               </div>
               <Switch checked={showMeta} onCheckedChange={setShowMeta} />
@@ -545,7 +542,7 @@ export default function Contrib() {
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
               <div className="space-y-2">
                 <Label htmlFor="type" className="flex items-center gap-2">
-                  <ClipboardList className="size-4" /> Content Type
+                  <ClipboardList className="size-4" /> {t('type.label')}
                 </Label>
                 <Controller
                   name="type"
@@ -557,13 +554,19 @@ export default function Contrib() {
                         aria-invalid={!!errors.type}
                         className="w-full"
                       >
-                        <SelectValue placeholder="Choose type" />
+                        <SelectValue placeholder={t('type.placeholder')} />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="survey">Survey</SelectItem>
-                        <SelectItem value="interview">Interview</SelectItem>
-                        <SelectItem value="review">Review</SelectItem>
-                        <SelectItem value="doc">Document</SelectItem>
+                        <SelectItem value="survey">
+                          {t('type.survey')}
+                        </SelectItem>
+                        <SelectItem value="interview">
+                          {t('type.interview')}
+                        </SelectItem>
+                        <SelectItem value="review">
+                          {t('type.review')}
+                        </SelectItem>
+                        <SelectItem value="doc">{t('type.doc')}</SelectItem>
                       </SelectContent>
                     </Select>
                   )}
@@ -577,7 +580,7 @@ export default function Contrib() {
 
               <div className="space-y-2">
                 <Label htmlFor="visibility" className="flex items-center gap-2">
-                  Visibility
+                  {t('visibility.label')}
                 </Label>
                 <Controller
                   name="visibility"
@@ -585,11 +588,17 @@ export default function Contrib() {
                   render={({ field }) => (
                     <Select onValueChange={field.onChange} value={field.value}>
                       <SelectTrigger id="visibility" className="w-full">
-                        <SelectValue placeholder="Select visibility" />
+                        <SelectValue
+                          placeholder={t('visibility.placeholder')}
+                        />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="public">Public</SelectItem>
-                        <SelectItem value="private">Private</SelectItem>
+                        <SelectItem value="public">
+                          {t('visibility.public')}
+                        </SelectItem>
+                        <SelectItem value="private">
+                          {t('visibility.private')}
+                        </SelectItem>
                       </SelectContent>
                     </Select>
                   )}
@@ -601,7 +610,7 @@ export default function Contrib() {
                   htmlFor="language_key"
                   className="flex items-center gap-2"
                 >
-                  <Languages className="size-4" /> Language
+                  <Languages className="size-4" /> {t('language.label')}
                 </Label>
                 <Controller
                   name="language_key"
@@ -609,11 +618,11 @@ export default function Contrib() {
                   render={({ field }) => (
                     <Select onValueChange={field.onChange} value={field.value}>
                       <SelectTrigger id="language_key" className="w-full">
-                        <SelectValue placeholder="Choose language" />
+                        <SelectValue placeholder={t('language.placeholder')} />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="en">English</SelectItem>
-                        <SelectItem value="id">Bahasa Indonesia</SelectItem>
+                        <SelectItem value="en">{t('language.en')}</SelectItem>
+                        <SelectItem value="id">{t('language.id')}</SelectItem>
                       </SelectContent>
                     </Select>
                   )}
@@ -624,7 +633,7 @@ export default function Contrib() {
             {/* Row 2: Domain | Source */}
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-6">
               <div className="space-y-2">
-                <Label htmlFor="domain_key">Domain (choose or create)</Label>
+                <Label htmlFor="domain_key">{t('domain.label')}</Label>
                 <Controller
                   name="domain_key"
                   control={control}
@@ -643,10 +652,10 @@ export default function Contrib() {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="source">Source (optional)</Label>
+                <Label htmlFor="source">{t('source.label')}</Label>
                 <Input
                   id="source"
-                  placeholder="e.g. Sprint 12 Research"
+                  placeholder={t('source.placeholder')}
                   {...register('source')}
                 />
               </div>
@@ -655,12 +664,12 @@ export default function Contrib() {
             {showText ? (
               <div className="space-y-2">
                 <Label htmlFor="text" className="flex items-center gap-2">
-                  <FileText className="size-4" /> Contribution Content
+                  <FileText className="size-4" /> {t('text.label')}
                 </Label>
                 <Textarea
                   id="text"
                   rows={10}
-                  placeholder="Paste raw text from survey/interview/review/document here..."
+                  placeholder={t('text.placeholder')}
                   aria-invalid={!!errors.text}
                   className="w-full"
                   {...register('text')}
@@ -675,16 +684,16 @@ export default function Contrib() {
 
             {showMeta ? (
               <div className="rounded-md border p-4">
-                <Label>Extra Metadata</Label>
+                <Label>{t('meta.label')}</Label>
                 <div className="mt-2 flex flex-col gap-2 sm:flex-row">
                   <Input
-                    placeholder="key (e.g. project)"
+                    placeholder={t('meta.key-placeholder')}
                     value={metaKey}
                     onChange={(e) => setMetaKey(e.target.value)}
                     className="w-full"
                   />
                   <Input
-                    placeholder="value (e.g. alpha)"
+                    placeholder={t('meta.value-placeholder')}
                     value={metaValue}
                     onChange={(e) => setMetaValue(e.target.value)}
                     className="w-full"
@@ -694,7 +703,7 @@ export default function Contrib() {
                     onClick={addMetaPair}
                     className="w-full sm:w-auto"
                   >
-                    Add
+                    {t('meta.add')}
                   </Button>
                 </div>
                 {Object.keys(metaObj).length ? (
@@ -714,14 +723,14 @@ export default function Contrib() {
                           onClick={() => removeMetaKey(k)}
                           className="w-full sm:w-auto"
                         >
-                          Remove
+                          {t('meta.remove')}
                         </Button>
                       </li>
                     ))}
                   </ul>
                 ) : (
                   <p className="mt-2 text-xs text-muted-foreground">
-                    No metadata added yet.
+                    {t('meta.empty')}
                   </p>
                 )}
               </div>
@@ -729,7 +738,7 @@ export default function Contrib() {
 
             {showFile ? (
               <div className="rounded-md border p-4">
-                <Label htmlFor="file">Upload file (.txt, .docx, .xlsx)</Label>
+                <Label htmlFor="file">{t('file.label')}</Label>
                 <div className="mt-2 flex items-center gap-3">
                   <Input
                     id="file"
@@ -741,7 +750,10 @@ export default function Contrib() {
                 </div>
                 {file ? (
                   <p className="mt-2 text-xs text-muted-foreground">
-                    Selected: {file.name} ({Math.ceil(file.size / 1024)} KB)
+                    {t('file.selected', {
+                      name: file.name,
+                      size: Math.ceil(file.size / 1024),
+                    })}
                   </p>
                 ) : null}
               </div>
@@ -752,8 +764,11 @@ export default function Contrib() {
                 <Database className="size-4 shrink-0" />
                 <span className="break-all">
                   {activeTokens > 0
-                    ? `Estimated ${activeTokens}/${TOKEN_LIMIT} tokens`
-                    : `Limit ${TOKEN_LIMIT} tokens`}
+                    ? t('tokens.count', {
+                        count: activeTokens,
+                        limit: TOKEN_LIMIT,
+                      })
+                    : t('tokens.limit', { limit: TOKEN_LIMIT })}
                 </span>
               </span>
               <Button
@@ -762,9 +777,9 @@ export default function Contrib() {
                 aria-disabled={submitting || loading || !user || !canSubmit}
                 title={
                   activeTokens > TOKEN_LIMIT
-                    ? 'Exceeds token limit'
+                    ? t('tokens.exceeds')
                     : !((showText && hasText) || (showFile && !!file))
-                      ? 'Provide text or choose a file first'
+                      ? t('submit.disabled')
                       : undefined
                 }
                 className="w-full sm:w-auto"
@@ -774,7 +789,7 @@ export default function Contrib() {
                 ) : (
                   <Upload className="mr-2 size-4" />
                 )}
-                Upload to RAG
+                {t('submit.label')}
               </Button>
             </div>
           </form>

@@ -17,6 +17,7 @@ import {
 import { useUser } from '@/contexts/user-context';
 import { cn } from '@/lib/utils';
 import { LogOut, Menu } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 
@@ -34,9 +35,10 @@ import ChangeLanguage from './change-language';
 import { ThemeToggle } from './theme-toggle';
 
 export default function Header() {
+  const t = useTranslations('shared.header');
   const baseMenus = [
-    { title: 'Home', href: '/' },
-    { title: 'Create', href: '/create' },
+    { title: t('home'), href: '/' },
+    { title: t('create'), href: '/create' },
   ];
 
   const pathname = usePathname();
@@ -45,9 +47,9 @@ export default function Header() {
   const menus = user
     ? [
         ...baseMenus,
-        { title: 'Explore', href: '/explore' },
-        { title: 'History', href: '/history' },
-        { title: 'Knowledge Base', href: '/knowledge-base' },
+        { title: t('explore'), href: '/explore' },
+        { title: t('history'), href: '/history' },
+        { title: t('knowledge-base'), href: '/knowledge-base' },
       ]
     : baseMenus;
 

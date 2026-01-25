@@ -1,5 +1,6 @@
 'use client';
 
+import { useTranslations } from 'next-intl';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
 
@@ -24,6 +25,7 @@ export default function PersonaItems() {
   } | null;
 
   const [persona, setPersona] = useState<GuestPersonaStorage>(null);
+  const t = useTranslations('history');
   useEffect(() => {
     const STORAGE_KEY = 'crafter:personas';
     const data = JSON.parse(localStorage.getItem(STORAGE_KEY) || 'null');
@@ -34,14 +36,14 @@ export default function PersonaItems() {
       <div className="container mx-auto">
         {!persona && (
           <p className="text-center text-sm text-muted-foreground md:text-base">
-            No personas found. Create your first persona!
+            {t('empty')}
           </p>
         )}
         <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2 md:gap-6 lg:grid-cols-3 lg:gap-8">
           {persona && (
             <Link href={'/detail/guest'}>
               <PersonaCard
-                name={persona?.response?.result?.full_name ?? 'Unknown Persona'}
+                name={persona?.response?.result?.full_name ?? t('unknown')}
                 quote={persona?.response?.result?.quote}
                 tag={persona?.response?.taxonomy?.domain?.label}
                 date={

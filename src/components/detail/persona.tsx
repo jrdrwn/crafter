@@ -5,6 +5,7 @@ import { cn } from '@/lib/utils';
 import { getCookie } from 'cookies-next/client';
 import parse from 'html-react-parser';
 import { Blend, List, Pencil, Text, User } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 import Image from 'next/image';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
@@ -50,6 +51,7 @@ function PersonaHeader({
   imageUrl: string;
   setImageUrl: (url: string) => void;
 }) {
+  const t = useTranslations('detail');
   const searchParams = useSearchParams();
   const [uploading, setUploading] = useState(false);
 
@@ -68,18 +70,18 @@ function PersonaHeader({
         body: formData,
       });
       if (!res.ok) {
-        toast.error('Image upload failed');
+        toast.error(t('image-upload-failed'));
         return;
       }
       const data = await res.json();
       if (data.status && data.url) {
         setImageUrl(data.url);
-        toast.success('Image uploaded!');
+        toast.success(t('image-uploaded'));
       } else {
-        toast.error(data.message || 'Upload failed');
+        toast.error(data.message || t('upload-failed'));
       }
     } catch (err: any) {
-      toast.error(err.message || 'Upload failed');
+      toast.error(err.message || t('upload-failed'));
     } finally {
       setUploading(false);
     }
@@ -99,12 +101,12 @@ function PersonaHeader({
                     {uploading ? (
                       <Button size="sm" variant="outline" disabled>
                         <Spinner />
-                        Uploading...
+                        {t('uploading')}
                       </Button>
                     ) : (
                       <Button size="sm" variant="outline">
                         <Pencil />
-                        Edit
+                        {t('edit')}
                       </Button>
                     )}
                   </DropdownMenuTrigger>
@@ -114,14 +116,14 @@ function PersonaHeader({
                         htmlFor="persona-upload-input"
                         className="w-full cursor-pointer"
                       >
-                        Upload (max 2MB)
+                        {t('upload-max-size')}
                       </label>
                     </DropdownMenuItem>
                     <DropdownMenuItem
                       onClick={() => setImageUrl('')}
                       variant="destructive"
                     >
-                      Remove
+                      {t('remove')}
                     </DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>
@@ -170,7 +172,7 @@ function PersonaHeader({
             </span>
           )}
           <p className="text-xl font-bold text-primary md:text-2xl">
-            {markdown?.result?.full_name ?? 'Persona Name'}
+            {markdown?.result?.full_name ?? t('persona-name-fallback')}
           </p>
           <p className="text-center text-base text-gray-500 italic md:text-lg dark:text-gray-300">
             {markdown?.result?.quote ?? '—'}
@@ -197,12 +199,13 @@ function PersonaStyleSelector({
   personaStyle: PersonaStyle;
   setPersonaStyle: (style: PersonaStyle) => void;
 }) {
+  const t = useTranslations('detail');
   return (
     <Card className="w-full border-primary bg-primary/5 py-3 md:py-4">
       <CardContent className="px-3 md:px-4">
         <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
           <h2 className="px-0 text-base font-bold text-primary md:text-xl">
-            Select Naration & Structure
+            {t('select-narration-structure')}
           </h2>
           <div className="flex flex-wrap items-center justify-start gap-2 md:justify-center md:gap-4">
             <Button
@@ -217,7 +220,7 @@ function PersonaStyleSelector({
               onClick={() => setPersonaStyle('mixed')}
             >
               <Text className="size-4" />
-              <span className="text-xs sm:text-sm">Mixed</span>
+              <span className="text-xs sm:text-sm">{t('mixed')}</span>
             </Button>
             <Button
               variant={'outline'}
@@ -231,7 +234,7 @@ function PersonaStyleSelector({
               onClick={() => setPersonaStyle('bullets')}
             >
               <List className="size-4" />
-              <span className="text-xs sm:text-sm">Bullets</span>
+              <span className="text-xs sm:text-sm">{t('bullets')}</span>
             </Button>
             <Button
               variant={'outline'}
@@ -245,7 +248,7 @@ function PersonaStyleSelector({
               onClick={() => setPersonaStyle('narative')}
             >
               <Blend className="size-4" />
-              <span className="text-xs sm:text-sm">Narrative</span>
+              <span className="text-xs sm:text-sm">{t('narrative')}</span>
             </Button>
           </div>
         </div>
@@ -262,6 +265,7 @@ function PersonaContent({
   personaStyle: PersonaStyle;
   markdown?: PersonaMarkdown;
 }) {
+  const t = useTranslations('detail');
   if (!markdown) return null;
   let content = '';
   if (personaStyle === 'mixed') content = markdown.result.mixed || '';
@@ -283,7 +287,7 @@ function PersonaContent({
         {personaStyle === 'narative' && parse(markdown.result.narative)}
       </div>
       <div className="px-3 pb-2 text-right text-xs text-muted-foreground md:px-4">
-        Word count: <span className="font-semibold">{wordCount}</span>
+        {t('word-count')} <span className="font-semibold">{wordCount}</span>
       </div>
     </Card>
   );
@@ -297,6 +301,7 @@ function PersonaContentEdit({
   markdown?: any;
   imageUrl: string;
 }) {
+  const t = useTranslations('detail');
   const token = getCookie('token');
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -327,9 +332,9 @@ function PersonaContentEdit({
     });
 
     if (res.ok) {
-      toast.success('Persona content updated successfully!');
+      toast.success(t('persona-content-updated'));
     } else {
-      toast.error('Failed to update persona content.');
+      toast.error(t('failed-update-persona-content'));
     }
     router.push(`?free_edit=true`);
   }

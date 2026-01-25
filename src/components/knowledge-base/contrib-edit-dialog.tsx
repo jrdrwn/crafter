@@ -22,6 +22,7 @@ import {
 import { Textarea } from '@/components/ui/textarea';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Loader2 } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 import { useEffect, useMemo, useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { toast } from 'sonner';
@@ -51,6 +52,7 @@ export function ContribEditDialog({
   onSavedAction: () => void;
   token: string;
 }) {
+  const t = useTranslations('contrib.edit');
   const [loading, setLoading] = useState(false);
   const [initializing, setInitializing] = useState(false);
 
@@ -203,35 +205,39 @@ export function ContribEditDialog({
     <Dialog open={open} onOpenChange={onOpenChangeAction}>
       <DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-2xl">
         <DialogHeader>
-          <DialogTitle>Edit Contribution</DialogTitle>
-          <DialogDescription>
-            Update content and metadata. The system will re-index embeddings.
-          </DialogDescription>
+          <DialogTitle>{t('title')}</DialogTitle>
+          <DialogDescription>{t('desc')}</DialogDescription>
         </DialogHeader>
 
         {initializing ? (
           <div className="flex items-center gap-2 py-8 text-sm text-muted-foreground">
-            <Loader2 className="size-4 animate-spin" /> Loading...
+            <Loader2 className="size-4 animate-spin" /> {t('loading')}
           </div>
         ) : (
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
             {/* Row 1: Content Type | Visibility | Language */}
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
               <div className="space-y-2">
-                <Label htmlFor="type">Type</Label>
+                <Label htmlFor="type">{t('type.label')}</Label>
                 <Controller
                   name="type"
                   control={control}
                   render={({ field }) => (
                     <Select onValueChange={field.onChange} value={field.value}>
                       <SelectTrigger id="type" className="w-full">
-                        <SelectValue placeholder="Select type" />
+                        <SelectValue placeholder={t('type.placeholder')} />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="survey">Survey</SelectItem>
-                        <SelectItem value="interview">Interview</SelectItem>
-                        <SelectItem value="review">Review</SelectItem>
-                        <SelectItem value="doc">Document</SelectItem>
+                        <SelectItem value="survey">
+                          {t('type.survey')}
+                        </SelectItem>
+                        <SelectItem value="interview">
+                          {t('type.interview')}
+                        </SelectItem>
+                        <SelectItem value="review">
+                          {t('type.review')}
+                        </SelectItem>
+                        <SelectItem value="doc">{t('type.doc')}</SelectItem>
                       </SelectContent>
                     </Select>
                   )}
@@ -239,18 +245,24 @@ export function ContribEditDialog({
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="visibility">Visibility</Label>
+                <Label htmlFor="visibility">{t('visibility.label')}</Label>
                 <Controller
                   name="visibility"
                   control={control}
                   render={({ field }) => (
                     <Select onValueChange={field.onChange} value={field.value}>
                       <SelectTrigger id="visibility" className="w-full">
-                        <SelectValue placeholder="Select visibility" />
+                        <SelectValue
+                          placeholder={t('visibility.placeholder')}
+                        />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="public">Public</SelectItem>
-                        <SelectItem value="private">Private</SelectItem>
+                        <SelectItem value="public">
+                          {t('visibility.public')}
+                        </SelectItem>
+                        <SelectItem value="private">
+                          {t('visibility.private')}
+                        </SelectItem>
                       </SelectContent>
                     </Select>
                   )}
@@ -258,18 +270,18 @@ export function ContribEditDialog({
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="language_key">Language</Label>
+                <Label htmlFor="language_key">{t('language.label')}</Label>
                 <Controller
                   name="language_key"
                   control={control}
                   render={({ field }) => (
                     <Select onValueChange={field.onChange} value={field.value}>
                       <SelectTrigger id="language_key" className="w-full">
-                        <SelectValue placeholder="Select language" />
+                        <SelectValue placeholder={t('language.placeholder')} />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="en">English</SelectItem>
-                        <SelectItem value="id">Bahasa Indonesia</SelectItem>
+                        <SelectItem value="en">{t('language.en')}</SelectItem>
+                        <SelectItem value="id">{t('language.id')}</SelectItem>
                       </SelectContent>
                     </Select>
                   )}
@@ -280,7 +292,7 @@ export function ContribEditDialog({
             {/* Row 2: Domain | Source */}
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               <div className="space-y-2">
-                <Label htmlFor="domain_key">Domain</Label>
+                <Label htmlFor="domain_key">{t('domain.label')}</Label>
                 <Controller
                   name="domain_key"
                   control={control}
@@ -298,17 +310,17 @@ export function ContribEditDialog({
                 )}
               </div>
               <div className="space-y-2">
-                <Label htmlFor="source">Source</Label>
+                <Label htmlFor="source">{t('source.label')}</Label>
                 <Input
                   id="source"
-                  placeholder="optional"
+                  placeholder={t('source.placeholder')}
                   {...register('source')}
                 />
               </div>
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="text">Content</Label>
+              <Label htmlFor="text">{t('text.label')}</Label>
               <Textarea
                 id="text"
                 rows={8}
@@ -321,22 +333,23 @@ export function ContribEditDialog({
                 </p>
               )}
               <p className="text-xs text-muted-foreground">
-                {charCount} chars • ~{approxTokens} tokens
+                {charCount} {t('text.chars')} • ~{approxTokens}{' '}
+                {t('text.tokens')}
               </p>
             </div>
 
             {/* Metadata builder */}
             <div className="rounded-md border p-4">
-              <Label>Extra Metadata</Label>
+              <Label>{t('meta.label')}</Label>
               <div className="mt-2 flex flex-col gap-2 sm:flex-row">
                 <Input
-                  placeholder="key (e.g. project)"
+                  placeholder={t('meta.key-placeholder')}
                   value={metaKey}
                   onChange={(e) => setMetaKey(e.target.value)}
                   className="w-full"
                 />
                 <Input
-                  placeholder="value (e.g. alpha)"
+                  placeholder={t('meta.value-placeholder')}
                   value={metaValue}
                   onChange={(e) => setMetaValue(e.target.value)}
                   className="w-full"
@@ -346,7 +359,7 @@ export function ContribEditDialog({
                   onClick={addMetaPair}
                   className="w-full sm:w-auto"
                 >
-                  Add
+                  {t('meta.add')}
                 </Button>
               </div>
               {Object.keys(metaObj).length ? (
@@ -366,14 +379,14 @@ export function ContribEditDialog({
                         onClick={() => removeMetaKey(k)}
                         className="w-full sm:w-auto"
                       >
-                        Remove
+                        {t('meta.remove')}
                       </Button>
                     </li>
                   ))}
                 </ul>
               ) : (
                 <p className="mt-2 text-xs text-muted-foreground">
-                  No metadata added yet.
+                  {t('meta.empty')}
                 </p>
               )}
             </div>
@@ -385,7 +398,7 @@ export function ContribEditDialog({
                 onClick={() => onOpenChangeAction(false)}
                 className="w-full sm:w-auto"
               >
-                Cancel
+                {t('cancel')}
               </Button>
               <Button
                 type="submit"
@@ -395,7 +408,7 @@ export function ContribEditDialog({
                 {loading ? (
                   <Loader2 className="mr-2 size-4 animate-spin" />
                 ) : null}
-                Save
+                {t('save')}
               </Button>
             </DialogFooter>
           </form>

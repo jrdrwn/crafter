@@ -2,6 +2,7 @@
 
 import { cn } from '@/lib/utils';
 import { SearchIcon } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 
 import {
   InputGroup,
@@ -26,7 +27,6 @@ interface PersonasToolbarProps {
 }
 
 export function PersonasToolbar({
-  placeholder = 'Search persona or tag...',
   className,
   searchValue,
   onSearchChangeAction,
@@ -35,6 +35,7 @@ export function PersonasToolbar({
   orderValue,
   onOrderChangeAction,
 }: PersonasToolbarProps) {
+  const t = useTranslations();
   return (
     <div
       className={cn(
@@ -46,7 +47,7 @@ export function PersonasToolbar({
         <InputGroup className="border-primary md:min-w-xs">
           <InputGroupInput
             type="search"
-            placeholder={placeholder}
+            placeholder={t('explore.persona-search-placeholder')}
             value={searchValue}
             onChange={(e) => onSearchChangeAction(e.target.value)}
           />

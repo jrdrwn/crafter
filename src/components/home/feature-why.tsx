@@ -1,9 +1,11 @@
 import { Brain, Group, Target } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 
 import Brand from '../shared/brand';
 import { Card, CardContent } from '../ui/card';
 
 export default function FeatureWhy() {
+  const t = useTranslations('home.featureWhy');
   return (
     <section className="relative border-b border-dashed border-primary py-8 md:py-12 lg:py-14">
       <div className="container mx-auto px-4 md:px-6 lg:px-8">
@@ -13,13 +15,9 @@ export default function FeatureWhy() {
         </div>
         <div className="text-center">
           <h2 className="mb-3 text-2xl font-bold tracking-wide text-primary sm:text-3xl md:mb-4 md:text-4xl">
-            Why CRAFTER 2.0?
+            {t('title')}
           </h2>
-          <p className="mx-auto max-w-md text-base md:text-lg">
-            A complete solution for creating{' '}
-            <span className="font-medium">high-quality personas</span> with
-            cutting-edge AI technology.
-          </p>
+          <p className="mx-auto max-w-md text-base md:text-lg">{t('desc')}</p>
         </div>
         <div className="mt-8 grid grid-cols-1 gap-4 px-4 sm:grid-cols-2 md:mt-12 md:gap-6 lg:grid-cols-3 lg:gap-8 lg:px-16">
           <Card className="w-full border-primary bg-primary/5">
@@ -39,12 +37,9 @@ export default function FeatureWhy() {
                 />
               </span>
               <h3 className="mt-3 mb-2 text-lg font-bold text-primary md:mt-4 md:text-xl">
-                AI-Powered Generation
+                {t('ai.title')}
               </h3>
-              <p className="text-xs md:text-sm">
-                Leverage advanced AI to generate accurate and comprehensive user
-                personas.
-              </p>
+              <p className="text-xs md:text-sm">{t('ai.desc')}</p>
             </CardContent>
           </Card>
           <Card className="w-full border-none bg-primary/5 shadow-none">
@@ -64,12 +59,9 @@ export default function FeatureWhy() {
                 />
               </span>
               <h3 className="mt-3 mb-2 text-lg font-bold text-primary md:mt-4 md:text-xl">
-                Taxonomy-Based
+                {t('taxonomy.title')}
               </h3>
-              <p className="text-xs md:text-sm">
-                A structured taxonomy-driven system that ensures consistent and
-                reliable results.
-              </p>
+              <p className="text-xs md:text-sm">{t('taxonomy.desc')}</p>
             </CardContent>
           </Card>
           <Card className="w-full border-none bg-primary/5 shadow-none sm:col-span-2 lg:col-span-1">
@@ -89,12 +81,9 @@ export default function FeatureWhy() {
                 />
               </span>
               <h3 className="mt-3 mb-2 text-lg font-bold text-primary md:mt-4 md:text-xl">
-                Multi-Domain Support
+                {t('multi.title')}
               </h3>
-              <p className="text-xs md:text-sm">
-                Adaptable across diverse domains, from healthcare and education
-                to technology
-              </p>
+              <p className="text-xs md:text-sm">{t('multi.desc')}</p>
             </CardContent>
           </Card>
         </div>

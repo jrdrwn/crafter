@@ -17,6 +17,7 @@ import {
   Trash,
   Wifi,
 } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
@@ -74,11 +75,12 @@ interface PersonaAPIResponse {
 
 // Subcomponents
 function BackToHistory() {
+  const t = useTranslations('detail');
   return (
     <Link href={'/history'}>
       <Button variant={'outline'} className="border-primary">
         <ChevronLeft />
-        Back to history
+        {t('back-to-history')}
       </Button>
     </Link>
   );
@@ -91,6 +93,7 @@ function TopActions({
   persona: any;
   fetchPersona: (id: string) => void;
 }) {
+  const t = useTranslations('detail');
   const { user } = useUser();
   const searchParams = useSearchParams();
 
@@ -107,12 +110,12 @@ function TopActions({
         },
       });
       if (res.ok) {
-        toast.success('Persona copied successfully!');
+        toast.success(t('persona-copied-successfully'));
         router.push('/history');
       }
     } catch (error) {
-      toast.error('Error copying persona:', {
-        description: (error as any)?.message || 'Please try again later.',
+      toast.error(t('error-copying-persona'), {
+        description: (error as any)?.message || t('please-try-again-later'),
       });
     }
   }
@@ -124,7 +127,7 @@ function TopActions({
         className="md:size-default text-green-500"
       >
         <Wifi className="size-4 md:size-5" />
-        <span className="hidden sm:inline">Online</span>
+        <span className="hidden sm:inline">{t('online')}</span>
       </Button>
       {user && persona.user.id === user.id && (
         <>
@@ -136,7 +139,7 @@ function TopActions({
                 className="md:size-default border-primary text-primary hover:bg-primary/10 hover:text-primary"
               >
                 <Edit className="size-4 md:size-5" />
-                <span className="hidden sm:inline">Edit Result</span>
+                <span className="hidden sm:inline">{t('edit-result')}</span>
               </Button>
             </Link>
           ) : (
@@ -146,7 +149,7 @@ function TopActions({
                 onClick={() => router.push(`?free_edit=true&save_edit=true`)}
               >
                 <Save className="size-4 md:size-5" />
-                <span className="hidden sm:inline">Save</span>
+                <span className="hidden sm:inline">{t('save')}</span>
               </Button>
               <Button
                 size={'sm'}
@@ -157,7 +160,7 @@ function TopActions({
                 }}
               >
                 <Eye className="size-4 md:size-5" />
-                <span className="hidden sm:inline">View Mode</span>
+                <span className="hidden sm:inline">{t('view-mode')}</span>
               </Button>
             </>
           )}
@@ -166,7 +169,7 @@ function TopActions({
               <Link href={`/edit/${persona.id}`}>
                 <Button size={'sm'} className="md:size-default">
                   <Recycle className="size-4 md:size-5" />
-                  <span className="hidden sm:inline">Regenerate</span>
+                  <span className="hidden sm:inline">{t('regenerate')}</span>
                 </Button>
               </Link>
 
@@ -182,7 +185,7 @@ function TopActions({
           onClick={copyThisPersona}
         >
           <Copy className="size-4 md:size-5" />
-          <span className="hidden sm:inline">Copy this Persona</span>
+          <span className="hidden sm:inline">{t('copy-this-persona')}</span>
         </Button>
       )}
     </div>
@@ -190,21 +193,26 @@ function TopActions({
 }
 
 function AuthorCard({ user }: { user: { name: string; email: string } }) {
+  const t = useTranslations('detail');
   return (
     <Card className="w-full gap-2 border-foreground py-3 md:py-4">
       <CardHeader className="px-3 md:px-4">
         <CardTitle className="text-xl text-primary md:text-2xl">
-          Author
+          {t('author')}
         </CardTitle>
       </CardHeader>
       <CardContent className="px-3 md:px-4">
         <div>
           <div>
-            <h3 className="mb-2 text-sm font-medium md:text-base">Name</h3>
+            <h3 className="mb-2 text-sm font-medium md:text-base">
+              {t('name')}
+            </h3>
             <p className="text-sm md:text-base">{user.name}</p>
           </div>
           <div className="mt-3 md:mt-4">
-            <h3 className="mb-2 text-sm font-medium md:text-base">Email</h3>
+            <h3 className="mb-2 text-sm font-medium md:text-base">
+              {t('email')}
+            </h3>
             <p className="text-sm md:text-base">{user.email}</p>
           </div>
         </div>
@@ -220,6 +228,7 @@ function QuickInfoCard({
   createdAt?: Date;
   updatedAt?: Date;
 }) {
+  const t = useTranslations('detail');
   const created = createdAt
     ? new Date(createdAt).toLocaleString('EN-en', {
         weekday: 'long',
@@ -240,16 +249,20 @@ function QuickInfoCard({
     <Card className="w-full gap-2 border-foreground py-3 md:py-4">
       <CardHeader className="px-3 md:px-4">
         <CardTitle className="text-xl text-primary md:text-2xl">
-          Quick Info
+          {t('quick-info')}
         </CardTitle>
       </CardHeader>
       <CardContent className="px-3 md:px-4">
         <div className="mb-3 md:mb-4">
-          <h3 className="mb-2 text-sm font-medium md:text-base">Created</h3>
+          <h3 className="mb-2 text-sm font-medium md:text-base">
+            {t('created')}
+          </h3>
           <p className="text-sm md:text-base">{created}</p>
         </div>
         <div>
-          <h3 className="mb-2 text-sm font-medium md:text-base">Updated</h3>
+          <h3 className="mb-2 text-sm font-medium md:text-base">
+            {t('updated')}
+          </h3>
           <p className="text-sm md:text-base">{updated}</p>
         </div>
       </CardContent>
@@ -264,6 +277,7 @@ function SharePersonaCard({
   persona?: any;
   _visibility?: 'private' | 'public';
 }) {
+  const t = useTranslations('detail');
   const token = getCookie('token');
   const [visibility, setVisibility] = useState<'private' | 'public'>(
     _visibility || 'private',
@@ -286,8 +300,8 @@ function SharePersonaCard({
         setVisibility(newVisibility ? 'public' : 'private');
       }
     } catch (error) {
-      toast.error('Error updating visibility:', {
-        description: (error as any)?.message || 'Please try again later.',
+      toast.error(t('error-updating-visibility'), {
+        description: (error as any)?.message || t('please-try-again-later'),
       });
     }
   }
@@ -296,10 +310,10 @@ function SharePersonaCard({
     <Card className="w-full border-foreground py-3 md:py-4">
       <CardHeader className="px-3 md:px-4">
         <CardTitle className="text-xl text-primary md:text-2xl">
-          Share Persona
+          {t('share-persona')}
         </CardTitle>
         <CardDescription className="text-xs md:text-sm">
-          Make this persona publicly accessible
+          {t('share-persona-desc')}
         </CardDescription>
       </CardHeader>
       <CardContent className="px-3 md:px-4">
@@ -310,7 +324,7 @@ function SharePersonaCard({
           <div className="flex items-center gap-2">
             <LockKeyhole className="size-4 text-primary md:size-5" />{' '}
             <span className="text-sm md:text-base">
-              {visibility === 'private' ? 'Private' : 'Public'}
+              {visibility === 'private' ? t('private') : t('public')}
             </span>
           </div>
           <Switch
@@ -325,6 +339,7 @@ function SharePersonaCard({
 }
 
 function DownloadPersonaCard({ persona }: { persona?: any }) {
+  const t = useTranslations('detail');
   const handleDownloadJSON = () => {
     if (!persona?.id) return;
     const dataStr = JSON.stringify(persona, null, 2);
@@ -496,19 +511,19 @@ function DownloadPersonaCard({ persona }: { persona?: any }) {
     y += 10;
     y = addSection(
       doc,
-      'Mixed Structure',
+      t('mixed-structure'),
       htmlToPlainText(persona.result.mixed),
       y,
     );
     y = addSection(
       doc,
-      'Bullets Structure',
+      t('bullets-structure'),
       htmlToPlainText(persona.result.bullets),
       y,
     );
     y = addSection(
       doc,
-      'Narrative Structure',
+      t('narrative-structure'),
       htmlToPlainText(persona.result.narative),
       y,
     );
@@ -518,10 +533,10 @@ function DownloadPersonaCard({ persona }: { persona?: any }) {
     <Card className="w-full border-foreground py-3 md:py-4">
       <CardHeader className="px-3 md:px-4">
         <CardTitle className="text-xl text-primary md:text-2xl">
-          Download Persona
+          {t('download-persona')}
         </CardTitle>
         <CardDescription className="text-xs md:text-sm">
-          Save persona in multiple formats
+          {t('download-persona-desc')}
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-2 px-3 md:px-4">
@@ -537,7 +552,7 @@ function DownloadPersonaCard({ persona }: { persona?: any }) {
             <FileText className="size-4 text-primary md:size-5" />
           </ItemMedia>
           <ItemContent className="text-sm md:text-base">
-            Download as PDF (Full)
+            {t('download-as-pdf-full')}
           </ItemContent>
           <ItemActions>
             <ChevronRight className="size-4" />
@@ -555,7 +570,7 @@ function DownloadPersonaCard({ persona }: { persona?: any }) {
             <FileJson className="size-4 text-primary md:size-5" />
           </ItemMedia>
           <ItemContent className="text-sm md:text-base">
-            Download as JSON (Raw)
+            {t('download-as-json-raw')}
           </ItemContent>
           <ItemActions>
             <ChevronRight className="size-4" />
@@ -595,6 +610,7 @@ function PersonaDetailSkeleton() {
 }
 
 export default function PersonaDetail({ personaId }: { personaId: string }) {
+  const t = useTranslations('detail');
   const { user } = useUser();
   const _cookies = getCookie('token');
   const [persona, setPersona] = useState<PersonaAPIResponse['data'] | null>(
@@ -613,8 +629,8 @@ export default function PersonaDetail({ personaId }: { personaId: string }) {
         setPersona(data.data);
       }
     } catch (error) {
-      toast.error('Error fetching persona', {
-        description: (error as any)?.message || 'Please try again later.',
+      toast.error(t('error-fetching-persona'), {
+        description: (error as any)?.message || t('please-try-again-later'),
       });
     }
   }
@@ -668,6 +684,7 @@ export default function PersonaDetail({ personaId }: { personaId: string }) {
 }
 
 function DeleteConfirmationDialog({ personaId }: { personaId?: string }) {
+  const t = useTranslations('detail');
   const router = useRouter();
   async function deletePersona() {
     if (!personaId) return;
@@ -683,8 +700,8 @@ function DeleteConfirmationDialog({ personaId }: { personaId?: string }) {
         router.push('/history');
       }
     } catch (error) {
-      toast.error('Error deleting persona', {
-        description: (error as any)?.message || 'Please try again later.',
+      toast.error(t('error-deleting-persona'), {
+        description: (error as any)?.message || t('please-try-again-later'),
       });
     }
   }
@@ -693,23 +710,22 @@ function DeleteConfirmationDialog({ personaId }: { personaId?: string }) {
       <AlertDialogTrigger asChild>
         <Button variant={'destructive'} size={'sm'} className="md:size-default">
           <Trash className="size-4 md:size-5" />
-          <span className="hidden sm:inline">Delete</span>
+          <span className="hidden sm:inline">{t('delete')}</span>
         </Button>
       </AlertDialogTrigger>
       <AlertDialogContent className="max-w-md">
         <AlertDialogHeader>
           <AlertDialogTitle className="text-base md:text-lg">
-            Are you absolutely sure?
+            {t('delete-confirmation-title')}
           </AlertDialogTitle>
           <AlertDialogDescription className="text-sm md:text-base">
-            This action cannot be undone. This will permanently delete your
-            persona and remove your data from our servers.
+            {t('delete-confirmation-desc')}
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
-          <AlertDialogCancel>Cancel</AlertDialogCancel>
+          <AlertDialogCancel>{t('cancel')}</AlertDialogCancel>
           <AlertDialogAction onClick={deletePersona}>
-            Continue
+            {t('continue')}
           </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>

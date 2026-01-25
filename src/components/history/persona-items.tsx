@@ -2,6 +2,7 @@
 'use client';
 
 import { getCookie } from 'cookies-next/client';
+import { useTranslations } from 'next-intl';
 import Link from 'next/link';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { useEffect, useMemo, useState } from 'react';
@@ -26,6 +27,7 @@ export default function PersonaItems() {
   const searchParams = useSearchParams();
   const pathname = usePathname();
   const router = useRouter();
+  const t = useTranslations('history');
 
   const [personas, setPersonas] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
@@ -79,7 +81,7 @@ export default function PersonaItems() {
       setPersonas(data.data || []);
       setTotal(data.total || 0);
     } catch (_e) {
-      setError('Gagal memuat data.');
+      setError(t('error'));
     } finally {
       setLoading(false);
     }
@@ -176,7 +178,7 @@ export default function PersonaItems() {
           <div className="mt-6 flex flex-col items-center justify-center gap-3">
             <p className="text-sm text-destructive">{error}</p>
             <Button variant="outline" onClick={() => fetchPersonas()}>
-              Refresh
+              {t('refresh')}
             </Button>
           </div>
         )}
@@ -189,7 +191,7 @@ export default function PersonaItems() {
 
           {!loading && !error && personas.length === 0 && (
             <p className="col-span-full text-center text-sm text-muted-foreground md:text-base">
-              No personas found.
+              {t('empty')}
             </p>
           )}
           {!loading &&

@@ -4,6 +4,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { ErrorMessageButtonRetry } from '@/helpers/error-retry';
 import { attribute } from '@prisma/client';
 import { Brain, RotateCcw, Users, X } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { Control, Controller } from 'react-hook-form';
 
@@ -39,6 +40,7 @@ type Props = {
 };
 
 export default function InternalFactorsCard({ control }: Props) {
+  const t = useTranslations('create');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [factors, setFactors] = useState<attribute[]>([]);
@@ -127,11 +129,10 @@ export default function InternalFactorsCard({ control }: Props) {
             size={16}
             className="text-foreground sm:size-[18px] md:size-5"
           />
-          Human Factors — Internal Layer
+          {t('internal-title')}
         </CardTitle>
         <CardDescription className="text-xs text-gray-400 sm:text-sm">
-          Select available internal factors. Edit the description as a list of
-          items.
+          {t('internal-desc')}
         </CardDescription>
       </CardHeader>
       <CardContent className="px-1.5 sm:px-2">
@@ -146,10 +147,10 @@ export default function InternalFactorsCard({ control }: Props) {
             <div className="flex items-center gap-2">
               <Input
                 type="search"
-                placeholder="Search..."
+                placeholder={t('internal-search-placeholder')}
                 className="flex-1 border-primary text-sm"
                 onChange={(e) => setQuery(e.target.value)}
-                aria-label="Search layer attributes"
+                aria-label={t('internal-search-aria')}
               />
               <Controller
                 name="internal"
@@ -161,26 +162,28 @@ export default function InternalFactorsCard({ control }: Props) {
                         type="button"
                         size="sm"
                         variant="outline"
-                        title="Reset edited internal attributes"
-                        aria-label="Reset edited internal attributes"
+                        title={t('internal-reset-title')}
+                        aria-label={t('internal-reset-title')}
                       >
                         <RotateCcw className="size-4" />
-                        <span className="ml-1 hidden sm:inline">Reset</span>
+                        <span className="ml-1 hidden sm:inline">
+                          {t('internal-reset')}
+                        </span>
                       </Button>
                     </AlertDialogTrigger>
                     <AlertDialogContent>
                       <AlertDialogHeader>
                         <AlertDialogTitle>
-                          Reset edited attributes?
+                          {t('internal-reset-dialog-title')}
                         </AlertDialogTitle>
                         <AlertDialogDescription>
-                          This will revert descriptions of selected internal
-                          attributes to their defaults. Selection remains
-                          unchanged.
+                          {t('internal-reset-dialog-desc')}
                         </AlertDialogDescription>
                       </AlertDialogHeader>
                       <AlertDialogFooter>
-                        <AlertDialogCancel>Cancel</AlertDialogCancel>
+                        <AlertDialogCancel>
+                          {t('internal-cancel')}
+                        </AlertDialogCancel>
                         <AlertDialogAction
                           onClick={() => {
                             const selected = (field.value || []) as attribute[];
@@ -223,7 +226,7 @@ export default function InternalFactorsCard({ control }: Props) {
                             setEditingIndex(null);
                           }}
                         >
-                          Reset
+                          {t('internal-reset')}
                         </AlertDialogAction>
                       </AlertDialogFooter>
                     </AlertDialogContent>
@@ -324,7 +327,7 @@ export default function InternalFactorsCard({ control }: Props) {
           {/* Middle: Selected */}
           <div className="space-y-2">
             <h3 className="text-xs font-medium text-primary sm:text-sm">
-              Selected
+              {t('internal-selected')}
             </h3>
             <Controller
               name="internal"
@@ -338,7 +341,9 @@ export default function InternalFactorsCard({ control }: Props) {
                         .map((t) => t.trim())
                         .filter(Boolean);
                       const preview = previewArr.length
-                        ? `${previewArr.slice(0, 3).join(', ')}${previewArr.length > 3 ? '…' : ''}`
+                        ? `${previewArr.slice(0, 3).join(', ')}${
+                            previewArr.length > 3 ? '…' : ''
+                          }`
                         : 'No items';
 
                       const selectItem = () => {
@@ -403,7 +408,9 @@ export default function InternalFactorsCard({ control }: Props) {
                                     setTokens([]);
                                   }
                                 }}
-                                aria-label={`Remove ${s.title}`}
+                                aria-label={t('internal-remove-aria', {
+                                  title: s.title,
+                                })}
                               >
                                 <X className="size-4" />
                               </Button>
@@ -417,7 +424,7 @@ export default function InternalFactorsCard({ control }: Props) {
                     })}
                     {((field.value || []) as attribute[]).length === 0 && (
                       <div className="rounded-md border border-dashed p-3 text-center text-xs text-muted-foreground">
-                        No selection
+                        {t('internal-no-selection')}
                       </div>
                     )}
                   </div>
@@ -429,7 +436,7 @@ export default function InternalFactorsCard({ control }: Props) {
           {/* Right: Details editor */}
           <div className="space-y-2">
             <h3 className="text-xs font-medium text-primary sm:text-sm">
-              Details
+              {t('internal-details')}
             </h3>
             <Controller
               name="internal"
@@ -456,7 +463,7 @@ export default function InternalFactorsCard({ control }: Props) {
                   >
                     {!selected ? (
                       <p className="text-sm text-muted-foreground">
-                        Select a factor from the middle list to edit details.
+                        {t('internal-details-empty')}
                       </p>
                     ) : (
                       <div className="flex h-full flex-col gap-3">
@@ -465,14 +472,14 @@ export default function InternalFactorsCard({ control }: Props) {
                             {selected.title}
                           </p>
                           <p className="text-xs text-muted-foreground">
-                            Manage description items (comma-separated)
+                            {t('internal-details-desc')}
                           </p>
                         </div>
 
                         <div className="flex flex-wrap gap-2">
-                          {tokens.map((t, i) => (
+                          {tokens.map((tVal, i) => (
                             <Badge
-                              key={`${t}-${i}`}
+                              key={`${tVal}-${i}`}
                               variant="secondary"
                               className="flex items-center gap-1"
                             >
@@ -480,13 +487,15 @@ export default function InternalFactorsCard({ control }: Props) {
                                 type="button"
                                 onClick={() => {
                                   setEditingIndex(i);
-                                  setInputValue(t);
+                                  setInputValue(tVal);
                                   inputRef.current?.focus();
                                 }}
                                 className="text-xs"
-                                aria-label={`Edit ${t}`}
+                                aria-label={t('internal-edit-aria', {
+                                  item: tVal,
+                                })}
                               >
-                                {t}
+                                {tVal}
                               </button>
                               <button
                                 type="button"
@@ -497,7 +506,9 @@ export default function InternalFactorsCard({ control }: Props) {
                                   setTokens(nextTokens);
                                   commitTokens(nextTokens);
                                 }}
-                                aria-label={`Remove ${t}`}
+                                aria-label={t('internal-remove-aria', {
+                                  title: tVal,
+                                })}
                               >
                                 <X className="size-3" />
                               </button>
@@ -505,7 +516,7 @@ export default function InternalFactorsCard({ control }: Props) {
                           ))}
                           {tokens.length === 0 && (
                             <span className="text-xs text-muted-foreground">
-                              No items
+                              {t('internal-no-items')}
                             </span>
                           )}
                         </div>
@@ -516,7 +527,9 @@ export default function InternalFactorsCard({ control }: Props) {
                             value={inputValue}
                             onChange={(e) => setInputValue(e.target.value)}
                             placeholder={
-                              editingIndex !== null ? 'Edit item' : 'Add item'
+                              editingIndex !== null
+                                ? t('internal-edit-placeholder')
+                                : t('internal-add-placeholder')
                             }
                             className="border-primary"
                             onKeyDown={(e) => {
@@ -558,7 +571,9 @@ export default function InternalFactorsCard({ control }: Props) {
                               }
                             }}
                           >
-                            {editingIndex !== null ? 'Save' : 'Add'}
+                            {editingIndex !== null
+                              ? t('internal-save')
+                              : t('internal-add')}
                           </Button>
                           {editingIndex !== null && (
                             <Button
@@ -569,7 +584,7 @@ export default function InternalFactorsCard({ control }: Props) {
                                 setInputValue('');
                               }}
                             >
-                              Cancel
+                              {t('internal-cancel')}
                             </Button>
                           )}
                         </div>

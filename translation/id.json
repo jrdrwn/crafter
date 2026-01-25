@@ -1,1 +1,495 @@
-{}
+{
+  "shared": {
+    "header": {
+      "home": "Beranda",
+      "create": "Buat",
+      "explore": "Jelajahi",
+      "history": "Riwayat",
+      "knowledge-base": "Basis Pengetahuan"
+    }
+  },
+  "home": {
+    "hero": {
+      "badge": "Baru di CRAFTER 2.0: Taksonomi Persona",
+      "title": "Rekomendasi dan Saran untuk Persona yang Disesuaikan dan Efektif",
+      "subtitle": "Berhenti menebak. Biarkan CRAFTER mengungkap tujuan, motivasi, dan frustrasi pengguna dalam hitungan detik.",
+      "start": "Mulai Buat Persona",
+      "continue": "Lanjutkan sebagai Tamu",
+      "join": "Gabung sekarang!",
+      "history": "Riwayat Saya",
+      "trusted": "Dipercaya oleh Tim Terkemuka",
+      "roles": ["Tim UI/UX", "Manajer Produk", "Pengembang", "Peneliti"]
+    },
+    "featureRevolutionize": {
+      "title": "Revolusi Cara Anda Memahami Pengguna",
+      "desc": "Dengan metodologi berbasis taksonomi, CRAFTER 2.0 menghasilkan persona yang tidak hanya akurat, tetapi juga konsisten dan andal untuk berbagai kebutuhan riset pengguna.",
+      "points": [
+        "Hemat waktu dalam riset pengguna",
+        "Persona lebih akurat dan detail",
+        "Konsistensi melalui metodologi terstruktur",
+        "Mudah digunakan untuk semua tim",
+        "Ekspor dalam berbagai format"
+      ],
+      "cta": "Mulai Buat Persona",
+      "persona": {
+        "name": "Ahmad Rizky",
+        "role": "Manajer Produk, 28 tahun",
+        "quote": "Saya butuh solusi efisien untuk mengotomasi proses bisnis tanpa mengorbankan kualitas.",
+        "motivation": "Efisiensi operasional",
+        "pain": "Antarmuka kompleks",
+        "skill": "Menengah"
+      },
+      "motivation": "Motivasi:",
+      "pain": "Poin Nyeri:",
+      "skill": "Tingkat Keahlian:"
+    },
+    "featureWhy": {
+      "title": "Mengapa CRAFTER 2.0?",
+      "desc": "Solusi lengkap untuk membuat persona berkualitas tinggi dengan teknologi AI terkini.",
+      "ai": {
+        "title": "Generasi Berbasis AI",
+        "desc": "Manfaatkan AI canggih untuk menghasilkan persona pengguna yang akurat dan komprehensif."
+      },
+      "taxonomy": {
+        "title": "Berbasis Taksonomi",
+        "desc": "Sistem terstruktur berbasis taksonomi yang memastikan hasil konsisten dan andal."
+      },
+      "multi": {
+        "title": "Dukungan Multi-Domain",
+        "desc": "Dapat diadaptasi di berbagai domain, dari kesehatan dan pendidikan hingga teknologi"
+      }
+    }
+  },
+  "end-cta": {
+    "ready-to-get-started": "Siap untuk Memulai?",
+    "join-thousands": "Bergabunglah dengan ribuan profesional yang sudah menggunakan CRAFTER 2.0 untuk membuat persona berkualitas tinggi.",
+    "try-for-free-now": "Coba Gratis Sekarang",
+    "learn-more": "Pelajari Lebih Lanjut"
+  },
+  "footer": {
+    "copyright": "© 2025 Crafter. Hak cipta dilindungi undang-undang.",
+    "follow-us-on-instagram": "Ikuti kami di Instagram",
+    "instagram": "Instagram"
+  },
+  "create": {
+    "hero-badge": "Tentukan domain dan faktor",
+    "hero-title": "Buat persona Anda dengan AI",
+    "hero-desc": "Pilih domain atau industri, tentukan faktor internal dan eksternal yang relevan, dan biarkan CRAFTER 2.0 menghasilkan persona terstruktur untuk kebutuhan riset Anda.",
+    "domain-title": "Pilih domain",
+    "domain-desc": "Pilih domain atau industri untuk persona yang ingin Anda buat.",
+    "domain-search-placeholder": "Cari...",
+    "domain-add-placeholder": "Tambah domain baru...",
+    "domain-selected": "Dipilih",
+    "domain-key-label": "Kunci: {key}",
+    "domain-add-suggestion": "Tambah \"{query}\" sebagai domain baru jika belum ada.",
+    "domain-fetch-error": "Gagal mengambil daftar domain.",
+    "internal-title": "Faktor Manusia — Lapisan Internal",
+    "internal-desc": "Pilih faktor internal yang tersedia. Edit deskripsi sebagai daftar item.",
+    "internal-search-placeholder": "Cari...",
+    "internal-search-aria": "Cari atribut layer",
+    "internal-reset-title": "Reset atribut internal yang diedit",
+    "internal-reset": "Reset",
+    "internal-reset-dialog-title": "Reset atribut yang diedit?",
+    "internal-reset-dialog-desc": "Ini akan mengembalikan deskripsi atribut internal terpilih ke default. Pilihan tetap dipertahankan.",
+    "internal-cancel": "Batal",
+    "internal-selected": "Terpilih",
+    "internal-remove-aria": "Hapus {title}",
+    "internal-no-selection": "Belum ada pilihan",
+    "internal-details": "Detail",
+    "internal-details-empty": "Pilih faktor dari daftar tengah untuk mengedit detail.",
+    "internal-details-desc": "Kelola item deskripsi (pisahkan dengan koma)",
+    "internal-edit-aria": "Edit {item}",
+    "internal-no-items": "Belum ada item",
+    "internal-edit-placeholder": "Edit item",
+    "internal-add-placeholder": "Tambah item",
+    "internal-save": "Simpan",
+    "internal-add": "Tambah",
+    "external-title": "Faktor Manusia — Lapisan Eksternal",
+    "external-desc": "Pilih faktor eksternal yang tersedia. Edit deskripsi sebagai daftar item.",
+    "external-search-placeholder": "Cari...",
+    "external-search-aria": "Cari atribut layer",
+    "external-reset-title": "Reset atribut eksternal yang diedit",
+    "external-reset": "Reset",
+    "external-reset-dialog-title": "Reset atribut yang diedit?",
+    "external-reset-dialog-desc": "Ini akan mengembalikan deskripsi atribut eksternal terpilih ke default. Pilihan tetap dipertahankan.",
+    "external-cancel": "Batal",
+    "external-selected": "Terpilih",
+    "external-remove-aria": "Hapus {title}",
+    "external-no-selection": "Belum ada pilihan",
+    "external-details": "Detail",
+    "external-details-empty": "Pilih faktor dari daftar tengah untuk mengedit detail.",
+    "external-details-desc": "Kelola item deskripsi (pisahkan dengan koma)",
+    "external-details-readonly": "Penjelasan layer (hanya baca).",
+    "external-edit-aria": "Edit {item}",
+    "external-no-items": "Belum ada item",
+    "external-edit-placeholder": "Edit item",
+    "external-add-placeholder": "Tambah item",
+    "external-save": "Simpan",
+    "external-add": "Tambah",
+    "external-required": "default",
+    "external-required-title": "Item ini wajib",
+    "external-no-explanation": "Tidak ada penjelasan.",
+    "additional-details-title": "Detail Tambahan",
+    "additional-details-desc": "Aspek spesifik yang ingin Anda fokuskan (opsional).",
+    "additional-details-placeholder": "Contoh: Fokus pada pengguna dengan gangguan penglihatan, atau pengguna dengan pengalaman teknologi minimal...",
+    "content-length-title": "Pengaturan Panjang Konten",
+    "content-length-desc": "Atur panjang deskripsi persona yang dihasilkan",
+    "content-length-warning": "Jika faktor manusia terlalu banyak, panjang respons bisa tidak sesuai keinginan",
+    "content-length-short": "Pendek",
+    "content-length-medium": "Sedang",
+    "content-length-long": "Panjang",
+    "content-length-custom": "Kustom",
+    "content-length-min": "Min:",
+    "content-length-max": "Maks:",
+    "content-length-words": "kata",
+    "content-length-helper-title": "Bantuan: Panjang Konten",
+    "content-length-helper-desc": "Panjang persona menentukan detail yang ditampilkan: pendek untuk ide cepat, sedang untuk seimbang, panjang untuk analisis mendalam.",
+    "content-length-short-label": "Pendek (±0-100 kata)",
+    "content-length-short-helper": "Cocok untuk brainstorming; berisi hal penting seperti demografi, tujuan utama, dan 1-2 pain point.",
+    "content-length-medium-label": "Sedang (±100-200 kata)",
+    "content-length-medium-helper": "Seimbang untuk workshop; mencakup motivasi, beberapa tujuan, pain point, dan interaksi dengan teknologi.",
+    "content-length-long-label": "Panjang (≥200 kata)",
+    "content-length-long-helper": "Mendalam; menambah cerita pribadi, konteks domain, dan faktor manusia lebih lengkap.",
+    "content-length-custom-label": "Kustom",
+    "content-length-custom-helper": "Pengguna dapat mengatur jumlah kata sesuai kebutuhan.",
+    "llm-config-title": "Konfigurasi LLM",
+    "llm-config-desc": "Pilih model AI yang digunakan untuk menghasilkan persona",
+    "llm-config-select-placeholder": "Pilih Model LLM",
+    "llm-config-use-rag": "Gunakan RAG (Retrieval-Augmented Generation)",
+    "llm-config-rag-unavailable": "RAG tidak tersedia untuk bahasa/domain terpilih",
+    "llm-config-language-placeholder": "Pilih Bahasa",
+    "construct-submit": "Buat persona",
+    "construct-loading": "Membuat...",
+    "construct-agreement": "Dengan mengklik \"Buat persona\", Anda setuju dengan Ketentuan Layanan dan Kebijakan Privasi kami.",
+    "construct-review-title": "Tinjau input Anda",
+    "construct-review-desc": "Pastikan semua sudah benar sebelum membuat.",
+    "construct-overview": "Ringkasan",
+    "construct-domain": "Domain:",
+    "construct-model": "Model:",
+    "construct-language": "Bahasa:",
+    "construct-note": "Catatan:",
+    "construct-note-rag-many": "RAG aktif dan Anda memilih banyak faktor. Proses bisa memakan waktu hingga satu menit.",
+    "construct-note-rag": "RAG aktif. Proses bisa sedikit lebih lama dari biasanya.",
+    "construct-note-many": "Anda memilih banyak faktor. Proses bisa lebih lama.",
+    "construct-note-none": "Tidak ada catatan khusus.",
+    "construct-factors": "Faktor",
+    "construct-internal": "Internal",
+    "construct-external": "Eksternal",
+    "construct-generation-settings": "Pengaturan Generasi",
+    "construct-content-length": "Panjang konten:",
+    "construct-words": "kata",
+    "construct-use-rag": "Gunakan RAG:",
+    "construct-enabled": "Aktif",
+    "construct-disabled": "Nonaktif",
+    "construct-detail": "Detail",
+    "construct-toast-10s": "Masih memproses... Pembuatan persona memakan waktu lebih lama dari biasanya (10 detik).",
+    "construct-toast-20s": "Masih memproses... Pembuatan persona lebih dari 20 detik.",
+    "construct-toast-30s": "Ini memakan waktu cukup lama (30 detik+). Mohon tunggu.",
+    "construct-toast-60s": "Pembuatan memakan waktu lebih dari 1 menit.",
+    "construct-toast-failed": "Gagal membuat persona: Kesalahan tidak diketahui",
+    "construct-toast-success": "Persona berhasil dibuat!",
+    "construct-toast-localstorage": "Gagal menyimpan persona ke localStorage:",
+    "construct-toast-localstorage-desc": "Silakan coba lagi nanti.",
+    "construct-toast-login": "Gagal membuat persona: Silakan login kembali"
+  },
+  "explore": {
+    "hero-badge": "Dirancang untuk Tim, Didukung AI",
+    "hero-title": "Jelajahi Persona",
+    "hero-desc": "Telusuri persona yang dibagikan komunitas atau gunakan ulang milik Anda sebagai template.",
+    "persona-viewing": "Menampilkan {count} dari {total} persona",
+    "persona-show-mine": "Tampilkan Persona Saya Saja",
+    "persona-error": "Gagal memuat data.",
+    "persona-refresh": "Muat Ulang",
+    "persona-empty": "Tidak ada persona ditemukan.",
+    "persona-search-placeholder": "Cari persona atau tag...",
+    "persona-domain-filter": "Filter berdasarkan Domain",
+    "persona-domain-search-placeholder": "Cari domain...",
+    "persona-domain-empty": "Domain tidak ditemukan.",
+    "persona-order-filter": "Urutkan",
+    "persona-order-search-placeholder": "Cari urutan...",
+    "persona-order-empty": "Urutan tidak ditemukan.",
+    "persona-order-recent": "Terbaru Ditambahkan",
+    "persona-order-updated": "Terbaru Diperbarui",
+    "persona-order-alphabetical": "Alfabetis"
+  },
+  "history": {
+    "hero-title": "Riwayat Persona",
+    "hero-desc": "Kelola semua persona yang telah Anda buat",
+    "create": "Buat Persona Baru",
+    "empty": "Belum ada persona ditemukan. Buat persona pertamamu!",
+    "unknown": "Persona Tidak Dikenal",
+    "error": "Gagal memuat data.",
+    "refresh": "Muat Ulang"
+  },
+  "edit": {
+    "hero-badge": "Tentukan Domain dan Faktor Anda",
+    "hero-title": "Regenerasi Persona Anda",
+    "hero-desc-part1": "Pilih domain atau industri, pilih",
+    "hero-desc-part2": "faktor internal dan eksternal yang relevan",
+    "hero-desc-part3": ", dan biarkan",
+    "hero-desc-part4": "CRAFTER 2.0",
+    "hero-desc-part5": "menghasilkan",
+    "hero-desc-part6": "persona",
+    "hero-desc-part7": "terstruktur untuk kebutuhan riset Anda.",
+    "toast-10s": "Masih memproses... Pengeditan persona memakan waktu lebih lama dari biasanya (10 detik).",
+    "toast-20s": "Masih memproses... Pengeditan persona lebih dari 20 detik.",
+    "toast-30s": "Ini memakan waktu cukup lama (30 detik+). Mohon tunggu.",
+    "toast-60s": "Pengeditan memakan waktu lebih dari 1 menit.",
+    "failed-edit-persona": "Gagal mengedit persona: Kesalahan tidak diketahui",
+    "failed-edit-persona-login": "Gagal mengedit persona: Silakan login kembali",
+    "persona-edited-successfully": "Persona berhasil diedit!",
+    "submit-label": "Edit persona",
+    "loading-label": "Mengedit...",
+    "agreement-text": "Dengan mengklik \"Edit persona\", Anda setuju dengan Ketentuan Layanan dan Kebijakan Privasi kami.",
+    "review-inputs-title": "Tinjau input Anda",
+    "review-inputs-desc": "Pastikan semua sudah benar sebelum mengedit.",
+    "overview": "Ringkasan",
+    "factors": "Faktor",
+    "generation-settings": "Pengaturan Generasi",
+    "select-internal-factor": "Pilih setidaknya satu faktor internal",
+    "select-external-factor": "Pilih setidaknya satu faktor eksternal"
+  },
+  "detail": {
+    "persona-name-fallback": "Nama Persona",
+    "uploading": "Mengunggah...",
+    "edit": "Edit",
+    "upload-max-size": "Unggah (maks 2MB)",
+    "remove": "Hapus",
+    "image-upload-failed": "Gagal mengunggah gambar",
+    "image-uploaded": "Gambar berhasil diunggah!",
+    "upload-failed": "Gagal mengunggah",
+    "select-narration-structure": "Pilih Narasi & Struktur",
+    "mixed": "Campuran",
+    "bullets": "Poin-poin",
+    "narrative": "Naratif",
+    "word-count": "Jumlah kata:",
+    "persona-content-updated": "Konten persona berhasil diperbarui!",
+    "failed-update-persona-content": "Gagal memperbarui konten persona.",
+    "back-to-history": "Kembali ke riwayat",
+    "online": "Online",
+    "edit-result": "Edit Hasil",
+    "save": "Simpan",
+    "view-mode": "Mode Lihat",
+    "regenerate": "Regenerasi",
+    "delete": "Hapus",
+    "copy-this-persona": "Salin Persona Ini",
+    "persona-copied-successfully": "Persona berhasil disalin!",
+    "error-copying-persona": "Gagal menyalin persona:",
+    "please-try-again-later": "Silakan coba lagi nanti.",
+    "error-updating-visibility": "Gagal memperbarui visibilitas:",
+    "error-fetching-persona": "Gagal mengambil persona",
+    "error-deleting-persona": "Gagal menghapus persona",
+    "author": "Penulis",
+    "name": "Nama",
+    "email": "Email",
+    "quick-info": "Info Cepat",
+    "created": "Dibuat",
+    "updated": "Diperbarui",
+    "share-persona": "Bagikan Persona",
+    "share-persona-desc": "Jadikan persona ini dapat diakses publik",
+    "private": "Privat",
+    "public": "Publik",
+    "download-persona": "Unduh Persona",
+    "download-persona-desc": "Simpan persona dalam berbagai format",
+    "download-as-pdf-full": "Unduh sebagai PDF (Lengkap)",
+    "download-as-json-raw": "Unduh sebagai JSON (Mentah)",
+    "mixed-structure": "Struktur Campuran",
+    "bullets-structure": "Struktur Poin-poin",
+    "narrative-structure": "Struktur Naratif",
+    "domain": "Domain:",
+    "author-label": "Penulis:",
+    "visibility": "Visibilitas:",
+    "created-label": "Dibuat:",
+    "updated-label": "Diperbarui:",
+    "delete-confirmation-title": "Apakah Anda yakin?",
+    "delete-confirmation-desc": "Tindakan ini tidak dapat dibatalkan. Ini akan menghapus persona Anda secara permanen dan menghapus data Anda dari server kami.",
+    "cancel": "Batal",
+    "continue": "Lanjutkan",
+    "persona-content-updated-guest": "Konten persona berhasil diperbarui!",
+    "failed-save-changes": "Gagal menyimpan perubahan.",
+    "saved": "Tersimpan",
+    "you-need-login-share": "Anda perlu masuk untuk mengakses semua fitur Bagikan Persona.",
+    "download-as-pdf": "Unduh sebagai PDF",
+    "download-as-json": "Unduh sebagai JSON"
+  },
+  "contrib": {
+    "title": "Manajemen Pengetahuan RAG",
+    "desc": "Kelola pengetahuan dengan mengunggah riset, wawancara, ulasan, atau dokumen. Data akan dipecah dan diindeks ke dalam vector store.",
+    "not-signed-in": "Anda belum masuk. Silakan login untuk mengunggah kontribusi.",
+    "toggle": {
+      "text": { "title": "Input teks", "desc": "Tulis/tempel konten manual" },
+      "file": { "title": "Unggah file", "desc": "TXT/DOCX/XLSX" },
+      "meta": { "title": "Tambah metadata", "desc": "Key-Value untuk konteks" }
+    },
+    "type": {
+      "label": "Tipe Konten",
+      "placeholder": "Pilih tipe",
+      "survey": "Survei",
+      "interview": "Wawancara",
+      "review": "Ulasan",
+      "doc": "Dokumen"
+    },
+    "visibility": {
+      "label": "Visibilitas",
+      "placeholder": "Pilih visibilitas",
+      "public": "Publik",
+      "private": "Privat"
+    },
+    "language": {
+      "label": "Bahasa",
+      "placeholder": "Pilih bahasa",
+      "en": "Inggris",
+      "id": "Bahasa Indonesia"
+    },
+    "domain": {
+      "label": "Domain (pilih atau buat baru)"
+    },
+    "source": {
+      "label": "Sumber (opsional)",
+      "placeholder": "misal: Riset Sprint 12"
+    },
+    "text": {
+      "label": "Konten Kontribusi",
+      "placeholder": "Tempel teks mentah dari survei/wawancara/ulasan/dokumen di sini..."
+    },
+    "meta": {
+      "label": "Metadata Tambahan",
+      "key-placeholder": "key (misal: proyek)",
+      "value-placeholder": "nilai (misal: alfa)",
+      "add": "Tambah",
+      "remove": "Hapus",
+      "empty": "Belum ada metadata."
+    },
+    "file": {
+      "label": "Unggah file (.txt, .docx, .xlsx)",
+      "selected": "Dipilih: {name} ({size} KB)"
+    },
+    "tokens": {
+      "count": "Perkiraan {count}/{limit} token",
+      "limit": "Batas {limit} token",
+      "exceeds": "Melebihi batas token"
+    },
+    "submit": {
+      "label": "Unggah ke RAG",
+      "disabled": "Isi teks atau pilih file terlebih dahulu"
+    },
+    "hero": {
+      "badge-full": "Kontribusi Pengetahuan RAG",
+      "badge-short": "Pengetahuan RAG",
+      "title": "Kelola & Kontribusi Pengetahuan",
+      "desc": "Unggah, kurasi, dan sinkronkan sumber pengetahuan untuk Retrieval-Augmented Generation (RAG). Pastikan data tim Anda selalu terbaru dan mudah ditemukan."
+    },
+    "list": {
+      "title": "Kontribusi Anda",
+      "desc": "Kelola survei, wawancara, ulasan, dan dokumen yang telah Anda tambahkan.",
+      "desc-not-signed-in": "Masuk untuk melihat dan mengelola kontribusi Anda.",
+      "refresh": "Muat Ulang",
+      "empty": "Belum ada kontribusi.",
+      "edit": "Edit",
+      "delete": "Hapus",
+      "delete-title": "Hapus kontribusi?",
+      "delete-desc": "Ini akan menghapus dokumen dan semua embedding terkait secara permanen. Tindakan ini tidak dapat dibatalkan.",
+      "deleted-success": "Berhasil dihapus",
+      "delete-failed": "Gagal",
+      "cancel": "Batal",
+
+      "type": {
+        "survey": "Survei",
+        "interview": "Wawancara",
+        "review": "Ulasan",
+        "doc": "Dokumen"
+      },
+      "language": {
+        "en": "Inggris",
+        "id": "Bahasa Indonesia"
+      },
+      "visibility": {
+        "public": "Publik",
+        "private": "Privat"
+      }
+    },
+    "edit": {
+      "title": "Edit Kontribusi",
+      "desc": "Perbarui konten dan metadata. Sistem akan mengindeks ulang embedding.",
+      "loading": "Memuat...",
+      "type": {
+        "label": "Tipe",
+        "placeholder": "Pilih tipe",
+        "survey": "Survei",
+        "interview": "Wawancara",
+        "review": "Ulasan",
+        "doc": "Dokumen"
+      },
+      "visibility": {
+        "label": "Visibilitas",
+        "placeholder": "Pilih visibilitas",
+        "public": "Publik",
+        "private": "Privat"
+      },
+      "language": {
+        "label": "Bahasa",
+        "placeholder": "Pilih bahasa",
+        "en": "Inggris",
+        "id": "Bahasa Indonesia"
+      },
+      "domain": {
+        "label": "Domain"
+      },
+      "source": {
+        "label": "Sumber",
+        "placeholder": "opsional"
+      },
+      "text": {
+        "label": "Konten",
+        "chars": "karakter",
+        "tokens": "token"
+      },
+      "meta": {
+        "label": "Metadata Tambahan",
+        "key-placeholder": "key (misal: proyek)",
+        "value-placeholder": "nilai (misal: alfa)",
+        "add": "Tambah",
+        "remove": "Hapus",
+        "empty": "Belum ada metadata."
+      },
+      "cancel": "Batal",
+      "save": "Simpan"
+    }
+  },
+  "login": {
+    "form": {
+      "title": "Masuk ke Akun Anda",
+      "description": "Login untuk mengakses riwayat persona dan fitur lanjutan.",
+      "email": "Email",
+      "emailPlaceholder": "nama@email.com",
+      "password": "Kata Sandi",
+      "passwordPlaceholder": "Masukkan kata sandi Anda",
+      "button": "Masuk",
+      "noAccount": "Belum punya akun?",
+      "createNow": "Buat sekarang.",
+      "success": "Berhasil masuk",
+      "failed": "Gagal masuk"
+    }
+  },
+  "create-account": {
+    "form": {
+      "title": "Buat Akun Baru",
+      "description": "Daftar untuk menyimpan riwayat persona dan akses fitur lanjutan.",
+      "name": "Nama",
+      "name-placeholder": "John Doe",
+      "email": "Email",
+      "email-placeholder": "nama@email.com",
+      "password": "Kata Sandi",
+      "password-placeholder": "Masukkan kata sandi Anda",
+      "confirm-password": "Konfirmasi Kata Sandi",
+      "button": "Buat Akun",
+      "terms-prefix": "Saya setuju dengan",
+      "terms-link": "Syarat dan Ketentuan",
+      "already-account": "Sudah punya akun?",
+      "login-link": "Masuk.",
+      "success": "Akun berhasil dibuat! Silakan masuk.",
+      "error-password-mismatch": "Kata sandi tidak cocok",
+      "error-generic": "Terjadi kesalahan. Silakan coba lagi."
+    }
+  }
+}

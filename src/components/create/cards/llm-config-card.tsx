@@ -7,6 +7,7 @@ import { cn } from '@/lib/utils';
 import { language, llm } from '@prisma/client';
 import * as SelectPrimitive from '@radix-ui/react-select';
 import { Bot, CheckIcon } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 import { useEffect, useState } from 'react';
 import { Control, Controller } from 'react-hook-form';
 
@@ -40,6 +41,7 @@ export default function LLMConfigCard({ control }: Props) {
   const [languages, setLanguages] = useState<language[]>([]);
   const [llmModels, setLlmModels] = useState<llm[]>([]);
   const [ragAvailable, setRagAvailable] = useState<boolean>(false);
+  const t = useTranslations('create');
 
   async function fetchLlmModels() {
     setErrorLlmModels(null);
@@ -105,10 +107,10 @@ export default function LLMConfigCard({ control }: Props) {
               size={16}
               className="text-foreground sm:size-[18px] md:size-5"
             />
-            LLM Configuration
+            {t('llm-config-title')}
           </CardTitle>
           <CardDescription className="text-xs text-gray-400 sm:text-sm">
-            Select the AI model used to generate personas
+            {t('llm-config-desc')}
           </CardDescription>
         </CardHeader>
         <CardContent className="px-1.5 sm:px-2">
@@ -141,7 +143,9 @@ export default function LLMConfigCard({ control }: Props) {
                       className="w-full border-primary"
                       aria-invalid={fieldState.invalid}
                     >
-                      <SelectValue placeholder="Select LLM Model" />
+                      <SelectValue
+                        placeholder={t('llm-config-select-placeholder')}
+                      />
                     </SelectTrigger>
                     <SelectContent>
                       {llmModels.map((model) => (
@@ -200,8 +204,8 @@ export default function LLMConfigCard({ control }: Props) {
                     )}
                   >
                     {ragAvailable
-                      ? `Use RAG (Retrieval-Augmented Generation)`
-                      : `RAG not available for selected language/domain`}
+                      ? t('llm-config-use-rag')
+                      : t('llm-config-rag-unavailable')}
                   </span>
                 </FieldLabel>
               </Field>
@@ -237,7 +241,7 @@ export default function LLMConfigCard({ control }: Props) {
                     >
                       <SelectTrigger className="w-full border-primary sm:w-42">
                         <SelectValue
-                          placeholder="Select Language"
+                          placeholder={t('llm-config-language-placeholder')}
                           aria-invalid={fieldState.invalid}
                         />
                       </SelectTrigger>

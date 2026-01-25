@@ -1,10 +1,12 @@
 import { BadgeCheck, User, Zap } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 import Link from 'next/link';
 
 import { Button } from '../ui/button';
 import { Card, CardContent } from '../ui/card';
 
 export default function FeatureRevolutionize() {
+  const t = useTranslations('home.featureRevolutionize');
   return (
     <section className="relative px-8 py-8 md:px-12 md:py-12 lg:px-16 lg:py-14 xl:px-24">
       <div className="container mx-auto">
@@ -12,40 +14,36 @@ export default function FeatureRevolutionize() {
         <div className="grid grid-cols-1 gap-8 lg:grid-cols-2 lg:gap-12">
           <div>
             <h2 className="mb-3 max-w-2xl text-2xl font-bold tracking-wide text-primary sm:text-3xl md:mb-4 md:text-4xl">
-              Revolutionize the Way You Understand Your Users
+              {t('title')}
             </h2>
-            <p className="max-w-3xl text-base md:text-lg">
-              With a taxonomy-based methodology, CRAFTER 2.0 generates personas
-              that are not only accurate, but also consistent and reliable for a
-              wide range of user research needs.
-            </p>
+            <p className="max-w-3xl text-base md:text-lg">{t('desc')}</p>
             <div className="mt-6 md:mt-8">
               <ul className="mb-6 space-y-2 md:mb-8 md:space-y-3 [&>li]:flex [&>li]:items-center [&>li]:gap-1.5 [&>li]:text-sm [&>li]:md:text-base [&>li>svg]:text-primary">
                 <li>
                   <BadgeCheck size={18} className="md:size-5" />
-                  Save time in user research
+                  {t('points.0')}
                 </li>
                 <li>
                   <BadgeCheck size={18} className="md:size-5" />
-                  More accurate and detailed personas
+                  {t('points.1')}
                 </li>
                 <li>
                   <BadgeCheck size={18} className="md:size-5" />
-                  Consistency through structured methodology
+                  {t('points.2')}
                 </li>
                 <li>
                   <BadgeCheck size={18} className="md:size-5" />
-                  Easy to use for any team
+                  {t('points.3')}
                 </li>
                 <li>
                   <BadgeCheck size={18} className="md:size-5" />
-                  Export in multiple formats
+                  {t('points.4')}
                 </li>
               </ul>
               <Link href="/create" className="inline-block w-full sm:w-auto">
                 <Button className="w-full sm:w-auto">
                   <Zap />
-                  Start Creating Personas
+                  {t('cta')}
                 </Button>
               </Link>
             </div>
@@ -59,29 +57,28 @@ export default function FeatureRevolutionize() {
                   </span>
                   <div>
                     <p className="text-base font-semibold text-primary md:text-lg">
-                      Ahmad Rizky
+                      {t('persona.name')}
                     </p>
                     <p className="text-sm font-medium text-card-foreground md:text-base">
-                      Product Manager, 28 years old
+                      {t('persona.role')}
                     </p>
                   </div>
                 </div>
                 <p className="text-sm text-card-foreground italic md:text-base">
-                  &ldquo;I need an efficient solution to automate business
-                  processes without sacrificing quality.&rdquo;
+                  &ldquo;{t('persona.quote')}&rdquo;
                 </p>
                 <div className="mt-4 space-y-2 [&>div]:flex [&>div]:justify-between [&>div]:text-xs [&>div]:font-medium [&>div]:text-card-foreground [&>div]:md:text-sm [&>div>:first-child]:text-primary">
                   <div>
-                    <span>Motivation:</span>
-                    <span>Operational efficiency</span>
+                    <span>{t('motivation')}</span>
+                    <span>{t('persona.motivation')}</span>
                   </div>
                   <div>
-                    <span>Pain Point:</span>
-                    <span>Complex interface</span>
+                    <span>{t('pain')}</span>
+                    <span>{t('persona.pain')}</span>
                   </div>
                   <div>
-                    <span>Skill Level:</span>
-                    <span>Intermediate</span>
+                    <span>{t('skill')}</span>
+                    <span>{t('persona.skill')}</span>
                   </div>
                 </div>
               </CardContent>

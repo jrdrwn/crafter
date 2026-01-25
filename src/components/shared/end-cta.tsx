@@ -1,6 +1,7 @@
 'use client';
 
 import { ChevronRight } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 import Link from 'next/link';
 import { SVGProps } from 'react';
 
@@ -65,17 +66,17 @@ const SvgComponent = (props: SVGProps<SVGSVGElement>) => (
 );
 export { SvgComponent as ReactComponent };
 
-export default function EndCTA() {
+export default function EndCta() {
+  const t = useTranslations('end-cta');
   return (
     <section className="relative flex h-full flex-col items-center justify-center px-2">
       <SvgComponent className="absolute inset-0 -z-10 h-full w-full object-cover" />
       <div className="relative container mx-auto flex flex-col items-center justify-center px-4 py-12 md:py-16 lg:py-20">
         <h1 className="z-10 mb-3 text-center text-xl font-medium text-primary-foreground sm:text-2xl md:mb-4 lg:text-3xl xl:text-4xl">
-          Ready to Get Started?
+          {t('ready-to-get-started')}
         </h1>
         <p className="z-10 mb-4 max-w-xl text-center text-sm text-primary-foreground sm:text-base md:mb-6 md:text-lg">
-          Join thousands of professionals already using CRAFTER 2.0 to create
-          high-quality personas.
+          {t('join-thousands')}
         </p>
         <div className="flex w-full flex-col justify-center gap-3 sm:w-auto sm:flex-row md:gap-4">
           <Link href="/create-account" className="z-10 w-full sm:w-auto">
@@ -84,7 +85,7 @@ export default function EndCTA() {
               variant={'secondary'}
               className="w-full sm:w-auto"
             >
-              Try for Free Now
+              {t('try-for-free-now')}
             </Button>
           </Link>
           <Link href="#" className="z-10 w-full sm:w-auto">
@@ -93,7 +94,7 @@ export default function EndCTA() {
               variant={'secondary'}
               className="w-full sm:w-auto"
             >
-              Learn More
+              {t('learn-more')}
               <ChevronRight />
             </Button>
           </Link>

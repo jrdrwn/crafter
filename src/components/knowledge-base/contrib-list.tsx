@@ -40,6 +40,7 @@ import {
   RefreshCw,
   Trash2,
 } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { toast } from 'sonner';
 
@@ -56,6 +57,7 @@ export type ContributionItem = {
 };
 
 export default function ContribList() {
+  const t = useTranslations('contrib.list');
   const { user, loading } = useUser();
   const [items, setItems] = useState<ContributionItem[]>([]);
   // offset state removed, use page only
@@ -130,10 +132,8 @@ export default function ContribList() {
       <section className="container mx-auto max-w-4xl px-4 py-6">
         <Card>
           <CardHeader>
-            <CardTitle>Contributions</CardTitle>
-            <CardDescription>
-              Sign in to view and manage your contributions.
-            </CardDescription>
+            <CardTitle>{t('title')}</CardTitle>
+            <CardDescription>{t('desc-not-signed-in')}</CardDescription>
           </CardHeader>
         </Card>
       </section>
@@ -145,12 +145,8 @@ export default function ContribList() {
       <Card>
         <CardHeader className="flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-center">
           <div>
-            <CardTitle className="text-lg sm:text-xl">
-              Your Contributions
-            </CardTitle>
-            <CardDescription className="text-sm">
-              Manage surveys, interviews, reviews, and documents you have added.
-            </CardDescription>
+            <CardTitle className="text-lg sm:text-xl">{t('title')}</CardTitle>
+            <CardDescription className="text-sm">{t('desc')}</CardDescription>
           </div>
           <Button
             variant="outline"
@@ -164,7 +160,7 @@ export default function ContribList() {
             ) : (
               <RefreshCw className="mr-2 size-4" />
             )}
-            Refresh
+            {t('refresh')}
           </Button>
         </CardHeader>
         <CardContent>
@@ -210,9 +206,7 @@ export default function ContribList() {
                 </li>
               ))
             ) : items.length === 0 ? (
-              <li className="text-sm text-muted-foreground">
-                No contributions yet.
-              </li>
+              <li className="text-sm text-muted-foreground">{t('empty')}</li>
             ) : (
               items.map((it) => {
                 const meta =
@@ -227,7 +221,7 @@ export default function ContribList() {
                     <div className="flex flex-wrap justify-between gap-3">
                       <div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
                         <span className="inline-flex items-center gap-1 rounded border px-2 py-0.5">
-                          <FileText className="size-3" /> {it.type}
+                          <FileText className="size-3" /> {t(`type.${it.type}`)}
                         </span>
                         {it.domain_key && (
                           <span className="inline-flex items-center gap-1 rounded border px-2 py-0.5">
@@ -239,7 +233,8 @@ export default function ContribList() {
                         )}
                         {it.language_key && (
                           <span className="inline-flex items-center gap-1 rounded border px-2 py-0.5">
-                            <Languages className="size-3" /> {it.language_key}
+                            <Languages className="size-3" />{' '}
+                            {t(`language.${it.language_key}`)}
                           </span>
                         )}
                         <Badge
@@ -247,7 +242,7 @@ export default function ContribList() {
                             visibility === 'public' ? 'secondary' : 'outline'
                           }
                         >
-                          {visibility === 'public' ? 'Public' : 'Private'}
+                          {t(`visibility.${visibility}`)}
                         </Badge>
                         <span className="inline-flex items-center gap-1 rounded border px-2 py-0.5 text-[10px] sm:text-xs">
                           <CalendarClock className="size-3 shrink-0" />
@@ -266,7 +261,7 @@ export default function ContribList() {
                           onClick={() => openEditDialog(it.id)}
                           className="flex-1"
                         >
-                          <Pencil className="mr-2 size-4" /> Edit
+                          <Pencil className="mr-2 size-4" /> {t('edit')}
                         </Button>
                         <DeleteButton
                           id={it.id}
@@ -357,6 +352,7 @@ function DeleteButton({
   token: string;
   onDeleted: (id: number) => void;
 }) {
+  const t = useTranslations('contrib.list');
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
 
@@ -368,11 +364,11 @@ function DeleteButton({
         headers: { Authorization: `Bearer ${token}` },
       });
       if (!res.ok) throw new Error('Failed to delete');
-      toast.success('Deleted successfully');
+      toast.success(t('deleted-success'));
       onDeleted(id);
       setOpen(false);
     } catch (e) {
-      toast.error('Failed', {
+      toast.error(t('delete-failed'), {
         description: e instanceof Error ? e.message : String(e),
       });
     } finally {
@@ -384,20 +380,19 @@ function DeleteButton({
     <AlertDialog open={open} onOpenChange={setOpen}>
       <AlertDialogTrigger asChild>
         <Button variant="destructive" size="sm" className="flex-1">
-          <Trash2 className="mr-2 size-4" /> Delete
+          <Trash2 className="mr-2 size-4" /> {t('delete')}
         </Button>
       </AlertDialogTrigger>
       <AlertDialogContent className="max-w-[90vw] sm:max-w-lg">
         <AlertDialogHeader>
-          <AlertDialogTitle>Delete contribution?</AlertDialogTitle>
+          <AlertDialogTitle>{t('delete-title')}</AlertDialogTitle>
           <AlertDialogDescription className="text-sm">
-            This will permanently delete the document and all related
-            embeddings. This action cannot be undone.
+            {t('delete-desc')}
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter className="flex-col gap-2 sm:flex-row">
           <AlertDialogCancel className="w-full sm:w-auto">
-            Cancel
+            {t('cancel')}
           </AlertDialogCancel>
           <AlertDialogAction
             onClick={handleDelete}
@@ -405,7 +400,7 @@ function DeleteButton({
             className="w-full sm:w-auto"
           >
             {loading ? <Loader2 className="mr-2 size-4 animate-spin" /> : null}
-            Delete
+            {t('delete')}
           </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>

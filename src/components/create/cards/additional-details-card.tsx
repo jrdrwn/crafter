@@ -1,6 +1,7 @@
 'use client';
 
 import { BadgeInfo } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 import { Control, Controller } from 'react-hook-form';
 
 import {
@@ -24,6 +25,7 @@ type Props = {
 };
 
 export default function AdditionalDetailsCard({ control }: Props) {
+  const t = useTranslations('create');
   return (
     <Card className="col-span-1 w-full border border-primary p-1.5 sm:p-2">
       <CardHeader className="relative p-1.5 sm:p-2">
@@ -32,10 +34,10 @@ export default function AdditionalDetailsCard({ control }: Props) {
             size={16}
             className="text-foreground sm:size-[18px] md:size-5"
           />
-          Additional Details
+          {t('additional-details-title')}
         </CardTitle>
         <CardDescription className="text-xs text-gray-400 sm:text-sm">
-          Specific aspects you want to focus on (optional).
+          {t('additional-details-desc')}
         </CardDescription>
       </CardHeader>
       <CardContent className="px-1.5 pb-1 sm:px-2">
@@ -57,7 +59,7 @@ export default function AdditionalDetailsCard({ control }: Props) {
                     maxLength={500}
                     value={value}
                     onChange={(e) => field.onChange(e.target.value)}
-                    placeholder="Example: Focus on users with visual impairments, or users with minimal technology experience..."
+                    placeholder={t('additional-details-placeholder')}
                   />
                   <InputGroupAddon align="block-end">
                     <InputGroupText className="text-xs tabular-nums sm:text-sm">

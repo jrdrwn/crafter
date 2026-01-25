@@ -1,1 +1,494 @@
-{}
+{
+  "shared": {
+    "header": {
+      "home": "Home",
+      "create": "Create",
+      "explore": "Explore",
+      "history": "History",
+      "knowledge-base": "Knowledge Base"
+    }
+  },
+  "home": {
+    "hero": {
+      "badge": "New in CRAFTER 2.0: Persona Taxonomy",
+      "title": "Crafting Recommendations and Advice for Tailored, Effective Personas",
+      "subtitle": "Stop guessing. Let CRAFTER uncover user goals, motivations, and frustrations in seconds.",
+      "start": "Start Creating Persona",
+      "continue": "Continue as Guest",
+      "join": "Join now!",
+      "history": "My History",
+      "trusted": "Trusted by Leading Teams",
+      "roles": ["UI/UX Teams", "Product Managers", "Developers", "Researchers"]
+    },
+    "featureRevolutionize": {
+      "title": "Revolutionize the Way You Understand Your Users",
+      "desc": "With a taxonomy-based methodology, CRAFTER 2.0 generates personas that are not only accurate, but also consistent and reliable for a wide range of user research needs.",
+      "points": [
+        "Save time in user research",
+        "More accurate and detailed personas",
+        "Consistency through structured methodology",
+        "Easy to use for any team",
+        "Export in multiple formats"
+      ],
+      "cta": "Start Creating Personas",
+      "persona": {
+        "name": "Ahmad Rizky",
+        "role": "Product Manager, 28 years old",
+        "quote": "I need an efficient solution to automate business processes without sacrificing quality.",
+        "motivation": "Operational efficiency",
+        "pain": "Complex interface",
+        "skill": "Intermediate"
+      },
+      "motivation": "Motivation:",
+      "pain": "Pain Point:",
+      "skill": "Skill Level:"
+    },
+    "featureWhy": {
+      "title": "Why CRAFTER 2.0?",
+      "desc": "A complete solution for creating high-quality personas with cutting-edge AI technology.",
+      "ai": {
+        "title": "AI-Powered Generation",
+        "desc": "Leverage advanced AI to generate accurate and comprehensive user personas."
+      },
+      "taxonomy": {
+        "title": "Taxonomy-Based",
+        "desc": "A structured taxonomy-driven system that ensures consistent and reliable results."
+      },
+      "multi": {
+        "title": "Multi-Domain Support",
+        "desc": "Adaptable across diverse domains, from healthcare and education to technology"
+      }
+    }
+  },
+  "end-cta": {
+    "ready-to-get-started": "Ready to Get Started?",
+    "join-thousands": "Join thousands of professionals already using CRAFTER 2.0 to create high-quality personas.",
+    "try-for-free-now": "Try for Free Now",
+    "learn-more": "Learn More"
+  },
+  "footer": {
+    "copyright": "© 2025 Crafter. All rights reserved.",
+    "follow-us-on-instagram": "Follow us on Instagram",
+    "instagram": "Instagram"
+  },
+  "create": {
+    "hero-badge": "Define your domain and factors",
+    "hero-title": "Create your persona with AI",
+    "hero-desc": "Select a domain or industry, choose relevant internal and external factors, and let CRAFTER 2.0 generate a structured persona for your research needs.",
+    "domain-title": "Choose domain",
+    "domain-desc": "Select the domain or industry for the persona you want to create.",
+    "domain-search-placeholder": "Search...",
+    "domain-add-placeholder": "Add a new domain...",
+    "domain-selected": "Selected",
+    "domain-key-label": "Key: {key}",
+    "domain-add-suggestion": "Add \"{query}\" as a new domain if not listed.",
+    "domain-fetch-error": "Failed to fetch domains.",
+    "internal-title": "Human Factors — Internal Layer",
+    "internal-desc": "Select available internal factors. Edit the description as a list of items.",
+    "internal-search-placeholder": "Search...",
+    "internal-search-aria": "Search layer attributes",
+    "internal-reset-title": "Reset edited internal attributes",
+    "internal-reset": "Reset",
+    "internal-reset-dialog-title": "Reset edited attributes?",
+    "internal-reset-dialog-desc": "This will revert descriptions of selected internal attributes to their defaults. Selection remains unchanged.",
+    "internal-cancel": "Cancel",
+    "internal-selected": "Selected",
+    "internal-remove-aria": "Remove {title}",
+    "internal-no-selection": "No selection",
+    "internal-details": "Details",
+    "internal-details-empty": "Select a factor from the middle list to edit details.",
+    "internal-details-desc": "Manage description items (comma-separated)",
+    "internal-edit-aria": "Edit {item}",
+    "internal-no-items": "No items",
+    "internal-edit-placeholder": "Edit item",
+    "internal-add-placeholder": "Add item",
+    "internal-save": "Save",
+    "internal-add": "Add",
+    "external-title": "Human Factors — External Layer",
+    "external-desc": "Select available external factors. Edit the description as a list of items.",
+    "external-search-placeholder": "Search...",
+    "external-search-aria": "Search layer attributes",
+    "external-reset-title": "Reset edited external attributes",
+    "external-reset": "Reset",
+    "external-reset-dialog-title": "Reset edited attributes?",
+    "external-reset-dialog-desc": "This will revert descriptions of selected external attributes to their defaults. Selection remains unchanged.",
+    "external-cancel": "Cancel",
+    "external-selected": "Selected",
+    "external-remove-aria": "Remove {title}",
+    "external-no-selection": "No selection",
+    "external-details": "Details",
+    "external-details-empty": "Select a factor from the middle list to edit details.",
+    "external-details-desc": "Manage description items (comma-separated)",
+    "external-details-readonly": "Layer explanation (read-only).",
+    "external-edit-aria": "Edit {item}",
+    "external-no-items": "No items",
+    "external-edit-placeholder": "Edit item",
+    "external-add-placeholder": "Add item",
+    "external-save": "Save",
+    "external-add": "Add",
+    "external-required": "default",
+    "external-required-title": "This item is required",
+    "external-no-explanation": "No explanation.",
+    "additional-details-title": "Additional Details",
+    "additional-details-desc": "Specific aspects you want to focus on (optional).",
+    "additional-details-placeholder": "Example: Focus on users with visual impairments, or users with minimal technology experience...",
+    "content-length-title": "Content Length Settings",
+    "content-length-desc": "Adjust the length of the generated persona description",
+    "content-length-warning": "If there are too many human factors, the response length can be not what you want",
+    "content-length-short": "Short",
+    "content-length-medium": "Medium",
+    "content-length-long": "Long",
+    "content-length-custom": "Custom",
+    "content-length-min": "Min:",
+    "content-length-max": "Max:",
+    "content-length-words": "words",
+    "content-length-helper-title": "Helper: Content Length",
+    "content-length-helper-desc": "The length of the persona determines the details shown: short for quick ideas, medium for balance, long for in-depth analysis.",
+    "content-length-short-label": "Short (±0-100 words)",
+    "content-length-short-helper": "Suitable for brainstorming; contains essentials like demographics, main goal, and 1-2 pain points.",
+    "content-length-medium-label": "Medium (±100-200 words)",
+    "content-length-medium-helper": "Balanced for workshops; includes motivation, several goals, pain points, and interaction with technology.",
+    "content-length-long-label": "Long (≥200 words)",
+    "content-length-long-helper": "In-depth; adds personal stories, domain context, and more complete human factors.",
+    "content-length-custom-label": "Custom",
+    "content-length-custom-helper": "Users can set the word count as needed.",
+    "llm-config-title": "LLM Configuration",
+    "llm-config-desc": "Select the AI model used to generate personas",
+    "llm-config-select-placeholder": "Select LLM Model",
+    "llm-config-use-rag": "Use RAG (Retrieval-Augmented Generation)",
+    "llm-config-rag-unavailable": "RAG not available for selected language/domain",
+    "llm-config-language-placeholder": "Select Language",
+    "construct-submit": "Create persona",
+    "construct-loading": "Creating...",
+    "construct-agreement": "By clicking \"Create persona\", you agree to our Terms of Service and Privacy Policy.",
+    "construct-review-title": "Review your inputs",
+    "construct-review-desc": "Make sure everything looks correct before creating.",
+    "construct-overview": "Overview",
+    "construct-domain": "Domain:",
+    "construct-model": "Model:",
+    "construct-language": "Language:",
+    "construct-note": "Note:",
+    "construct-note-rag-many": "RAG is enabled and you have selected many factors. Generation may take up to a minute.",
+    "construct-note-rag": "RAG is enabled. Generation may take a bit longer than usual.",
+    "construct-note-many": "You have selected many factors. Generation may take longer.",
+    "construct-note-none": "No special notes.",
+    "construct-factors": "Factors",
+    "construct-internal": "Internal",
+    "construct-external": "External",
+    "construct-generation-settings": "Generation Settings",
+    "construct-content-length": "Content length:",
+    "construct-words": "words",
+    "construct-use-rag": "Use RAG:",
+    "construct-enabled": "Enabled",
+    "construct-disabled": "Disabled",
+    "construct-detail": "Detail",
+    "construct-toast-10s": "Still working... Persona generation is taking longer than usual (10s).",
+    "construct-toast-20s": "Still working... Persona generation is taking over 20 seconds.",
+    "construct-toast-30s": "This is taking a while (30s+). Please wait.",
+    "construct-toast-60s": "Generation is taking more than 1 minute.",
+    "construct-toast-failed": "Failed to create persona: Unknown error",
+    "construct-toast-success": "Persona created successfully!",
+    "construct-toast-localstorage": "Failed to save personas to localStorage:",
+    "construct-toast-localstorage-desc": "Please try again later.",
+    "construct-toast-login": "Failed to create persona: Please login again"
+  },
+  "explore": {
+    "hero-badge": "Designed for Teams, Powered by AI",
+    "hero-title": "Discover Personas",
+    "hero-desc": "Browse community-shared personas or reuse your own as templates.",
+    "persona-viewing": "Viewing {count} out of {total} personas",
+    "persona-show-mine": "Show My Personas Only",
+    "persona-error": "Failed to load data.",
+    "persona-refresh": "Refresh",
+    "persona-empty": "No personas found.",
+    "persona-search-placeholder": "Search persona or tag...",
+    "persona-domain-filter": "Filter by Domain",
+    "persona-domain-search-placeholder": "Search domains...",
+    "persona-domain-empty": "No domain found.",
+    "persona-order-filter": "Order by",
+    "persona-order-search-placeholder": "Search order...",
+    "persona-order-empty": "No order found.",
+    "persona-order-recent": "Recently Added",
+    "persona-order-updated": "Recently Updated",
+    "persona-order-alphabetical": "Alphabetical"
+  },
+  "history": {
+    "hero-title": "Persona History",
+    "hero-desc": "Manage all the personas you have created",
+    "create": "Create New Persona",
+    "empty": "No personas found. Create your first persona!",
+    "unknown": "Unknown Persona",
+    "error": "Failed to load data.",
+    "refresh": "Refresh"
+  },
+  "edit": {
+    "hero-badge": "Define Your Domain and Factors",
+    "hero-title": "Regenerate Your Persona",
+    "hero-desc-part1": "Select a domain or industry, choose",
+    "hero-desc-part2": "relevant internal and external factors",
+    "hero-desc-part3": ", and let",
+    "hero-desc-part4": "CRAFTER 2.0",
+    "hero-desc-part5": "generate a structured",
+    "hero-desc-part6": "persona",
+    "hero-desc-part7": "for your research needs.",
+    "toast-10s": "Still working... Persona editing is taking longer than usual (10s).",
+    "toast-20s": "Still working... Persona editing is taking over 20 seconds.",
+    "toast-30s": "This is taking a while (30s+). Please wait.",
+    "toast-60s": "Editing is taking more than 1 minute.",
+    "failed-edit-persona": "Failed to edit persona: Unknown error",
+    "failed-edit-persona-login": "Failed to edit persona: Please login again",
+    "persona-edited-successfully": "Persona edited successfully!",
+    "submit-label": "Edit persona",
+    "loading-label": "Editing...",
+    "agreement-text": "By clicking \"Edit persona\", you agree to our Terms of Service and Privacy Policy.",
+    "review-inputs-title": "Review your inputs",
+    "review-inputs-desc": "Make sure everything looks correct before editing.",
+    "overview": "Overview",
+    "factors": "Factors",
+    "generation-settings": "Generation Settings",
+    "select-internal-factor": "Select at least one internal factor",
+    "select-external-factor": "Select at least one external factor"
+  },
+  "detail": {
+    "persona-name-fallback": "Persona Name",
+    "uploading": "Uploading...",
+    "edit": "Edit",
+    "upload-max-size": "Upload (max 2MB)",
+    "remove": "Remove",
+    "image-upload-failed": "Image upload failed",
+    "image-uploaded": "Image uploaded!",
+    "upload-failed": "Upload failed",
+    "select-narration-structure": "Select Naration & Structure",
+    "mixed": "Mixed",
+    "bullets": "Bullets",
+    "narrative": "Narrative",
+    "word-count": "Word count:",
+    "persona-content-updated": "Persona content updated successfully!",
+    "failed-update-persona-content": "Failed to update persona content.",
+    "back-to-history": "Back to history",
+    "online": "Online",
+    "edit-result": "Edit Result",
+    "save": "Save",
+    "view-mode": "View Mode",
+    "regenerate": "Regenerate",
+    "delete": "Delete",
+    "copy-this-persona": "Copy this Persona",
+    "persona-copied-successfully": "Persona copied successfully!",
+    "error-copying-persona": "Error copying persona:",
+    "please-try-again-later": "Please try again later.",
+    "error-updating-visibility": "Error updating visibility:",
+    "error-fetching-persona": "Error fetching persona",
+    "error-deleting-persona": "Error deleting persona",
+    "author": "Author",
+    "name": "Name",
+    "email": "Email",
+    "quick-info": "Quick Info",
+    "created": "Created",
+    "updated": "Updated",
+    "share-persona": "Share Persona",
+    "share-persona-desc": "Make this persona publicly accessible",
+    "private": "Private",
+    "public": "Public",
+    "download-persona": "Download Persona",
+    "download-persona-desc": "Save persona in multiple formats",
+    "download-as-pdf-full": "Download as PDF (Full)",
+    "download-as-json-raw": "Download as JSON (Raw)",
+    "mixed-structure": "Mixed Structure",
+    "bullets-structure": "Bullets Structure",
+    "narrative-structure": "Narrative Structure",
+    "domain": "Domain:",
+    "author-label": "Author:",
+    "visibility": "Visibility:",
+    "created-label": "Created:",
+    "updated-label": "Updated:",
+    "delete-confirmation-title": "Are you absolutely sure?",
+    "delete-confirmation-desc": "This action cannot be undone. This will permanently delete your persona and remove your data from our servers.",
+    "cancel": "Cancel",
+    "continue": "Continue",
+    "persona-content-updated-guest": "Persona content updated successfully!",
+    "failed-save-changes": "Failed to save changes.",
+    "saved": "Saved",
+    "you-need-login-share": "You need to log in to access all Share Persona features.",
+    "download-as-pdf": "Download as PDF",
+    "download-as-json": "Download as JSON"
+  },
+  "contrib": {
+    "title": "RAG Knowledge Management",
+    "desc": "Manage knowledge by uploading research, interviews, reviews, or documents. Data will be chunked and indexed into the vector store.",
+    "not-signed-in": "You are not signed in. Please login to upload contributions.",
+    "toggle": {
+      "text": { "title": "Text input", "desc": "Write/Paste content manually" },
+      "file": { "title": "Upload file", "desc": "TXT/DOCX/XLSX" },
+      "meta": { "title": "Add metadata", "desc": "Key-Value for context" }
+    },
+    "type": {
+      "label": "Content Type",
+      "placeholder": "Choose type",
+      "survey": "Survey",
+      "interview": "Interview",
+      "review": "Review",
+      "doc": "Document"
+    },
+    "visibility": {
+      "label": "Visibility",
+      "placeholder": "Select visibility",
+      "public": "Public",
+      "private": "Private"
+    },
+    "language": {
+      "label": "Language",
+      "placeholder": "Choose language",
+      "en": "English",
+      "id": "Bahasa Indonesia"
+    },
+    "domain": {
+      "label": "Domain (choose or create)"
+    },
+    "source": {
+      "label": "Source (optional)",
+      "placeholder": "e.g. Sprint 12 Research"
+    },
+    "text": {
+      "label": "Contribution Content",
+      "placeholder": "Paste raw text from survey/interview/review/document here..."
+    },
+    "meta": {
+      "label": "Extra Metadata",
+      "key-placeholder": "key (e.g. project)",
+      "value-placeholder": "value (e.g. alpha)",
+      "add": "Add",
+      "remove": "Remove",
+      "empty": "No metadata added yet."
+    },
+    "file": {
+      "label": "Upload file (.txt, .docx, .xlsx)",
+      "selected": "Selected: {name} ({size} KB)"
+    },
+    "tokens": {
+      "count": "Estimated {count}/{limit} tokens",
+      "limit": "Limit {limit} tokens",
+      "exceeds": "Exceeds token limit"
+    },
+    "submit": {
+      "label": "Upload to RAG",
+      "disabled": "Provide text or choose a file first"
+    },
+    "hero": {
+      "badge-full": "RAG Knowledge Contributions",
+      "badge-short": "RAG Knowledge",
+      "title": "Manage & Contribute Knowledge",
+      "desc": "Upload, curate, and sync knowledge sources for Retrieval-Augmented Generation (RAG). Keep your team's data up to date and easy to find."
+    },
+    "list": {
+      "title": "Your Contributions",
+      "desc": "Manage surveys, interviews, reviews, and documents you have added.",
+      "desc-not-signed-in": "Sign in to view and manage your contributions.",
+      "refresh": "Refresh",
+      "empty": "No contributions yet.",
+      "edit": "Edit",
+      "delete": "Delete",
+      "delete-title": "Delete contribution?",
+      "delete-desc": "This will permanently delete the document and all related embeddings. This action cannot be undone.",
+      "deleted-success": "Deleted successfully",
+      "delete-failed": "Failed",
+      "cancel": "Cancel",
+      "type": {
+        "survey": "Survey",
+        "interview": "Interview",
+        "review": "Review",
+        "doc": "Document"
+      },
+      "language": {
+        "en": "English",
+        "id": "Bahasa Indonesia"
+      },
+      "visibility": {
+        "public": "Public",
+        "private": "Private"
+      }
+    },
+    "edit": {
+      "title": "Edit Contribution",
+      "desc": "Update content and metadata. The system will re-index embeddings.",
+      "loading": "Loading...",
+      "type": {
+        "label": "Type",
+        "placeholder": "Select type",
+        "survey": "Survey",
+        "interview": "Interview",
+        "review": "Review",
+        "doc": "Document"
+      },
+      "visibility": {
+        "label": "Visibility",
+        "placeholder": "Select visibility",
+        "public": "Public",
+        "private": "Private"
+      },
+      "language": {
+        "label": "Language",
+        "placeholder": "Select language",
+        "en": "English",
+        "id": "Bahasa Indonesia"
+      },
+      "domain": {
+        "label": "Domain"
+      },
+      "source": {
+        "label": "Source",
+        "placeholder": "optional"
+      },
+      "text": {
+        "label": "Content",
+        "chars": "chars",
+        "tokens": "tokens"
+      },
+      "meta": {
+        "label": "Extra Metadata",
+        "key-placeholder": "key (e.g. project)",
+        "value-placeholder": "value (e.g. alpha)",
+        "add": "Add",
+        "remove": "Remove",
+        "empty": "No metadata added yet."
+      },
+      "cancel": "Cancel",
+      "save": "Save"
+    }
+  },
+  "login": {
+    "form": {
+      "title": "Login to Your Account",
+      "description": "Log in to access your persona history and advanced features.",
+      "email": "Email",
+      "emailPlaceholder": "name@email.com",
+      "password": "Password",
+      "passwordPlaceholder": "Enter your password",
+      "button": "Login",
+      "noAccount": "Don't have an account?",
+      "createNow": "Create now.",
+      "success": "Login Successful",
+      "failed": "Login Failed"
+    }
+  },
+  "create-account": {
+    "form": {
+      "title": "Create a New Account",
+      "description": "Sign up to save your persona history and access advanced features.",
+      "name": "Name",
+      "name-placeholder": "John Doe",
+      "email": "Email",
+      "email-placeholder": "name@email.com",
+      "password": "Password",
+      "password-placeholder": "Enter your password",
+      "confirm-password": "Confirm Password",
+      "button": "Create Account",
+      "terms-prefix": "I agree to the",
+      "terms-link": "Terms and Conditions",
+      "already-account": "Already have an account?",
+      "login-link": "Login.",
+      "success": "Account created successfully! Please log in.",
+      "error-password-mismatch": "Passwords do not match",
+      "error-generic": "Something went wrong. Please try again."
+    }
+  }
+}

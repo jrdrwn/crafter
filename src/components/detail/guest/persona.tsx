@@ -3,6 +3,7 @@
 import { cn } from '@/lib/utils';
 import parse from 'html-react-parser';
 import { Blend, List, Text, User } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 import { useSearchParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
@@ -35,6 +36,7 @@ function PersonaHeader({
 }: {
   personaResponse?: PersonaResponse;
 }) {
+  const t = useTranslations('detail');
   return (
     <Card className="w-full border-primary bg-primary/5">
       <CardContent className="py-6 md:py-8">
@@ -43,7 +45,7 @@ function PersonaHeader({
             <User className="size-10 md:size-[60px]" />
           </span>
           <p className="text-xl font-bold text-primary md:text-2xl">
-            {persona?.result?.full_name ?? 'Persona Name'}
+            {persona?.result?.full_name ?? t('persona-name-fallback')}
           </p>
           <p className="text-center text-base text-gray-500 italic md:text-lg dark:text-gray-300">
             {persona?.result?.quote ?? '—'}
@@ -70,12 +72,13 @@ function PersonaStyleSelector({
   personaStyle: PersonaStyle;
   setPersonaStyle: (style: PersonaStyle) => void;
 }) {
+  const t = useTranslations('detail');
   return (
     <Card className="w-full border-primary bg-primary/5 py-3 md:py-4">
       <CardContent className="px-3 md:px-4">
         <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
           <h2 className="px-0 text-base font-bold text-primary md:text-xl">
-            Select Naration & Structure
+            {t('select-narration-structure')}
           </h2>
           <div className="flex flex-wrap items-center justify-start gap-2 md:justify-center md:gap-4">
             <Button
@@ -90,7 +93,7 @@ function PersonaStyleSelector({
               onClick={() => setPersonaStyle('mixed')}
             >
               <Text className="size-4" />
-              <span className="text-xs sm:text-sm">Mixed</span>
+              <span className="text-xs sm:text-sm">{t('mixed')}</span>
             </Button>
             <Button
               variant={'outline'}
@@ -104,7 +107,7 @@ function PersonaStyleSelector({
               onClick={() => setPersonaStyle('bullets')}
             >
               <List className="size-4" />
-              <span className="text-xs sm:text-sm">Bullets</span>
+              <span className="text-xs sm:text-sm">{t('bullets')}</span>
             </Button>
             <Button
               variant={'outline'}
@@ -118,7 +121,7 @@ function PersonaStyleSelector({
               onClick={() => setPersonaStyle('narative')}
             >
               <Blend className="size-4" />
-              <span className="text-xs sm:text-sm">Narrative</span>
+              <span className="text-xs sm:text-sm">{t('narrative')}</span>
             </Button>
           </div>
         </div>
@@ -155,6 +158,7 @@ function PersonaContentEdit({
   personaStyle: PersonaStyle;
   markdown?: PersonaResponse;
 }) {
+  const t = useTranslations('detail');
   const searchParams = useSearchParams();
   const [mixedContent, setMixedContent] = useState<string>(
     markdown?.result?.mixed || '',
@@ -186,9 +190,9 @@ function PersonaContentEdit({
         updated_at: new Date().toISOString(),
       };
       localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
-      toast.success('Persona content updated successfully!');
+      toast.success(t('persona-content-updated-guest'));
     } catch (_e) {
-      toast.error('Failed to save changes.');
+      toast.error(t('failed-save-changes'));
     }
   }
 

@@ -4,6 +4,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { ErrorMessageButtonRetry } from '@/helpers/error-retry';
 import { attribute } from '@prisma/client';
 import { Brain, RotateCcw, Users, X } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { Control, Controller } from 'react-hook-form';
 
@@ -48,6 +49,7 @@ const defaultExplanations: Record<string, string> = {
 };
 
 export default function ExternalFactorsCard({ control }: Props) {
+  const t = useTranslations('create');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [factors, setFactors] = useState<attribute[]>([]);
@@ -151,11 +153,10 @@ export default function ExternalFactorsCard({ control }: Props) {
             size={16}
             className="text-foreground sm:size-[18px] md:size-5"
           />
-          Human Factors — External Layer
+          {t('external-title')}
         </CardTitle>
         <CardDescription className="text-xs sm:text-sm">
-          Select available external factors. Edit the description as a list of
-          items.
+          {t('external-desc')}
         </CardDescription>
       </CardHeader>
       <CardContent className="px-1.5 sm:px-2">
@@ -170,10 +171,10 @@ export default function ExternalFactorsCard({ control }: Props) {
             <div className="flex items-center gap-2">
               <Input
                 type="search"
-                placeholder="Search..."
+                placeholder={t('external-search-placeholder')}
                 className="flex-1 border-primary text-sm"
                 onChange={(e) => setQuery(e.target.value)}
-                aria-label="Search layer attributes"
+                aria-label={t('external-search-aria')}
               />
               <Controller
                 name="external"
@@ -185,26 +186,28 @@ export default function ExternalFactorsCard({ control }: Props) {
                         type="button"
                         size="sm"
                         variant="outline"
-                        title="Reset edited external attributes"
-                        aria-label="Reset edited external attributes"
+                        title={t('external-reset-title')}
+                        aria-label={t('external-reset-title')}
                       >
                         <RotateCcw className="size-4" />
-                        <span className="ml-1 hidden sm:inline">Reset</span>
+                        <span className="ml-1 hidden sm:inline">
+                          {t('external-reset')}
+                        </span>
                       </Button>
                     </AlertDialogTrigger>
                     <AlertDialogContent>
                       <AlertDialogHeader>
                         <AlertDialogTitle>
-                          Reset edited attributes?
+                          {t('external-reset-dialog-title')}
                         </AlertDialogTitle>
                         <AlertDialogDescription>
-                          This will revert descriptions of selected external
-                          attributes to their defaults. Selection remains
-                          unchanged.
+                          {t('external-reset-dialog-desc')}
                         </AlertDialogDescription>
                       </AlertDialogHeader>
                       <AlertDialogFooter>
-                        <AlertDialogCancel>Cancel</AlertDialogCancel>
+                        <AlertDialogCancel>
+                          {t('external-cancel')}
+                        </AlertDialogCancel>
                         <AlertDialogAction
                           onClick={() => {
                             const selected = (field.value || []) as attribute[];
@@ -247,7 +250,7 @@ export default function ExternalFactorsCard({ control }: Props) {
                             setEditingIndex(null);
                           }}
                         >
-                          Reset
+                          {t('external-reset')}
                         </AlertDialogAction>
                       </AlertDialogFooter>
                     </AlertDialogContent>
@@ -345,7 +348,7 @@ export default function ExternalFactorsCard({ control }: Props) {
                                       variant="secondary"
                                       className="text-xs"
                                     >
-                                      default
+                                      {t('external-required')}
                                     </Badge>
                                   )}
                                 </ItemTitle>
@@ -366,7 +369,7 @@ export default function ExternalFactorsCard({ control }: Props) {
           {/* Middle: Selected */}
           <div className="space-y-2">
             <h3 className="text-xs font-medium text-primary sm:text-sm">
-              Selected
+              {t('external-selected')}
             </h3>
             <Controller
               name="external"
@@ -380,7 +383,9 @@ export default function ExternalFactorsCard({ control }: Props) {
                         .map((t) => t.trim())
                         .filter(Boolean);
                       const preview = previewArr.length
-                        ? `${previewArr.slice(0, 3).join(', ')}${previewArr.length > 3 ? '…' : ''}`
+                        ? `${previewArr.slice(0, 3).join(', ')}${
+                            previewArr.length > 3 ? '…' : ''
+                          }`
                         : 'No items';
                       const selectItem = () => {
                         setActiveName(s.name);
@@ -442,7 +447,7 @@ export default function ExternalFactorsCard({ control }: Props) {
                                 disabled={required.has(s.name)}
                                 title={
                                   required.has(s.name)
-                                    ? 'This item is required'
+                                    ? t('external-required-title')
                                     : undefined
                                 }
                                 onClick={(e) => {
@@ -457,13 +462,15 @@ export default function ExternalFactorsCard({ control }: Props) {
                                     setTokens([]);
                                   }
                                 }}
-                                aria-label={`Remove ${s.title}`}
+                                aria-label={t('external-remove-aria', {
+                                  title: s.title,
+                                })}
                               >
                                 <X className="size-4" />
                               </Button>
                               {required.has(s.name) && (
                                 <Badge variant="secondary" className="text-xs">
-                                  default
+                                  {t('external-required')}
                                 </Badge>
                               )}
                             </ItemTitle>
@@ -476,7 +483,7 @@ export default function ExternalFactorsCard({ control }: Props) {
                     })}
                     {((field.value || []) as attribute[]).length === 0 && (
                       <div className="rounded-md border border-dashed p-3 text-center text-xs text-muted-foreground">
-                        No selection
+                        {t('external-no-selection')}
                       </div>
                     )}
                   </div>
@@ -487,7 +494,7 @@ export default function ExternalFactorsCard({ control }: Props) {
           {/* Right: Details editor */}
           <div className="space-y-2">
             <h3 className="text-xs font-medium text-primary sm:text-sm">
-              Details
+              {t('external-details')}
             </h3>
             <Controller
               name="external"
@@ -512,23 +519,23 @@ export default function ExternalFactorsCard({ control }: Props) {
                   >
                     {!selected ? (
                       <p className="text-sm text-muted-foreground">
-                        Select a factor from the middle list to edit details.
+                        {t('external-details-empty')}
                       </p>
                     ) : required.has(selected.name) ? (
                       <div className="flex h-full flex-col gap-3">
                         <div>
                           <p className="text-sm font-medium">
-                            {selected.title} (default)
+                            {selected.title} ({t('external-required')})
                           </p>
                           <p className="text-xs text-muted-foreground">
-                            Layer explanation (read-only).
+                            {t('external-details-readonly')}
                           </p>
                         </div>
                         <div className="h-32 w-full overflow-auto rounded border border-border bg-muted p-2 text-xs leading-relaxed whitespace-pre-line text-muted-foreground">
                           {defaultExplanations[selected.name] ||
                             (selected as attribute & { explanation?: string })
                               .explanation ||
-                            'No explanation.'}
+                            t('external-no-explanation')}
                         </div>
                         {/* no editing controls for default factors */}
                       </div>
@@ -539,14 +546,14 @@ export default function ExternalFactorsCard({ control }: Props) {
                             {selected.title}
                           </p>
                           <p className="text-xs text-muted-foreground">
-                            Manage description items (comma-separated)
+                            {t('external-details-desc')}
                           </p>
                         </div>
 
                         <div className="flex flex-wrap gap-2">
-                          {tokens.map((t, i) => (
+                          {tokens.map((tVal, i) => (
                             <Badge
-                              key={`${t}-${i}`}
+                              key={`${tVal}-${i}`}
                               variant="secondary"
                               className="flex items-center gap-1"
                             >
@@ -554,13 +561,15 @@ export default function ExternalFactorsCard({ control }: Props) {
                                 type="button"
                                 onClick={() => {
                                   setEditingIndex(i);
-                                  setInputValue(t);
+                                  setInputValue(tVal);
                                   inputRef.current?.focus();
                                 }}
                                 className="text-xs"
-                                aria-label={`Edit ${t}`}
+                                aria-label={t('external-edit-aria', {
+                                  item: tVal,
+                                })}
                               >
-                                {t}
+                                {tVal}
                               </button>
                               <button
                                 type="button"
@@ -571,7 +580,9 @@ export default function ExternalFactorsCard({ control }: Props) {
                                   setTokens(nextTokens);
                                   commitTokens(nextTokens);
                                 }}
-                                aria-label={`Remove ${t}`}
+                                aria-label={t('external-remove-aria', {
+                                  title: tVal,
+                                })}
                               >
                                 <X className="size-3" />
                               </button>
@@ -579,7 +590,7 @@ export default function ExternalFactorsCard({ control }: Props) {
                           ))}
                           {tokens.length === 0 && (
                             <span className="text-xs text-muted-foreground">
-                              No items
+                              {t('external-no-items')}
                             </span>
                           )}
                         </div>
@@ -590,7 +601,9 @@ export default function ExternalFactorsCard({ control }: Props) {
                             value={inputValue}
                             onChange={(e) => setInputValue(e.target.value)}
                             placeholder={
-                              editingIndex !== null ? 'Edit item' : 'Add item'
+                              editingIndex !== null
+                                ? t('external-edit-placeholder')
+                                : t('external-add-placeholder')
                             }
                             className="border-primary"
                             onKeyDown={(e) => {
@@ -632,7 +645,9 @@ export default function ExternalFactorsCard({ control }: Props) {
                               }
                             }}
                           >
-                            {editingIndex !== null ? 'Save' : 'Add'}
+                            {editingIndex !== null
+                              ? t('external-save')
+                              : t('external-add')}
                           </Button>
                           {editingIndex !== null && (
                             <Button
@@ -643,7 +658,7 @@ export default function ExternalFactorsCard({ control }: Props) {
                                 setInputValue('');
                               }}
                             >
-                              Cancel
+                              {t('external-cancel')}
                             </Button>
                           )}
                         </div>

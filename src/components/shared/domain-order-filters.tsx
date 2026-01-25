@@ -3,6 +3,7 @@
 import { cn } from '@/lib/utils';
 import { getCookie } from 'cookies-next/client';
 import { Check, ChevronsUpDown, Filter, ListFilter } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 import { useEffect, useMemo, useState } from 'react';
 
 import { Button } from '../ui/button';
@@ -30,6 +31,7 @@ export function DomainFilterCombobox({
   const [open, setOpen] = useState(false);
   const [options, setOptions] = useState<DomainOption[]>([]);
   const token = getCookie('token');
+  const t = useTranslations();
 
   useEffect(() => {
     async function fetchDomains() {
@@ -68,16 +70,19 @@ export function DomainFilterCombobox({
         >
           <div className="flex items-center gap-2">
             <Filter className="text-primary" />
-            {selectedLabel || 'Filter by Domain'}
+            {selectedLabel || t('explore.persona-domain-filter')}
           </div>
           <ChevronsUpDown className="opacity-50" />
         </Button>
       </PopoverTrigger>
       <PopoverContent className="p-0">
         <Command>
-          <CommandInput placeholder="Search domains..." className="h-9" />
+          <CommandInput
+            placeholder={t('explore.persona-domain-search-placeholder')}
+            className="h-9"
+          />
           <CommandList>
-            <CommandEmpty>No domain found.</CommandEmpty>
+            <CommandEmpty>{t('explore.persona-domain-empty')}</CommandEmpty>
             <CommandGroup>
               {options.map((domain) => (
                 <CommandItem
@@ -122,11 +127,16 @@ export function OrderFilterCombobox({
   onChangeAction?: (value: OrderValue) => void;
 }) {
   const [open, setOpen] = useState(false);
+  const t = useTranslations();
 
-  const currentLabel = useMemo(
-    () => orderOptions.find((i) => i.value === value)?.label || 'Order by',
-    [value],
-  );
+  const orderLabels: Record<OrderValue, string> = {
+    recent: t('explore.persona-order-recent'),
+    updated: t('explore.persona-order-updated'),
+    alphabetical: t('explore.persona-order-alphabetical'),
+  };
+
+  const currentLabel =
+    (value && orderLabels[value]) || t('explore.persona-order-filter');
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
@@ -146,9 +156,12 @@ export function OrderFilterCombobox({
       </PopoverTrigger>
       <PopoverContent className="p-0">
         <Command>
-          <CommandInput placeholder="Search order..." className="h-9" />
+          <CommandInput
+            placeholder={t('explore.persona-order-search-placeholder')}
+            className="h-9"
+          />
           <CommandList>
-            <CommandEmpty>No order found.</CommandEmpty>
+            <CommandEmpty>{t('explore.persona-order-empty')}</CommandEmpty>
             <CommandGroup>
               {orderOptions.map((item) => (
                 <CommandItem
@@ -160,7 +173,7 @@ export function OrderFilterCombobox({
                     setOpen(false);
                   }}
                 >
-                  {item.label}
+                  {orderLabels[item.value]}
                   <Check
                     className={cn(
                       'ml-auto',

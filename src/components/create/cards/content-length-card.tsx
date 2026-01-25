@@ -17,6 +17,7 @@ import {
 import { cn } from '@/lib/utils';
 import * as RadioGroupPrimitive from '@radix-ui/react-radio-group';
 import { CircleAlertIcon, CircleQuestionMark, Text } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 import { useState } from 'react';
 import { Control, Controller } from 'react-hook-form';
 import z from 'zod';
@@ -69,6 +70,7 @@ export default function ContentLengthCard({ control }: Props) {
     initialRange[0],
     initialRange[1],
   ]);
+  const t = useTranslations('create');
 
   return (
     <Card className="col-span-1 w-full border border-primary p-1.5 sm:p-2">
@@ -78,22 +80,19 @@ export default function ContentLengthCard({ control }: Props) {
             <CircleAlertIcon className="absolute top-0 right-5 size-4 text-gray-400 hover:text-gray-600 sm:right-7 sm:size-5" />
           </TooltipTrigger>
           <TooltipContent>
-            <p className="text-xs sm:text-sm">
-              if there are too many human factor, the response length can be not
-              what you want
-            </p>
+            <p className="text-xs sm:text-sm">{t('content-length-warning')}</p>
           </TooltipContent>
         </Tooltip>
-        <ContentLengthHelperModal />
+        <ContentLengthHelperModal t={t} />
         <CardTitle className="flex items-center gap-1.5 text-base text-primary sm:gap-2 sm:text-lg md:text-xl">
           <Text
             size={16}
             className="text-foreground sm:size-[18px] md:size-5"
           />
-          Content Length Settings
+          {t('content-length-title')}
         </CardTitle>
         <CardDescription className="text-xs text-gray-400 sm:text-sm">
-          Adjust the length of the generated persona description
+          {t('content-length-desc')}
         </CardDescription>
       </CardHeader>
       <CardContent className="px-1.5 sm:px-2">
@@ -125,36 +124,40 @@ export default function ContentLengthCard({ control }: Props) {
                   id="short"
                   className="text-xs sm:text-sm"
                 >
-                  Short
+                  {t('content-length-short')}
                 </RadioBoxItem>
                 <RadioBoxItem
                   value="medium"
                   id="medium"
                   className="text-xs sm:text-sm"
                 >
-                  Medium
+                  {t('content-length-medium')}
                 </RadioBoxItem>
                 <RadioBoxItem
                   value="long"
                   id="long"
                   className="text-xs sm:text-sm"
                 >
-                  Long
+                  {t('content-length-long')}
                 </RadioBoxItem>
                 <RadioBoxItem
                   value="custom"
                   id="custom"
                   className="w-full text-xs sm:flex-1 sm:text-sm"
                 >
-                  Custom
+                  {t('content-length-custom')}
                 </RadioBoxItem>
               </RadioGroup>
               <Label className="mb-2 flex justify-between border-t border-dashed pt-2 text-xs text-gray-500 dark:text-gray-400">
                 <span>
-                  Min: <span className="font-semibold">{range[0]}</span> words
+                  {t('content-length-min')}{' '}
+                  <span className="font-semibold">{range[0]}</span>{' '}
+                  {t('content-length-words')}
                 </span>
                 <span>
-                  Max: <span className="font-semibold">{range[1]}</span> words
+                  {t('content-length-max')}{' '}
+                  <span className="font-semibold">{range[1]}</span>{' '}
+                  {t('content-length-words')}
                 </span>
               </Label>
               <Slider
@@ -177,7 +180,11 @@ export default function ContentLengthCard({ control }: Props) {
   );
 }
 
-function ContentLengthHelperModal() {
+function ContentLengthHelperModal({
+  t,
+}: {
+  t: ReturnType<typeof useTranslations>;
+}) {
   return (
     <ResponsiveModal>
       <ResponsiveModalTrigger asChild>
@@ -186,49 +193,41 @@ function ContentLengthHelperModal() {
       <ResponsiveModalContent>
         <ResponsiveModalHeader>
           <ResponsiveModalTitle className="text-2xl">
-            Helper: Content Length
+            {t('content-length-helper-title')}
           </ResponsiveModalTitle>
           <ResponsiveModalDescription>
-            The length of the persona determines the details shown: short for
-            quick ideas, medium for balance, long for in-depth analysis.
+            {t('content-length-helper-desc')}
           </ResponsiveModalDescription>
         </ResponsiveModalHeader>
         <div className="mt-4 space-y-4">
           <ul className="space-y-2">
             <li>
               <span className="font-medium text-primary">
-                Short (±0-100 words)
+                {t('content-length-short-label')}
               </span>
               <br />
-              <span>
-                Suitable for brainstorming; contains essentials like
-                demographics, main goal, and 1-2 pain points.
-              </span>
+              <span>{t('content-length-short-helper')}</span>
             </li>
             <li>
               <span className="font-medium text-primary">
-                Medium (±100-200 words)
+                {t('content-length-medium-label')}
               </span>
               <br />
-              <span>
-                Balanced for workshops; includes motivation, several goals, pain
-                points, and interaction with technology.
-              </span>
+              <span>{t('content-length-medium-helper')}</span>
             </li>
             <li>
               <span className="font-medium text-primary">
-                Long (≥200 words)
+                {t('content-length-long-label')}
               </span>
               <br />
-              <span>
-                In-depth; adds personal stories, domain context, and more
-                complete human factors.
-              </span>
+              <span>{t('content-length-long-helper')}</span>
             </li>
             <li>
-              <span className="font-medium text-primary">Custom</span>
+              <span className="font-medium text-primary">
+                {t('content-length-custom-label')}
+              </span>
               <br />
-              <span>Users can set the word count as needed.</span>
+              <span>{t('content-length-custom-helper')}</span>
             </li>
           </ul>
         </div>
