@@ -21,7 +21,6 @@ import { useTranslations } from 'next-intl';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 
-import { getCookie } from 'cookies-next/client';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -36,12 +35,11 @@ import ChangeLanguage from './change-language';
 import { ThemeToggle } from './theme-toggle';
 
 export default function Header() {
-  const _cookies = getCookie('lang');
   const t = useTranslations('shared.header');
   const baseMenus = [
     { title: t('home'), href: '/' },
     { title: t('create'), href: '/create' },
-    { title: 'Tutorial', href: `/${_cookies ?? 'en'}-tutorial.pdf` },
+    { title: t('tutorial.title'), href: t('tutorial.href') },
   ];
 
   const pathname = usePathname();

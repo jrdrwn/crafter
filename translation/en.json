@@ -5,7 +5,11 @@
       "create": "Create",
       "explore": "Explore",
       "history": "History",
-      "knowledge-base": "Knowledge Base"
+      "knowledge-base": "Knowledge Base",
+      "tutorial": {
+        "title": "Tutorial",
+        "href": "/en-tutorial.pdf"
+      }
     }
   },
   "home": {

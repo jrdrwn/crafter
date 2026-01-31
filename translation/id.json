@@ -5,7 +5,11 @@
       "create": "Buat",
       "explore": "Jelajahi",
       "history": "Riwayat",
-      "knowledge-base": "Basis Pengetahuan"
+      "knowledge-base": "Basis Pengetahuan",
+      "tutorial": {
+        "title": "Tutorial",
+        "href": "/id-tutorial.pdf"
+      }
     }
   },
   "home": {
