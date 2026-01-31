@@ -4,7 +4,7 @@ output_specifications:
     - 'Bullet-points'
     - 'Mixed (paragraf + poin)'
   post_versions: 'Setelah ketiga versi, tampilkan JSON untuk persona taxonomy dan domain.'
-  layer_translation: 'Atribut layer tidak diterjemahkan.'
+  layer_translation: 'Atribut layer diterjemahkan ke bahasa indonesia.'
   html_rules:
   no_bold_or_italic: true
   paragraph_wrap: 'p'
