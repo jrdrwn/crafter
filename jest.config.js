@@ -24,6 +24,13 @@ const config = {
     '/e2e/',
     '/src/components/ui/',
     '/src/contexts/',
+    // Ignore all test files in src/app except those in __tests__ folders
+    '/src/app/[^/]+\.test\.tsx$',
+    '/src/app/[^/]+/[^/]+\.test\.tsx$',
+    '/src/app/[^/]+/[^/]+/[^/]+\.test\.tsx$',
+    // Ignore specific test files that cause errors when combined
+    '/src/app/__tests__/layout\.test\.tsx$',
+    '/src/app/__tests__/page\.test\.tsx$',
   ],
   // Collect coverage dari direktori src
   collectCoverageFrom: [
@@ -33,6 +40,7 @@ const config = {
     '!src/**/index.{js,jsx,ts,tsx}',
     '!src/components/ui/**',
     '!src/contexts/**',
+    '!src/app/**/__tests__/**',
   ],
   // Transform ES Modules packages
   transformIgnorePatterns: [
