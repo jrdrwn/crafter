@@ -10,9 +10,10 @@
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "prisma:generate": "prisma generate",
-    "test": "jest",
-    "test:watch": "jest --watch",
-    "test:coverage": "jest --coverage",
+    "test:unit": "jest",
+    "test:unit:watch": "jest --watch",
+    "test:unit:coverage": "jest --coverage",
+    "test:e2e": "playwright test",
     "prisma:migrate:diff": "npx prisma migrate diff --from-empty --to-schema-datamodel prisma/schema.prisma --script > prisma/migrations/0_init/migration.sql"
   },
   "dependencies": {
@@ -98,6 +99,7 @@
   "devDependencies": {
     "@eslint/eslintrc": "^3",
     "@ianvs/prettier-plugin-sort-imports": "^4.7.0",
+    "@playwright/test": "^1.58.2",
     "@tailwindcss/postcss": "^4",
     "@tailwindcss/typography": "^0.5.19",
     "@testing-library/jest-dom": "^6.9.1",
@@ -111,6 +113,8 @@
     "eslint-config-next": "15.5.3",
     "jest": "^30.3.0",
     "jest-environment-jsdom": "^30.3.0",
+    "msw": "^2.12.11",
+    "nock": "^14.0.11",
     "prettier": "^3.6.2",
     "prettier-plugin-tailwindcss": "^0.6.14",
     "tailwindcss": "^4",

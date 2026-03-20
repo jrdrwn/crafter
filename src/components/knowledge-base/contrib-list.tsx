@@ -284,7 +284,7 @@ export default function ContribList() {
                     href="#"
                     onClick={(e: React.MouseEvent) => {
                       e.preventDefault();
-                      if (page > 1) load(page - 1);
+                      if (page > 1) setPage((p) => p - 1);
                     }}
                     aria-disabled={page === 1}
                     style={
@@ -301,7 +301,7 @@ export default function ContribList() {
                       isActive={page === idx + 1}
                       onClick={(e: React.MouseEvent) => {
                         e.preventDefault();
-                        load(idx + 1);
+                        setPage(idx + 1);
                       }}
                     >
                       {idx + 1}
@@ -313,8 +313,9 @@ export default function ContribList() {
                     href="#"
                     onClick={(e: React.MouseEvent) => {
                       e.preventDefault();
-                      if (page < Math.max(1, Math.ceil(total / pageSize)))
-                        load(page + 1);
+                      if (page < Math.max(1, Math.ceil(total / pageSize))) {
+                        setPage((p) => p + 1);
+                      }
                     }}
                     aria-disabled={
                       page === Math.max(1, Math.ceil(total / pageSize))
