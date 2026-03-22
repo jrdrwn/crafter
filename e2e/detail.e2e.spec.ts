@@ -1,6 +1,6 @@
 import { expect, test } from '@playwright/test';
 
-test.describe('Detail Page (Authenticated)', () => {
+test.describe('Halaman Detail (Terautentikasi)', () => {
   test.beforeEach(async ({ page }) => {
     // Intercept API call for persona detail
     await page.route('/api/persona/123', async (route) => {
@@ -33,7 +33,7 @@ test.describe('Detail Page (Authenticated)', () => {
     });
   });
 
-  test.describe('Page Load and Basic Elements', () => {
+  test.describe('Pemuatan Halaman dan Elemen Dasar', () => {
     test('should display header with correct elements', async ({ page }) => {
       await page.goto('/detail/123');
 
@@ -135,7 +135,7 @@ test.describe('Detail Page (Authenticated)', () => {
     });
   });
 
-  test.describe('Navigation', () => {
+  test.describe('Navigasi', () => {
     test('should navigate to history page when clicking back button', async ({
       page,
     }) => {
@@ -160,7 +160,7 @@ test.describe('Detail Page (Authenticated)', () => {
     });
   });
 
-  test.describe('Responsive Design', () => {
+  test.describe('Desain Responsif', () => {
     test('should display correctly on mobile viewport', async ({ page }) => {
       await page.setViewportSize({ width: 375, height: 667 });
       await page.goto('/detail/123');
@@ -200,7 +200,7 @@ test.describe('Detail Page (Authenticated)', () => {
     });
   });
 
-  test.describe('SEO and Meta', () => {
+  test.describe('SEO dan Meta', () => {
     test('should have correct page title', async ({ page }) => {
       await page.goto('/detail/123');
       await page.waitForLoadState('networkidle');
@@ -211,7 +211,7 @@ test.describe('Detail Page (Authenticated)', () => {
   });
 });
 
-test.describe('Detail Guest Page', () => {
+test.describe('Halaman Detail Tamu', () => {
   // Helper function to setup persona in localStorage
   async function setupGuestPersona(page: any) {
     await page.addInitScript(() => {
@@ -386,7 +386,7 @@ test.describe('Detail Guest Page', () => {
     });
   });
 
-  test.describe('Persona Style Selection', () => {
+  test.describe('Pemilihan Gaya Persona', () => {
     test('should switch between mixed, bullets, and narrative styles', async ({
       page,
     }) => {
@@ -419,7 +419,7 @@ test.describe('Detail Guest Page', () => {
     });
   });
 
-  test.describe('Edit Mode', () => {
+  test.describe('Mode Edit', () => {
     test('should enter edit mode when clicking edit button', async ({
       page,
     }) => {
@@ -460,7 +460,7 @@ test.describe('Detail Guest Page', () => {
     });
   });
 
-  test.describe('Delete Dialog', () => {
+  test.describe('Dialog Hapus', () => {
     test('should open delete confirmation dialog', async ({ page }) => {
       await setupGuestPersona(page);
       await page.goto('/detail/guest');
