@@ -78,15 +78,15 @@ const mockPersona = {
   response: {},
 };
 
-describe('GuestEditConstruct', () => {
-  it('renders guest edit construct form', () => {
+describe('Konstruksi Edit Guest', () => {
+  it('merender formulir konstruksi edit guest', () => {
     const { container } = render(<GuestEditConstruct persona={mockPersona} />);
     expect(
       container.querySelector('form') || container.querySelector('section'),
     ).toBeInTheDocument();
   });
 
-  it('renders with null persona', () => {
+  it('merender dengan persona null', () => {
     const { container } = render(<GuestEditConstruct persona={null} />);
     expect(
       container.querySelector('form') || container.querySelector('section'),

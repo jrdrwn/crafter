@@ -56,10 +56,10 @@ jest.mock('@/components/shared/header', () => {
   };
 });
 
-describe('Edit Page', () => {
+describe('Halaman Edit', () => {
   const mockParams = { id: 'persona-123' };
 
-  it('should render all components with correct id', async () => {
+  it('harus merender semua komponen dengan id yang benar', async () => {
     const PageComponent = await EditPage({
       params: Promise.resolve(mockParams),
     });
@@ -72,7 +72,7 @@ describe('Edit Page', () => {
     expect(screen.getByTestId('footer')).toBeInTheDocument();
   });
 
-  it('should pass id and persona prop to Design component', async () => {
+  it('harus meneruskan prop id dan persona ke komponen Design', async () => {
     const PageComponent = await EditPage({
       params: Promise.resolve(mockParams),
     });
@@ -81,7 +81,7 @@ describe('Edit Page', () => {
     expect(screen.getByTestId('design')).toBeInTheDocument();
   });
 
-  it('should handle different ids', async () => {
+  it('harus menangani id yang berbeda', async () => {
     const anotherParams = { id: 'persona-789' };
     const PageComponent = await EditPage({
       params: Promise.resolve(anotherParams),

@@ -1,5 +1,6 @@
 import { render, waitFor } from '@testing-library/react';
 import { useForm } from 'react-hook-form';
+
 import DomainCard from '../domain-card';
 
 // Mock fetch
@@ -19,12 +20,12 @@ function DomainCardWrapper() {
   return <DomainCard control={form.control} />;
 }
 
-describe('DomainCard', () => {
+describe('Kartu Domain', () => {
   beforeEach(() => {
     jest.clearAllMocks();
   });
 
-  it('renders domain card', async () => {
+  it('merender kartu domain', async () => {
     (fetch as jest.Mock).mockResolvedValueOnce({
       ok: true,
       json: async () => ({ data: [] }),
@@ -33,11 +34,14 @@ describe('DomainCard', () => {
     const { container } = render(<DomainCardWrapper />);
 
     await waitFor(() => {
-      expect(container.querySelector('[class*="card"]') || container.querySelector('div')).toBeInTheDocument();
+      expect(
+        container.querySelector('[class*="card"]') ||
+          container.querySelector('div'),
+      ).toBeInTheDocument();
     });
   });
 
-  it('renders search input', async () => {
+  it('merender input pencarian', async () => {
     (fetch as jest.Mock).mockResolvedValueOnce({
       ok: true,
       json: async () => ({ data: [] }),

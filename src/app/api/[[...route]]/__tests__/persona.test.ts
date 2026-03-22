@@ -20,6 +20,9 @@
  * - GET  /persona/helper/llm
  */
 
+import { persona } from '@/app/api/[[...route]]/persona';
+import { runPersonaRAG } from '@/lib/persona.service';
+import prisma from '@db';
 import { Hono } from 'hono';
 
 // ---------- Mocks ----------
@@ -65,18 +68,22 @@ jest.mock('@/lib/persona.service', () => ({
   normalizeToRAGNote: jest.fn(),
 }));
 
-import prisma from '@db';
-import { runPersonaRAG } from '@/lib/persona.service';
-import { persona } from '@/app/api/[[...route]]/persona';
-
 const mockPrisma = prisma as jest.Mocked<typeof prisma>;
 const mockRunPersonaRAG = runPersonaRAG as jest.Mock;
 
 // Base valid payload for generate endpoints
 const baseGenerateBody = {
   domain: { key: 'tech', label: 'Technology' },
-  internal: [{ name: 'introvert', title: 'Introvert', description: 'Prefers solitude' }],
-  external: [{ name: 'social-media', title: 'Social Media', description: 'Active online' }],
+  internal: [
+    { name: 'introvert', title: 'Introvert', description: 'Prefers solitude' },
+  ],
+  external: [
+    {
+      name: 'social-media',
+      title: 'Social Media',
+      description: 'Active online',
+    },
+  ],
   contentLengthRange: [100, 300],
   llmModel: { key: 'gemini-pro', label: 'Gemini Pro' },
   language: { key: 'en', label: 'English' },
@@ -95,14 +102,22 @@ function buildApp(jwtPayload?: { sub: number; role: string }) {
   return app;
 }
 
-const fakeRAGResult = { result: { narative: 'A tech persona', bullets: '...', mixed: '...', quote: '...', full_name: 'Alex' } };
+const fakeRAGResult = {
+  result: {
+    narative: 'A tech persona',
+    bullets: '...',
+    mixed: '...',
+    quote: '...',
+    full_name: 'Alex',
+  },
+};
 
 // ---------- generate/guest ----------
 
-describe('POST /api/persona/generate/guest', () => {
+describe('POST /api/persona/generate/guest - Generate Persona Guest', () => {
   afterEach(() => jest.clearAllMocks());
 
-  it('returns RAG result for valid guest request', async () => {
+  it('mengembalikan hasil RAG untuk request guest yang valid', async () => {
     mockRunPersonaRAG.mockResolvedValue(fakeRAGResult);
 
     const app = buildApp(); // no jwt needed
@@ -118,7 +133,7 @@ describe('POST /api/persona/generate/guest', () => {
     expect(mockRunPersonaRAG).toHaveBeenCalledTimes(1);
   });
 
-  it('returns 400 when internal array is empty', async () => {
+  it('mengembalikan 400 ketika array internal kosong', async () => {
     const app = buildApp();
     const res = await app.request('/api/persona/generate/guest', {
       method: 'POST',
@@ -129,12 +144,15 @@ describe('POST /api/persona/generate/guest', () => {
     expect(res.status).toBe(400);
   });
 
-  it('returns 400 when language key is invalid', async () => {
+  it('mengembalikan 400 ketika key bahasa tidak valid', async () => {
     const app = buildApp();
     const res = await app.request('/api/persona/generate/guest', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ ...baseGenerateBody, language: { key: 'fr', label: 'French' } }),
+      body: JSON.stringify({
+        ...baseGenerateBody,
+        language: { key: 'fr', label: 'French' },
+      }),
     });
 
     expect(res.status).toBe(400);
@@ -143,16 +161,29 @@ describe('POST /api/persona/generate/guest', () => {
 
 // ---------- generate (authenticated) ----------
 
-describe('POST /api/persona/generate', () => {
+describe('POST /api/persona/generate - Generate Persona (Autentikasi)', () => {
   afterEach(() => jest.clearAllMocks());
 
-  it('creates persona and returns result + personaId', async () => {
+  it('membuat persona dan mengembalikan hasil + personaId', async () => {
     mockRunPersonaRAG.mockResolvedValue(fakeRAGResult);
-    (mockPrisma.domain.findUnique as jest.Mock).mockResolvedValue({ id: 10, key: 'tech', label: 'Technology' });
-    (mockPrisma.language.findUnique as jest.Mock).mockResolvedValue({ id: 1, key: 'en' });
-    (mockPrisma.llm.findUnique as jest.Mock).mockResolvedValue({ id: 2, key: 'gemini-pro' });
+    (mockPrisma.domain.findUnique as jest.Mock).mockResolvedValue({
+      id: 10,
+      key: 'tech',
+      label: 'Technology',
+    });
+    (mockPrisma.language.findUnique as jest.Mock).mockResolvedValue({
+      id: 1,
+      key: 'en',
+    });
+    (mockPrisma.llm.findUnique as jest.Mock).mockResolvedValue({
+      id: 2,
+      key: 'gemini-pro',
+    });
     (mockPrisma.persona.create as jest.Mock).mockResolvedValue({ id: 99 });
-    (mockPrisma.attribute.findUnique as jest.Mock).mockResolvedValue({ id: 5, name: 'introvert' });
+    (mockPrisma.attribute.findUnique as jest.Mock).mockResolvedValue({
+      id: 5,
+      name: 'introvert',
+    });
     (mockPrisma.persona_attribute.create as jest.Mock).mockResolvedValue({});
 
     const app = buildApp({ sub: 1, role: 'user' });
@@ -167,14 +198,21 @@ describe('POST /api/persona/generate', () => {
     expect(json).toMatchObject({ personaId: 99 });
   });
 
-  it('creates domain if it does not exist', async () => {
+  it('membuat domain jika belum ada', async () => {
     mockRunPersonaRAG.mockResolvedValue(fakeRAGResult);
     (mockPrisma.domain.findUnique as jest.Mock).mockResolvedValue(null);
-    (mockPrisma.domain.create as jest.Mock).mockResolvedValue({ id: 11, key: 'tech', label: 'Technology' });
+    (mockPrisma.domain.create as jest.Mock).mockResolvedValue({
+      id: 11,
+      key: 'tech',
+      label: 'Technology',
+    });
     (mockPrisma.language.findUnique as jest.Mock).mockResolvedValue({ id: 1 });
     (mockPrisma.llm.findUnique as jest.Mock).mockResolvedValue({ id: 2 });
     (mockPrisma.persona.create as jest.Mock).mockResolvedValue({ id: 100 });
-    (mockPrisma.attribute.findUnique as jest.Mock).mockResolvedValue({ id: 5, name: 'introvert' });
+    (mockPrisma.attribute.findUnique as jest.Mock).mockResolvedValue({
+      id: 5,
+      name: 'introvert',
+    });
     (mockPrisma.persona_attribute.create as jest.Mock).mockResolvedValue({});
 
     const app = buildApp({ sub: 1, role: 'user' });
@@ -192,11 +230,24 @@ describe('POST /api/persona/generate', () => {
 
 // ---------- GET /persona/:id ----------
 
-describe('GET /api/persona/:id', () => {
+describe('GET /api/persona/:id - Ambil Detail Persona', () => {
   afterEach(() => jest.clearAllMocks());
 
-  it('returns persona data when found', async () => {
-    const fakePersona = { id: 1, result: {}, detail: 'test', visibility: 'public', domain: { key: 'tech', label: 'Technology' }, user: { id: 1, name: 'John', email: 'j@e.com' }, persona_attribute: [], content_length_range: [100, 300], created_at: new Date(), updated_at: new Date(), llm: {}, language: {} };
+  it('mengembalikan data persona saat ditemukan', async () => {
+    const fakePersona = {
+      id: 1,
+      result: {},
+      detail: 'test',
+      visibility: 'public',
+      domain: { key: 'tech', label: 'Technology' },
+      user: { id: 1, name: 'John', email: 'j@e.com' },
+      persona_attribute: [],
+      content_length_range: [100, 300],
+      created_at: new Date(),
+      updated_at: new Date(),
+      llm: {},
+      language: {},
+    };
     (mockPrisma.persona.findUnique as jest.Mock).mockResolvedValue(fakePersona);
 
     const app = buildApp({ sub: 1, role: 'user' });
@@ -207,7 +258,7 @@ describe('GET /api/persona/:id', () => {
     expect(json).toMatchObject({ status: true, data: { id: 1 } });
   });
 
-  it('returns 404 when persona not found', async () => {
+  it('mengembalikan 404 ketika persona tidak ditemukan', async () => {
     (mockPrisma.persona.findUnique as jest.Mock).mockResolvedValue(null);
 
     const app = buildApp({ sub: 1, role: 'user' });
@@ -221,13 +272,23 @@ describe('GET /api/persona/:id', () => {
 
 // ---------- GET /persona/ (list) ----------
 
-describe('GET /api/persona/', () => {
+describe('GET /api/persona/ - Daftar Persona', () => {
   afterEach(() => jest.clearAllMocks());
 
-  it('returns paginated list with default params', async () => {
+  it('mengembalikan daftar terpaginasi dengan parameter default', async () => {
     (mockPrisma.persona.count as jest.Mock).mockResolvedValue(2);
     (mockPrisma.persona.findMany as jest.Mock).mockResolvedValue([
-      { id: 1, result: {}, detail: 'p1', visibility: 'public', domain: { key: 'tech', label: 'Technology' }, user: { id: 1, name: 'John', email: 'j@e.com' }, content_length_range: [100, 300], created_at: new Date(), updated_at: new Date() },
+      {
+        id: 1,
+        result: {},
+        detail: 'p1',
+        visibility: 'public',
+        domain: { key: 'tech', label: 'Technology' },
+        user: { id: 1, name: 'John', email: 'j@e.com' },
+        content_length_range: [100, 300],
+        created_at: new Date(),
+        updated_at: new Date(),
+      },
     ]);
 
     const app = buildApp({ sub: 1, role: 'user' });
@@ -236,11 +297,16 @@ describe('GET /api/persona/', () => {
 
     expect(res.status).toBe(200);
     const json = await res.json();
-    expect(json).toMatchObject({ status: true, total: 2, page: 1, pageSize: 9 });
+    expect(json).toMatchObject({
+      status: true,
+      total: 2,
+      page: 1,
+      pageSize: 9,
+    });
     expect(json.data).toHaveLength(1);
   });
 
-  it('passes search and domain filter to query', async () => {
+  it('meneruskan filter pencarian dan domain ke query', async () => {
     (mockPrisma.persona.count as jest.Mock).mockResolvedValue(0);
     (mockPrisma.persona.findMany as jest.Mock).mockResolvedValue([]);
 
@@ -256,13 +322,23 @@ describe('GET /api/persona/', () => {
 
 // ---------- GET /persona/me ----------
 
-describe('GET /api/persona/me', () => {
+describe('GET /api/persona/me - Persona Saya', () => {
   afterEach(() => jest.clearAllMocks());
 
-  it('returns personas owned by the current user', async () => {
+  it('mengembalikan persona yang dimiliki oleh pengguna saat ini', async () => {
     (mockPrisma.persona.count as jest.Mock).mockResolvedValue(1);
     (mockPrisma.persona.findMany as jest.Mock).mockResolvedValue([
-      { id: 5, result: {}, detail: 'mine', visibility: 'private', domain: { key: 'tech', label: 'Technology' }, user: { id: 2, name: 'Me', email: 'me@e.com' }, content_length_range: [100, 200], created_at: new Date(), updated_at: new Date() },
+      {
+        id: 5,
+        result: {},
+        detail: 'mine',
+        visibility: 'private',
+        domain: { key: 'tech', label: 'Technology' },
+        user: { id: 2, name: 'Me', email: 'me@e.com' },
+        content_length_range: [100, 200],
+        created_at: new Date(),
+        updated_at: new Date(),
+      },
     ]);
 
     const app = buildApp({ sub: 2, role: 'user' });
@@ -273,19 +349,26 @@ describe('GET /api/persona/me', () => {
     expect(json).toMatchObject({ status: true, total: 1 });
     // Verify owner_id filter was used
     expect(mockPrisma.persona.findMany).toHaveBeenCalledWith(
-      expect.objectContaining({ where: expect.objectContaining({ owner_id: 2 }) }),
+      expect.objectContaining({
+        where: expect.objectContaining({ owner_id: 2 }),
+      }),
     );
   });
 });
 
 // ---------- DELETE /persona/:id ----------
 
-describe('DELETE /api/persona/:id', () => {
+describe('DELETE /api/persona/:id - Hapus Persona', () => {
   afterEach(() => jest.clearAllMocks());
 
-  it('deletes persona and its attributes', async () => {
-    (mockPrisma.persona.findUnique as jest.Mock).mockResolvedValue({ id: 3, owner_id: 1 });
-    (mockPrisma.persona_attribute.deleteMany as jest.Mock).mockResolvedValue({});
+  it('menghapus persona dan atribut-atributnya', async () => {
+    (mockPrisma.persona.findUnique as jest.Mock).mockResolvedValue({
+      id: 3,
+      owner_id: 1,
+    });
+    (mockPrisma.persona_attribute.deleteMany as jest.Mock).mockResolvedValue(
+      {},
+    );
     (mockPrisma.persona.delete as jest.Mock).mockResolvedValue({});
 
     const app = buildApp({ sub: 1, role: 'user' });
@@ -293,12 +376,19 @@ describe('DELETE /api/persona/:id', () => {
 
     expect(res.status).toBe(200);
     const json = await res.json();
-    expect(json).toMatchObject({ status: true, message: 'Persona deleted successfully' });
-    expect(mockPrisma.persona_attribute.deleteMany).toHaveBeenCalledWith({ where: { persona_id: 3 } });
-    expect(mockPrisma.persona.delete).toHaveBeenCalledWith({ where: { id: 3 } });
+    expect(json).toMatchObject({
+      status: true,
+      message: 'Persona deleted successfully',
+    });
+    expect(mockPrisma.persona_attribute.deleteMany).toHaveBeenCalledWith({
+      where: { persona_id: 3 },
+    });
+    expect(mockPrisma.persona.delete).toHaveBeenCalledWith({
+      where: { id: 3 },
+    });
   });
 
-  it('returns 404 when persona not found or not owned by user', async () => {
+  it('mengembalikan 404 ketika persona tidak ditemukan atau bukan milik pengguna', async () => {
     (mockPrisma.persona.findUnique as jest.Mock).mockResolvedValue(null);
 
     const app = buildApp({ sub: 1, role: 'user' });
@@ -312,12 +402,18 @@ describe('DELETE /api/persona/:id', () => {
 
 // ---------- PUT /persona/:id/visibility ----------
 
-describe('PUT /api/persona/:id/visibility', () => {
+describe('PUT /api/persona/:id/visibility - Ubah Visibilitas', () => {
   afterEach(() => jest.clearAllMocks());
 
-  it('updates visibility and returns updated persona', async () => {
-    (mockPrisma.persona.findUnique as jest.Mock).mockResolvedValue({ id: 1, owner_id: 1 });
-    (mockPrisma.persona.update as jest.Mock).mockResolvedValue({ id: 1, visibility: 'public' });
+  it('memperbarui visibilitas dan mengembalikan persona yang diperbarui', async () => {
+    (mockPrisma.persona.findUnique as jest.Mock).mockResolvedValue({
+      id: 1,
+      owner_id: 1,
+    });
+    (mockPrisma.persona.update as jest.Mock).mockResolvedValue({
+      id: 1,
+      visibility: 'public',
+    });
 
     const app = buildApp({ sub: 1, role: 'user' });
     const res = await app.request('/api/persona/1/visibility', {
@@ -331,7 +427,7 @@ describe('PUT /api/persona/:id/visibility', () => {
     expect(json).toMatchObject({ status: true });
   });
 
-  it('returns 404 when persona not found', async () => {
+  it('mengembalikan 404 ketika persona tidak ditemukan', async () => {
     (mockPrisma.persona.findUnique as jest.Mock).mockResolvedValue(null);
 
     const app = buildApp({ sub: 1, role: 'user' });
@@ -347,12 +443,18 @@ describe('PUT /api/persona/:id/visibility', () => {
 
 // ---------- PUT /persona/:id/content ----------
 
-describe('PUT /api/persona/:id/content', () => {
+describe('PUT /api/persona/:id/content - Ubah Konten', () => {
   afterEach(() => jest.clearAllMocks());
 
-  it('updates content result and returns updated persona', async () => {
-    (mockPrisma.persona.findUnique as jest.Mock).mockResolvedValue({ id: 1, owner_id: 1 });
-    (mockPrisma.persona.update as jest.Mock).mockResolvedValue({ id: 1, result: { narative: 'updated' } });
+  it('memperbarui hasil konten dan mengembalikan persona yang diperbarui', async () => {
+    (mockPrisma.persona.findUnique as jest.Mock).mockResolvedValue({
+      id: 1,
+      owner_id: 1,
+    });
+    (mockPrisma.persona.update as jest.Mock).mockResolvedValue({
+      id: 1,
+      result: { narative: 'updated' },
+    });
 
     const app = buildApp({ sub: 1, role: 'user' });
     const res = await app.request('/api/persona/1/content', {
@@ -366,7 +468,7 @@ describe('PUT /api/persona/:id/content', () => {
     expect(json).toMatchObject({ status: true });
   });
 
-  it('returns 404 when persona not owned by user', async () => {
+  it('mengembalikan 404 ketika persona bukan milik pengguna', async () => {
     (mockPrisma.persona.findUnique as jest.Mock).mockResolvedValue(null);
 
     const app = buildApp({ sub: 2, role: 'user' });
@@ -382,12 +484,18 @@ describe('PUT /api/persona/:id/content', () => {
 
 // ---------- POST /persona/copy/:id ----------
 
-describe('POST /api/persona/copy/:id', () => {
+describe('POST /api/persona/copy/:id - Duplikat Persona', () => {
   afterEach(() => jest.clearAllMocks());
 
-  it('creates a copy of persona and returns new id', async () => {
+  it('membuat salinan persona dan mengembalikan id baru', async () => {
     (mockPrisma.persona.findUnique as jest.Mock).mockResolvedValue({
-      id: 1, result: {}, content_length_range: [100, 300], detail: 'Original', domain_id: 1, llm_id: 1, language_id: 1,
+      id: 1,
+      result: {},
+      content_length_range: [100, 300],
+      detail: 'Original',
+      domain_id: 1,
+      llm_id: 1,
+      language_id: 1,
       persona_attribute: [{ attribute_id: 5 }],
     });
     (mockPrisma.persona.create as jest.Mock).mockResolvedValue({ id: 200 });
@@ -401,7 +509,7 @@ describe('POST /api/persona/copy/:id', () => {
     expect(json).toMatchObject({ status: true, data: { personaId: 200 } });
   });
 
-  it('returns 404 when source persona not found', async () => {
+  it('mengembalikan 404 ketika persona sumber tidak ditemukan', async () => {
     (mockPrisma.persona.findUnique as jest.Mock).mockResolvedValue(null);
 
     const app = buildApp({ sub: 1, role: 'user' });
@@ -415,11 +523,13 @@ describe('POST /api/persona/copy/:id', () => {
 
 // ---------- Helper endpoints ----------
 
-describe('GET /api/persona/helper/*', () => {
+describe('GET /api/persona/helper/* - Helper Endpoint', () => {
   afterEach(() => jest.clearAllMocks());
 
-  it('GET /helper/domain returns list of domains', async () => {
-    (mockPrisma.domain.findMany as jest.Mock).mockResolvedValue([{ id: 1, key: 'tech', label: 'Technology' }]);
+  it('GET /helper/domain mengembalikan daftar domain', async () => {
+    (mockPrisma.domain.findMany as jest.Mock).mockResolvedValue([
+      { id: 1, key: 'tech', label: 'Technology' },
+    ]);
 
     const app = buildApp({ sub: 1, role: 'user' });
     const res = await app.request('/api/persona/helper/domain');
@@ -429,8 +539,10 @@ describe('GET /api/persona/helper/*', () => {
     expect(json).toMatchObject({ status: true, data: [{ key: 'tech' }] });
   });
 
-  it('GET /helper/language returns list of languages', async () => {
-    (mockPrisma.language.findMany as jest.Mock).mockResolvedValue([{ id: 1, key: 'en', label: 'English' }]);
+  it('GET /helper/language mengembalikan daftar bahasa', async () => {
+    (mockPrisma.language.findMany as jest.Mock).mockResolvedValue([
+      { id: 1, key: 'en', label: 'English' },
+    ]);
 
     const app = buildApp({ sub: 1, role: 'user' });
     const res = await app.request('/api/persona/helper/language');
@@ -440,8 +552,10 @@ describe('GET /api/persona/helper/*', () => {
     expect(json).toMatchObject({ status: true, data: [{ key: 'en' }] });
   });
 
-  it('GET /helper/llm returns list of LLM models', async () => {
-    (mockPrisma.llm.findMany as jest.Mock).mockResolvedValue([{ id: 1, key: 'gemini-pro', label: 'Gemini Pro' }]);
+  it('GET /helper/llm mengembalikan daftar model LLM', async () => {
+    (mockPrisma.llm.findMany as jest.Mock).mockResolvedValue([
+      { id: 1, key: 'gemini-pro', label: 'Gemini Pro' },
+    ]);
 
     const app = buildApp({ sub: 1, role: 'user' });
     const res = await app.request('/api/persona/helper/llm');
@@ -451,21 +565,29 @@ describe('GET /api/persona/helper/*', () => {
     expect(json).toMatchObject({ status: true, data: [{ key: 'gemini-pro' }] });
   });
 
-  it('GET /helper/attribute?layer=internal returns internal attributes', async () => {
-    (mockPrisma.attribute.findMany as jest.Mock).mockResolvedValue([{ id: 1, name: 'introvert', layer: 'internal' }]);
+  it('GET /helper/attribute?layer=internal mengembalikan atribut internal', async () => {
+    (mockPrisma.attribute.findMany as jest.Mock).mockResolvedValue([
+      { id: 1, name: 'introvert', layer: 'internal' },
+    ]);
 
     const app = buildApp({ sub: 1, role: 'user' });
-    const res = await app.request('/api/persona/helper/attribute?layer=internal');
+    const res = await app.request(
+      '/api/persona/helper/attribute?layer=internal',
+    );
 
     expect(res.status).toBe(200);
     const json = await res.json();
     expect(json).toMatchObject({ status: true, data: [{ name: 'introvert' }] });
-    expect(mockPrisma.attribute.findMany).toHaveBeenCalledWith({ where: { layer: 'internal' } });
+    expect(mockPrisma.attribute.findMany).toHaveBeenCalledWith({
+      where: { layer: 'internal' },
+    });
   });
 
-  it('GET /helper/attribute?layer=invalid returns 400', async () => {
+  it('GET /helper/attribute?layer=invalid mengembalikan 400', async () => {
     const app = buildApp({ sub: 1, role: 'user' });
-    const res = await app.request('/api/persona/helper/attribute?layer=invalid');
+    const res = await app.request(
+      '/api/persona/helper/attribute?layer=invalid',
+    );
 
     expect(res.status).toBe(400);
   });

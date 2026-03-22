@@ -39,12 +39,12 @@ Object.defineProperty(window, 'matchMedia', {
   })),
 });
 
-describe('ContribEditDialog', () => {
+describe('Dialog Edit Kontribusi', () => {
   beforeEach(() => {
     jest.clearAllMocks();
   });
 
-  it('renders edit dialog when open', async () => {
+  it('merender dialog edit saat terbuka', async () => {
     (fetch as jest.Mock).mockResolvedValueOnce({
       ok: true,
       json: async () => ({

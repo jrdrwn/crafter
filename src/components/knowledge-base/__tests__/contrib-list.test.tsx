@@ -1,4 +1,5 @@
 import { render, waitFor } from '@testing-library/react';
+
 import ContribList from '../contrib-list';
 
 // Mock fetch
@@ -15,20 +16,28 @@ jest.mock('@/contexts/user-context', () => ({
   }),
 }));
 
-describe('ContribList', () => {
+describe('Daftar Kontribusi', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     (fetch as jest.Mock).mockResolvedValueOnce({
       ok: true,
-      json: async () => ({ items: [], total: 0, nextOffset: null, status: true }),
+      json: async () => ({
+        items: [],
+        total: 0,
+        nextOffset: null,
+        status: true,
+      }),
     });
   });
 
-  it('renders contribution list container', async () => {
+  it('merender container daftar kontribusi', async () => {
     const { container } = render(<ContribList />);
 
     await waitFor(() => {
-      expect(container.querySelector('section') || container.querySelector('[class*="card"]')).toBeInTheDocument();
+      expect(
+        container.querySelector('section') ||
+          container.querySelector('[class*="card"]'),
+      ).toBeInTheDocument();
     });
   });
 });

@@ -72,20 +72,20 @@ jest.mock('sonner', () => ({
   },
 }));
 
-describe('LoginForm', () => {
-  it('renders login form with email input', () => {
+describe('Formulir Login', () => {
+  it('merender formulir login dengan input email', () => {
     render(<LoginForm />);
     const emailInput = document.querySelector('input[type="email"]');
     expect(emailInput).toBeInTheDocument();
   });
 
-  it('renders password input', () => {
+  it('merender input password', () => {
     render(<LoginForm />);
     const passwordInput = document.querySelector('input[type="password"]');
     expect(passwordInput).toBeInTheDocument();
   });
 
-  it('renders submit button', () => {
+  it('merender tombol submit', () => {
     render(<LoginForm />);
     const submitButton = screen.getByRole('button', {
       name: /sign in/i,
@@ -94,7 +94,7 @@ describe('LoginForm', () => {
     expect(submitButton).toBeInTheDocument();
   });
 
-  it('renders create account link', () => {
+  it('merender link buat akun', () => {
     render(<LoginForm />);
     const createAccountLink = screen.getByRole('link', { name: /create/i });
     expect(createAccountLink).toBeInTheDocument();

@@ -32,8 +32,8 @@ jest.mock('@/components/shared/header', () => {
   };
 });
 
-describe('History Page', () => {
-  it('should render all components', () => {
+describe('Halaman Riwayat', () => {
+  it('harus merender semua komponen', () => {
     render(<HistoryPage />);
 
     expect(screen.getByTestId('header')).toBeInTheDocument();
@@ -43,7 +43,7 @@ describe('History Page', () => {
     expect(screen.getByTestId('footer')).toBeInTheDocument();
   });
 
-  it('should be a function component', () => {
+  it('harus berupa komponen fungsi', () => {
     expect(HistoryPage).toBeDefined();
     expect(typeof HistoryPage).toBe('function');
   });

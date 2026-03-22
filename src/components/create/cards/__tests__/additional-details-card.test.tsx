@@ -1,5 +1,6 @@
 import { render } from '@testing-library/react';
 import { useForm } from 'react-hook-form';
+
 import AdditionalDetailsCard from '../additional-details-card';
 
 jest.mock('next-intl', () => ({
@@ -16,9 +17,12 @@ function AdditionalDetailsCardWrapper() {
   return <AdditionalDetailsCard control={form.control} />;
 }
 
-describe('AdditionalDetailsCard', () => {
-  it('renders additional details card', () => {
+describe('Kartu Detail Tambahan', () => {
+  it('merender kartu detail tambahan', () => {
     const { container } = render(<AdditionalDetailsCardWrapper />);
-    expect(container.querySelector('[class*="card"]') || container.querySelector('div')).toBeInTheDocument();
+    expect(
+      container.querySelector('[class*="card"]') ||
+        container.querySelector('div'),
+    ).toBeInTheDocument();
   });
 });

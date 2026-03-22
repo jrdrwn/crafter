@@ -17,8 +17,8 @@ Object.defineProperty(window, 'matchMedia', {
   })),
 });
 
-describe('ThemeToggle', () => {
-  it('renders theme toggle button', () => {
+describe('Toggle Tema', () => {
+  it('merender tombol toggle tema', () => {
     render(<ThemeToggle />);
     expect(screen.getByRole('button')).toBeInTheDocument();
   });

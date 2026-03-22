@@ -36,8 +36,8 @@ jest.mock('@/components/shared/header', () => {
   };
 });
 
-describe('Guest Edit Page', () => {
-  it('should render all components', () => {
+describe('Halaman Edit Guest', () => {
+  it('harus merender semua komponen', () => {
     render(<GuestEditPage />);
 
     expect(screen.getByTestId('header')).toBeInTheDocument();

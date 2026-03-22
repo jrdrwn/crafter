@@ -13,13 +13,13 @@ jest.mock('next-intl', () => ({
   },
 }));
 
-describe('Create Hero', () => {
-  it('renders hero section', () => {
+describe('Hero Buat Persona', () => {
+  it('merender bagian hero', () => {
     const { container } = render(<Hero />);
     expect(container.querySelector('section')).toBeInTheDocument();
   });
 
-  it('renders badge', () => {
+  it('merender badge', () => {
     const { container } = render(<Hero />);
     expect(container.querySelector('svg')).toBeInTheDocument();
   });

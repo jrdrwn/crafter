@@ -32,8 +32,8 @@ jest.mock('@/components/shared/header', () => {
   };
 });
 
-describe('Explore Page', () => {
-  it('should render all components', () => {
+describe('Halaman Jelajahi', () => {
+  it('harus merender semua komponen', () => {
     render(<ExplorePage />);
 
     expect(screen.getByTestId('header')).toBeInTheDocument();
@@ -43,7 +43,7 @@ describe('Explore Page', () => {
     expect(screen.getByTestId('footer')).toBeInTheDocument();
   });
 
-  it('should be a function component', () => {
+  it('harus berupa komponen fungsi', () => {
     expect(ExplorePage).toBeDefined();
     expect(typeof ExplorePage).toBe('function');
   });

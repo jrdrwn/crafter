@@ -26,8 +26,8 @@ jest.mock('@/components/shared/header', () => {
   };
 });
 
-describe('Create Account Page', () => {
-  it('should render all components', () => {
+describe('Halaman Buat Akun', () => {
+  it('harus merender semua komponen', () => {
     render(<CreateAccountPage />);
 
     expect(screen.getByTestId('header')).toBeInTheDocument();
@@ -36,7 +36,7 @@ describe('Create Account Page', () => {
     expect(screen.getByTestId('footer')).toBeInTheDocument();
   });
 
-  it('should render components in correct order', () => {
+  it('harus merender komponen dalam urutan yang benar', () => {
     const { container } = render(<CreateAccountPage />);
 
     const sections = container.querySelectorAll('[data-testid]');
@@ -52,7 +52,7 @@ describe('Create Account Page', () => {
     ]);
   });
 
-  it('should be a function component', () => {
+  it('harus berupa komponen fungsi', () => {
     expect(CreateAccountPage).toBeDefined();
     expect(typeof CreateAccountPage).toBe('function');
   });

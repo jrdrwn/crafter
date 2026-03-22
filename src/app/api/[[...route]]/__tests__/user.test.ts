@@ -6,6 +6,8 @@
  * Route: GET /api/user/profile (protected — butuh jwtPayload di context)
  */
 
+import { user } from '@/app/api/[[...route]]/user';
+import prisma from '@db';
 import { Hono } from 'hono';
 
 // ---------- Mocks ----------
@@ -18,9 +20,6 @@ jest.mock('@db', () => ({
     },
   },
 }));
-
-import prisma from '@db';
-import { user } from '@/app/api/[[...route]]/user';
 
 const mockFindUnique = prisma.user.findUnique as jest.Mock;
 
@@ -40,10 +39,10 @@ function buildApp(jwtPayload?: { sub: number; role: string }) {
 
 // ---------- Tests ----------
 
-describe('GET /api/user/profile', () => {
+describe('GET /api/user/profile - Profil Pengguna', () => {
   afterEach(() => jest.clearAllMocks());
 
-  it('returns user data on success', async () => {
+  it('mengembalikan data pengguna saat berhasil', async () => {
     const fakeUser = {
       id: 1,
       name: 'John Doe',
@@ -58,14 +57,17 @@ describe('GET /api/user/profile', () => {
 
     expect(res.status).toBe(200);
     const json = await res.json();
-    expect(json).toMatchObject({ status: true, data: { id: 1, name: 'John Doe', email: 'john@example.com' } });
+    expect(json).toMatchObject({
+      status: true,
+      data: { id: 1, name: 'John Doe', email: 'john@example.com' },
+    });
     expect(mockFindUnique).toHaveBeenCalledWith({
       where: { id: 1 },
       select: expect.objectContaining({ id: true, name: true, email: true }),
     });
   });
 
-  it('returns 404 when user not found in database', async () => {
+  it('mengembalikan 404 ketika pengguna tidak ditemukan di database', async () => {
     mockFindUnique.mockResolvedValue(null);
 
     const app = buildApp({ sub: 99, role: 'user' });

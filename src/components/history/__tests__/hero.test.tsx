@@ -1,4 +1,5 @@
 import { render, screen } from '@testing-library/react';
+
 import Hero from '../hero';
 
 jest.mock('next-intl', () => ({
@@ -21,13 +22,13 @@ jest.mock('next/link', () => ({
   ),
 }));
 
-describe('History Hero', () => {
-  it('renders hero section', () => {
+describe('Hero Riwayat', () => {
+  it('merender bagian hero', () => {
     const { container } = render(<Hero />);
     expect(container.querySelector('section')).toBeInTheDocument();
   });
 
-  it('renders create button', () => {
+  it('merender tombol buat', () => {
     render(<Hero />);
     const createButton = screen.getByRole('link', { name: /create/i });
     expect(createButton).toBeInTheDocument();

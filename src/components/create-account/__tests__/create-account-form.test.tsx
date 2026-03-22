@@ -72,39 +72,39 @@ jest.mock('sonner', () => ({
   },
 }));
 
-describe('CreateAccountForm', () => {
-  it('renders name input', () => {
+describe('Formulir Buat Akun', () => {
+  it('merender input nama', () => {
     render(<CreateAccountForm />);
     const nameInput = document.querySelector('input[type="text"]');
     expect(nameInput).toBeInTheDocument();
   });
 
-  it('renders email input', () => {
+  it('merender input email', () => {
     render(<CreateAccountForm />);
     const emailInput = document.querySelector('input[type="email"]');
     expect(emailInput).toBeInTheDocument();
   });
 
-  it('renders password inputs', () => {
+  it('merender input password', () => {
     render(<CreateAccountForm />);
     const passwordInputs = document.querySelectorAll('input[type="password"]');
     expect(passwordInputs.length).toBeGreaterThanOrEqual(1);
   });
 
-  it('renders terms checkbox', () => {
+  it('merender checkbox syarat', () => {
     render(<CreateAccountForm />);
     const checkbox = document.querySelector('input[type="checkbox"]');
     expect(checkbox).toBeInTheDocument();
   });
 
-  it('renders submit button', () => {
+  it('merender tombol submit', () => {
     render(<CreateAccountForm />);
     const submitButton = screen.getByRole('button', { name: /sign up/i });
     expect(submitButton).toBeInTheDocument();
     expect(submitButton).toHaveAttribute('type', 'submit');
   });
 
-  it('renders login link', () => {
+  it('merender link login', () => {
     render(<CreateAccountForm />);
     const loginLink = screen.getByRole('link', { name: /login/i });
     expect(loginLink).toBeInTheDocument();

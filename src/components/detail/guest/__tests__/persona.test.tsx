@@ -1,4 +1,5 @@
 import { render, screen } from '@testing-library/react';
+
 import Persona from '../persona';
 
 jest.mock('next-intl', () => ({
@@ -33,23 +34,23 @@ const mockGuestPersona = {
   },
 };
 
-describe('Guest Persona', () => {
-  it('renders guest persona with name', () => {
+describe('Persona Guest', () => {
+  it('merender persona guest dengan nama', () => {
     render(<Persona markdown={mockGuestPersona} />);
     expect(screen.getByText('Guest Persona')).toBeInTheDocument();
   });
 
-  it('renders guest persona with quote', () => {
+  it('merender persona guest dengan quote', () => {
     render(<Persona markdown={mockGuestPersona} />);
     expect(screen.getByText('Guest quote')).toBeInTheDocument();
   });
 
-  it('renders guest persona with domain', () => {
+  it('merender persona guest dengan domain', () => {
     render(<Persona markdown={mockGuestPersona} />);
     expect(screen.getByText('Technology')).toBeInTheDocument();
   });
 
-  it('renders style selector buttons', () => {
+  it('merender tombol pemilih gaya', () => {
     render(<Persona markdown={mockGuestPersona} />);
     const buttons = screen.getAllByRole('button');
     expect(buttons.length).toBeGreaterThanOrEqual(3);

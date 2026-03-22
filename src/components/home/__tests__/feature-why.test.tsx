@@ -18,13 +18,13 @@ jest.mock('next-intl', () => ({
   },
 }));
 
-describe('FeatureWhy', () => {
-  it('renders why section with title', () => {
+describe('Fitur Mengapa', () => {
+  it('merender bagian mengapa dengan judul', () => {
     render(<FeatureWhy />);
     expect(screen.getByText('Why Choose Us')).toBeInTheDocument();
   });
 
-  it('renders why description', () => {
+  it('merender deskripsi mengapa', () => {
     render(<FeatureWhy />);
     expect(
       screen.getByText('The best tool for persona creation'),

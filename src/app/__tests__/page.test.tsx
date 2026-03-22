@@ -38,8 +38,8 @@ jest.mock('@/components/shared/header', () => {
   };
 });
 
-describe('Home Page', () => {
-  it('should render all components', () => {
+describe('Halaman Beranda', () => {
+  it('harus merender semua komponen', () => {
     render(<Home />);
 
     expect(screen.getByTestId('header')).toBeInTheDocument();
@@ -50,7 +50,7 @@ describe('Home Page', () => {
     expect(screen.getByTestId('footer')).toBeInTheDocument();
   });
 
-  it('should render components in correct order', () => {
+  it('harus merender komponen dalam urutan yang benar', () => {
     const { container } = render(<Home />);
 
     const sections = container.querySelectorAll('[data-testid]');

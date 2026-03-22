@@ -23,19 +23,19 @@ jest.mock('next/link', () => ({
 }));
 
 describe('Footer', () => {
-  it('renders copyright text', () => {
+  it('merender teks hak cipta', () => {
     render(<Footer />);
     expect(
       screen.getByText('© 2024 Crafter. All rights reserved.'),
     ).toBeInTheDocument();
   });
 
-  it('renders instagram button', () => {
+  it('merender tombol instagram', () => {
     render(<Footer />);
     expect(screen.getByText('Follow us on Instagram')).toBeInTheDocument();
   });
 
-  it('renders instagram link with correct href', () => {
+  it('merender link instagram dengan href yang benar', () => {
     render(<Footer />);
     const link = screen.getByRole('link', { name: /instagram/i });
     expect(link).toHaveAttribute('href', 'https://www.instagram.com/crafter/');

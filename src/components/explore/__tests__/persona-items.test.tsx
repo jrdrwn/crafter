@@ -1,4 +1,5 @@
 import { render, waitFor } from '@testing-library/react';
+
 import PersonaItems from '../persona-items';
 
 // Mock fetch
@@ -23,7 +24,7 @@ jest.mock('@/contexts/user-context', () => ({
   }),
 }));
 
-describe('Explore PersonaItems', () => {
+describe('Item Persona Jelajahi', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     (fetch as jest.Mock).mockResolvedValue({
@@ -32,7 +33,7 @@ describe('Explore PersonaItems', () => {
     });
   });
 
-  it('renders persona items container', async () => {
+  it('merender container item persona', async () => {
     const { container } = render(<PersonaItems />);
 
     await waitFor(() => {

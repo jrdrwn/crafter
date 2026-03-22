@@ -23,18 +23,18 @@ jest.mock('next/link', () => ({
   ),
 }));
 
-describe('EndCta', () => {
-  it('renders CTA title', () => {
+describe('CTA Akhir', () => {
+  it('merender judul CTA', () => {
     render(<EndCta />);
     expect(screen.getByText('Ready to Start?')).toBeInTheDocument();
   });
 
-  it('renders CTA subtitle', () => {
+  it('merender subtitle CTA', () => {
     render(<EndCta />);
     expect(screen.getByText('Join thousands of users')).toBeInTheDocument();
   });
 
-  it('renders CTA button', () => {
+  it('merender tombol CTA', () => {
     render(<EndCta />);
     expect(screen.getByText('Get Started')).toBeInTheDocument();
   });

@@ -1,4 +1,5 @@
 import { render } from '@testing-library/react';
+
 import Contrib from '../contrib';
 
 jest.mock('next-intl', () => ({
@@ -12,9 +13,11 @@ jest.mock('@/contexts/user-context', () => ({
   }),
 }));
 
-describe('Contrib', () => {
-  it('renders contribution form card', () => {
+describe('Kontribusi', () => {
+  it('merender kartu formulir kontribusi', () => {
     const { container } = render(<Contrib />);
-    expect(container.querySelector('form') || container.querySelector('section')).toBeInTheDocument();
+    expect(
+      container.querySelector('form') || container.querySelector('section'),
+    ).toBeInTheDocument();
   });
 });

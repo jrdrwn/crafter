@@ -1,4 +1,5 @@
 import { render } from '@testing-library/react';
+
 import PersonaItems from '../persona-items';
 
 jest.mock('next-intl', () => ({
@@ -14,8 +15,8 @@ jest.mock('next/link', () => ({
   ),
 }));
 
-describe('Guest PersonaItems', () => {
-  it('renders guest persona items container', () => {
+describe('Item Persona Guest', () => {
+  it('merender container item persona guest', () => {
     const { container } = render(<PersonaItems />);
     expect(container.querySelector('section')).toBeInTheDocument();
   });

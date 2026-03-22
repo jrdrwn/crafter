@@ -1,4 +1,5 @@
 import { render, screen } from '@testing-library/react';
+
 import Header from '../header';
 
 jest.mock('next-intl', () => ({
@@ -38,31 +39,33 @@ jest.mock('@/contexts/user-context', () => ({
 }));
 
 describe('Header', () => {
-  it('renders header with brand', () => {
+  it('merender header dengan brand', () => {
     render(<Header />);
     const header = document.querySelector('header');
     expect(header).toBeInTheDocument();
   });
 
-  it('renders navigation menu', () => {
+  it('merender menu navigasi', () => {
     render(<Header />);
     const nav = document.querySelector('nav');
     expect(nav).toBeInTheDocument();
   });
 
-  it('renders brand link', () => {
+  it('merender link brand', () => {
     render(<Header />);
-    const brandLink = screen.getByRole('link', { name: /crafter/i }) || document.querySelector('a[href="/"]');
+    const brandLink =
+      screen.getByRole('link', { name: /crafter/i }) ||
+      document.querySelector('a[href="/"]');
     expect(brandLink).toBeInTheDocument();
   });
 
-  it('renders theme toggle', () => {
+  it('merender toggle tema', () => {
     render(<Header />);
     const buttons = screen.getAllByRole('button');
     expect(buttons.length).toBeGreaterThanOrEqual(1);
   });
 
-  it('renders mobile menu button', () => {
+  it('merender tombol menu mobile', () => {
     render(<Header />);
     const menuButtons = screen.getAllByRole('button');
     expect(menuButtons.length).toBeGreaterThanOrEqual(1);

@@ -41,36 +41,36 @@ jest.mock('@/contexts/user-context', () => ({
   }),
 }));
 
-describe('Hero', () => {
-  it('renders hero section with badge', () => {
+describe('Hero Beranda', () => {
+  it('merender bagian hero dengan badge', () => {
     render(<Hero />);
     expect(screen.getByText('AI-Powered')).toBeInTheDocument();
   });
 
-  it('renders hero title', () => {
+  it('merender judul hero', () => {
     render(<Hero />);
     expect(screen.getByText('Create Persona')).toBeInTheDocument();
   });
 
-  it('renders hero subtitle', () => {
+  it('merender subtitle hero', () => {
     render(<Hero />);
     expect(
       screen.getByText('Create detailed personas with AI'),
     ).toBeInTheDocument();
   });
 
-  it('renders CTA buttons for guest user', () => {
+  it('merender tombol CTA untuk pengguna guest', () => {
     render(<Hero />);
     expect(screen.getByText('Continue')).toBeInTheDocument();
     expect(screen.getByText('Join Now')).toBeInTheDocument();
   });
 
-  it('renders trusted section', () => {
+  it('merender bagian trusted', () => {
     render(<Hero />);
     expect(screen.getByText('Trusted by professionals')).toBeInTheDocument();
   });
 
-  it('renders role tags', () => {
+  it('merender tag peran', () => {
     render(<Hero />);
     expect(screen.getByText('Marketers')).toBeInTheDocument();
     expect(screen.getByText('Designers')).toBeInTheDocument();

@@ -9,7 +9,12 @@
  * - Test setiap branch: happy path, user not found, wrong password, user exists
  */
 
+// Import AFTER mocks are set up
+import { auth } from '@/app/api/[[...route]]/auth';
+import prisma from '@db';
+import bcrypt from 'bcryptjs';
 import { Hono } from 'hono';
+import { sign } from 'hono/jwt';
 
 // ---------- Mocks ----------
 
@@ -41,13 +46,6 @@ jest.mock('hono/adapter', () => ({
   env: jest.fn(() => ({ JWT_SECRET: 'test-secret' })),
 }));
 
-import prisma from '@db';
-import bcrypt from 'bcryptjs';
-import { sign } from 'hono/jwt';
-
-// Import AFTER mocks are set up
-import { auth } from '@/app/api/[[...route]]/auth';
-
 const mockPrisma = prisma as jest.Mocked<typeof prisma>;
 const mockBcrypt = bcrypt as jest.Mocked<typeof bcrypt>;
 const mockSign = sign as jest.MockedFunction<typeof sign>;
@@ -61,18 +59,21 @@ function buildApp() {
 
 // ---------- Tests ----------
 
-describe('POST /api/auth/login', () => {
+describe('POST /api/auth/login - Login Pengguna', () => {
   const app = buildApp();
 
   afterEach(() => jest.clearAllMocks());
 
-  it('returns 404 when user not found', async () => {
+  it('mengembalikan 404 ketika pengguna tidak ditemukan', async () => {
     (mockPrisma.user.findUnique as jest.Mock).mockResolvedValue(null);
 
     const res = await app.request('/api/auth/login', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ identifier: 'notfound@example.com', password: 'password123' }),
+      body: JSON.stringify({
+        identifier: 'notfound@example.com',
+        password: 'password123',
+      }),
     });
 
     expect(res.status).toBe(404);
@@ -80,7 +81,7 @@ describe('POST /api/auth/login', () => {
     expect(json).toMatchObject({ status: false, message: 'User not found' });
   });
 
-  it('returns 401 when password does not match', async () => {
+  it('mengembalikan 401 ketika password tidak cocok', async () => {
     (mockPrisma.user.findUnique as jest.Mock).mockResolvedValue({
       id: 1,
       email: 'user@example.com',
@@ -91,15 +92,21 @@ describe('POST /api/auth/login', () => {
     const res = await app.request('/api/auth/login', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ identifier: 'user@example.com', password: 'wrongpass' }),
+      body: JSON.stringify({
+        identifier: 'user@example.com',
+        password: 'wrongpass',
+      }),
     });
 
     expect(res.status).toBe(401);
     const json = await res.json();
-    expect(json).toMatchObject({ status: false, message: 'Password not match' });
+    expect(json).toMatchObject({
+      status: false,
+      message: 'Password not match',
+    });
   });
 
-  it('returns token on successful login', async () => {
+  it('mengembalikan token saat login berhasil', async () => {
     (mockPrisma.user.findUnique as jest.Mock).mockResolvedValue({
       id: 1,
       email: 'user@example.com',
@@ -111,56 +118,78 @@ describe('POST /api/auth/login', () => {
     const res = await app.request('/api/auth/login', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ identifier: 'user@example.com', password: 'validpass123' }),
+      body: JSON.stringify({
+        identifier: 'user@example.com',
+        password: 'validpass123',
+      }),
     });
 
     expect(res.status).toBe(200);
     const json = await res.json();
-    expect(json).toMatchObject({ status: true, data: { token: 'jwt-token-abc' } });
+    expect(json).toMatchObject({
+      status: true,
+      data: { token: 'jwt-token-abc' },
+    });
   });
 
-  it('returns 400 on invalid JSON schema (bad email)', async () => {
+  it('mengembalikan 400 untuk schema JSON tidak valid (email salah)', async () => {
     const res = await app.request('/api/auth/login', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ identifier: 'not-an-email', password: 'password123' }),
+      body: JSON.stringify({
+        identifier: 'not-an-email',
+        password: 'password123',
+      }),
     });
 
     expect(res.status).toBe(400);
   });
 
-  it('returns 400 when password is too short', async () => {
+  it('mengembalikan 400 ketika password terlalu pendek', async () => {
     const res = await app.request('/api/auth/login', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ identifier: 'user@example.com', password: 'short' }),
+      body: JSON.stringify({
+        identifier: 'user@example.com',
+        password: 'short',
+      }),
     });
 
     expect(res.status).toBe(400);
   });
 });
 
-describe('POST /api/auth/register', () => {
+describe('POST /api/auth/register - Registrasi Pengguna', () => {
   const app = buildApp();
 
   afterEach(() => jest.clearAllMocks());
 
-  it('returns 409 when email already exists', async () => {
-    (mockPrisma.user.findUnique as jest.Mock).mockResolvedValue({ id: 1, email: 'existing@example.com' });
+  it('mengembalikan 409 ketika email sudah terdaftar', async () => {
+    (mockPrisma.user.findUnique as jest.Mock).mockResolvedValue({
+      id: 1,
+      email: 'existing@example.com',
+    });
     (mockBcrypt.hash as jest.Mock).mockResolvedValue('hashed');
 
     const res = await app.request('/api/auth/register', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ name: 'Test', email: 'existing@example.com', password: 'password123' }),
+      body: JSON.stringify({
+        name: 'Test',
+        email: 'existing@example.com',
+        password: 'password123',
+      }),
     });
 
     expect(res.status).toBe(409);
     const json = await res.json();
-    expect(json).toMatchObject({ status: false, message: 'User already exists' });
+    expect(json).toMatchObject({
+      status: false,
+      message: 'User already exists',
+    });
   });
 
-  it('creates user and returns user_id on success', async () => {
+  it('membuat pengguna dan mengembalikan user_id saat berhasil', async () => {
     (mockPrisma.user.findUnique as jest.Mock).mockResolvedValue(null);
     (mockBcrypt.hash as jest.Mock).mockResolvedValue('hashed-password');
     (mockPrisma.user.create as jest.Mock).mockResolvedValue({ id: 42 });
@@ -168,7 +197,11 @@ describe('POST /api/auth/register', () => {
     const res = await app.request('/api/auth/register', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ name: 'New User', email: 'new@example.com', password: 'securepass123' }),
+      body: JSON.stringify({
+        name: 'New User',
+        email: 'new@example.com',
+        password: 'securepass123',
+      }),
     });
 
     expect(res.status).toBe(200);
@@ -177,11 +210,14 @@ describe('POST /api/auth/register', () => {
     expect(mockBcrypt.hash).toHaveBeenCalledWith('securepass123', 10);
   });
 
-  it('returns 400 on invalid schema (missing name)', async () => {
+  it('mengembalikan 400 untuk schema tidak valid (nama kosong)', async () => {
     const res = await app.request('/api/auth/register', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email: 'test@example.com', password: 'password123' }),
+      body: JSON.stringify({
+        email: 'test@example.com',
+        password: 'password123',
+      }),
     });
 
     expect(res.status).toBe(400);

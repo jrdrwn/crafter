@@ -9,7 +9,7 @@ jest.mock('next/image', () => ({
   },
 }));
 
-describe('PersonaCard', () => {
+describe('Kartu Persona', () => {
   const defaultProps = {
     name: 'Test Persona',
     subtitle: 'Test Subtitle',
@@ -18,48 +18,48 @@ describe('PersonaCard', () => {
     date: '2024-01-01',
   };
 
-  it('renders persona name', () => {
+  it('merender nama persona', () => {
     render(<PersonaCard {...defaultProps} />);
     expect(screen.getByText('Test Persona')).toBeInTheDocument();
   });
 
-  it('renders subtitle when provided', () => {
+  it('merender subtitle saat disediakan', () => {
     render(<PersonaCard {...defaultProps} />);
     expect(screen.getByText('Test Subtitle')).toBeInTheDocument();
   });
 
-  it('renders quote when provided', () => {
+  it('merender quote saat disediakan', () => {
     render(<PersonaCard {...defaultProps} />);
     // Quote is wrapped in curly quotes, search for the text content
     expect(screen.getByText(/This is a test quote/)).toBeInTheDocument();
   });
 
-  it('renders tag when provided', () => {
+  it('merender tag saat disediakan', () => {
     render(<PersonaCard {...defaultProps} />);
     expect(screen.getByText('Marketing')).toBeInTheDocument();
   });
 
-  it('renders date when provided', () => {
+  it('merender tanggal saat disediakan', () => {
     render(<PersonaCard {...defaultProps} />);
     expect(screen.getByText('2024-01-01')).toBeInTheDocument();
   });
 
-  it('renders "Created by Me" badge when createdByMe is true', () => {
+  it('merender badge "Dibuat oleh Saya" saat createdByMe true', () => {
     render(<PersonaCard {...defaultProps} createdByMe={true} />);
     expect(screen.getByText('Created by Me')).toBeInTheDocument();
   });
 
-  it('does not render badge when createdByMe is false', () => {
+  it('tidak merender badge saat createdByMe false', () => {
     render(<PersonaCard {...defaultProps} createdByMe={false} />);
     expect(screen.queryByText('Created by Me')).not.toBeInTheDocument();
   });
 
-  it('renders author name when provided', () => {
+  it('merender nama penulis saat disediakan', () => {
     render(<PersonaCard {...defaultProps} authorName="John Doe" />);
     expect(screen.getByText('by John Doe')).toBeInTheDocument();
   });
 
-  it('renders photo image when photoUrl is provided', () => {
+  it('merender gambar foto saat photoUrl disediakan', () => {
     render(
       <PersonaCard
         {...defaultProps}
@@ -71,14 +71,14 @@ describe('PersonaCard', () => {
     expect(img).toHaveAttribute('src', 'https://example.com/photo.jpg');
   });
 
-  it('applies custom className', () => {
+  it('menerapkan className kustom', () => {
     const { container } = render(
       <PersonaCard {...defaultProps} className="custom-class" />,
     );
     expect(container.firstChild).toHaveClass('custom-class');
   });
 
-  it('renders without optional props', () => {
+  it('merender tanpa prop opsional', () => {
     render(<PersonaCard name="Minimal Persona" />);
     expect(screen.getByText('Minimal Persona')).toBeInTheDocument();
   });

@@ -121,8 +121,8 @@ const mockPersona = {
   language: { key: 'en', label: 'English' },
 };
 
-describe('EditConstruct', () => {
-  it('renders construct form with persona data', () => {
+describe('Konstruksi Edit', () => {
+  it('merender formulir konstruksi dengan data persona', () => {
     const { container } = render(
       <EditConstruct personaId="1" persona={mockPersona} />,
     );

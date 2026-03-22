@@ -17,8 +17,8 @@ Object.defineProperty(window, 'matchMedia', {
   })),
 });
 
-describe('ThemeProvider', () => {
-  it('renders children', () => {
+describe('Theme Provider', () => {
+  it('merender children', () => {
     render(
       <ThemeProvider>
         <div data-testid="child">Child Content</div>

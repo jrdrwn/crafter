@@ -26,8 +26,8 @@ jest.mock('@/components/shared/header', () => {
   };
 });
 
-describe('Guest Detail Page', () => {
-  it('should render all components', async () => {
+describe('Halaman Detail Guest', () => {
+  it('harus merender semua komponen', async () => {
     const PageComponent = await GuestDetailPage();
     render(PageComponent);
 
@@ -37,7 +37,7 @@ describe('Guest Detail Page', () => {
     expect(screen.getByTestId('footer')).toBeInTheDocument();
   });
 
-  it('should be an async component', () => {
+  it('harus berupa komponen async', () => {
     expect(GuestDetailPage).toBeDefined();
     expect(typeof GuestDetailPage).toBe('function');
   });

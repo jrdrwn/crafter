@@ -1,5 +1,9 @@
 import { render, screen, waitFor } from '@testing-library/react';
-import { DomainFilterCombobox, OrderFilterCombobox } from '../domain-order-filters';
+
+import {
+  DomainFilterCombobox,
+  OrderFilterCombobox,
+} from '../domain-order-filters';
 
 // Mock fetch
 global.fetch = jest.fn();
@@ -8,7 +12,7 @@ jest.mock('next-intl', () => ({
   useTranslations: () => (key: string) => key,
 }));
 
-describe('DomainFilterCombobox', () => {
+describe('Combobox Filter Domain', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     (fetch as jest.Mock).mockResolvedValue({
@@ -17,7 +21,7 @@ describe('DomainFilterCombobox', () => {
     });
   });
 
-  it('renders domain filter combobox', async () => {
+  it('merender combobox filter domain', async () => {
     render(<DomainFilterCombobox />);
 
     await waitFor(() => {
@@ -27,14 +31,14 @@ describe('DomainFilterCombobox', () => {
   });
 });
 
-describe('OrderFilterCombobox', () => {
-  it('renders order filter combobox', () => {
+describe('Combobox Filter Urutan', () => {
+  it('merender combobox filter urutan', () => {
     render(<OrderFilterCombobox />);
     const button = screen.getByRole('combobox');
     expect(button).toBeInTheDocument();
   });
 
-  it('renders with selected order', () => {
+  it('merender dengan urutan yang dipilih', () => {
     render(<OrderFilterCombobox value="recent" onChangeAction={() => {}} />);
     const button = screen.getByRole('combobox');
     expect(button).toBeInTheDocument();

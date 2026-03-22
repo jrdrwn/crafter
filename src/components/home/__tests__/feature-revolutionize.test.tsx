@@ -27,13 +27,13 @@ jest.mock('next-intl', () => ({
   },
 }));
 
-describe('FeatureRevolutionize', () => {
-  it('renders feature section with title', () => {
+describe('Fitur Revolusioner', () => {
+  it('merender bagian fitur dengan judul', () => {
     render(<FeatureRevolutionize />);
     expect(screen.getByText('Revolutionize Your Workflow')).toBeInTheDocument();
   });
 
-  it('renders feature description', () => {
+  it('merender deskripsi fitur', () => {
     render(<FeatureRevolutionize />);
     expect(screen.getByText('Create personas in minutes')).toBeInTheDocument();
   });

@@ -1,5 +1,6 @@
 import { render, waitFor } from '@testing-library/react';
 import { useForm } from 'react-hook-form';
+
 import ExternalFactorsCard from '../external-factors-card';
 
 // Mock fetch
@@ -19,7 +20,7 @@ function ExternalFactorsCardWrapper() {
   return <ExternalFactorsCard control={form.control} />;
 }
 
-describe('ExternalFactorsCard', () => {
+describe('Kartu Faktor Eksternal', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     (fetch as jest.Mock).mockResolvedValueOnce({
@@ -28,11 +29,14 @@ describe('ExternalFactorsCard', () => {
     });
   });
 
-  it('renders external factors card', async () => {
+  it('merender kartu faktor eksternal', async () => {
     const { container } = render(<ExternalFactorsCardWrapper />);
 
     await waitFor(() => {
-      expect(container.querySelector('[class*="card"]') || container.querySelector('div')).toBeInTheDocument();
+      expect(
+        container.querySelector('[class*="card"]') ||
+          container.querySelector('div'),
+      ).toBeInTheDocument();
     });
   });
 });

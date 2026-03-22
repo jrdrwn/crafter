@@ -1,4 +1,5 @@
 import { render, waitFor } from '@testing-library/react';
+
 import PersonaDetail from '../persona-detail';
 
 // Mock fetch
@@ -38,13 +39,15 @@ const mockPersona = {
   updated_at: '2024-01-02T00:00:00Z',
 };
 
-describe('PersonaDetail', () => {
-  it('renders skeleton when loading', () => {
+describe('Detail Persona', () => {
+  it('merender skeleton saat loading', () => {
     (fetch as jest.Mock).mockImplementation(() => new Promise(() => {}));
 
     const { container } = render(<PersonaDetail personaId="1" />);
 
-    const skeleton = container.querySelector('[class*="skeleton"]') || container.querySelector('section');
+    const skeleton =
+      container.querySelector('[class*="skeleton"]') ||
+      container.querySelector('section');
     expect(skeleton).toBeInTheDocument();
   });
 });

@@ -32,8 +32,8 @@ jest.mock('@/components/shared/header', () => {
   };
 });
 
-describe('Guest History Page', () => {
-  it('should render all components', () => {
+describe('Halaman Riwayat Guest', () => {
+  it('harus merender semua komponen', () => {
     render(<GuestHistoryPage />);
 
     expect(screen.getByTestId('header')).toBeInTheDocument();

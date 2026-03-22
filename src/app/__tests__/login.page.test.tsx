@@ -26,8 +26,8 @@ jest.mock('@/components/shared/header', () => {
   };
 });
 
-describe('Login Page', () => {
-  it('should render all components', () => {
+describe('Halaman Login', () => {
+  it('harus merender semua komponen', () => {
     render(<LoginPage />);
 
     expect(screen.getByTestId('header')).toBeInTheDocument();
@@ -36,7 +36,7 @@ describe('Login Page', () => {
     expect(screen.getByTestId('footer')).toBeInTheDocument();
   });
 
-  it('should render components in correct order', () => {
+  it('harus merender komponen dalam urutan yang benar', () => {
     const { container } = render(<LoginPage />);
 
     const sections = container.querySelectorAll('[data-testid]');
@@ -47,7 +47,7 @@ describe('Login Page', () => {
     expect(order).toEqual(['header', 'login-form', 'end-cta', 'footer']);
   });
 
-  it('should be a function component', () => {
+  it('harus berupa komponen fungsi', () => {
     expect(LoginPage).toBeDefined();
     expect(typeof LoginPage).toBe('function');
   });

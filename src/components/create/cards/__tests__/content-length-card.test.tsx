@@ -50,8 +50,8 @@ function ContentLengthCardWrapper() {
   return <ContentLengthCard control={form.control} />;
 }
 
-describe('ContentLengthCard', () => {
-  it('renders content length card', () => {
+describe('Kartu Panjang Konten', () => {
+  it('merender kartu panjang konten', () => {
     const { container } = render(<ContentLengthCardWrapper />);
     expect(
       container.querySelector('[class*="card"]') ||

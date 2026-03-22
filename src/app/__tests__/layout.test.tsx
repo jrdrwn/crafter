@@ -26,7 +26,7 @@ jest.mock('next-intl', () => ({
 }));
 
 describe('RootLayout', () => {
-  it('should render children correctly', () => {
+  it('harus merender children dengan benar', () => {
     render(
       <RootLayout>
         <div data-testid="test-child">Test Content</div>
@@ -37,7 +37,7 @@ describe('RootLayout', () => {
     expect(screen.getByText('Test Content')).toBeInTheDocument();
   });
 
-  it('should wrap children with all required providers', () => {
+  it('harus membungkus children dengan semua provider yang diperlukan', () => {
     render(
       <RootLayout>
         <div data-testid="test-child">Content</div>

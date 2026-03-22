@@ -32,8 +32,8 @@ jest.mock('@/components/shared/header', () => {
   };
 });
 
-describe('Create Page', () => {
-  it('should render all components', async () => {
+describe('Halaman Buat Persona', () => {
+  it('harus merender semua komponen', async () => {
     const PageComponent = await CreatePage();
     render(PageComponent);
 
@@ -44,7 +44,7 @@ describe('Create Page', () => {
     expect(screen.getByTestId('footer')).toBeInTheDocument();
   });
 
-  it('should be an async component', () => {
+  it('harus berupa komponen async', () => {
     expect(CreatePage).toBeDefined();
     expect(typeof CreatePage).toBe('function');
   });

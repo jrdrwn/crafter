@@ -13,6 +13,16 @@
  * - POST /rag/contributions/upload
  */
 
+import { rag } from '@/app/api/[[...route]]/rag';
+import {
+  deleteContribution,
+  getUserContribution,
+  ingestContribution,
+  listUserContributions,
+  updateContribution,
+} from '@/lib/ingestion';
+import { normalizeToRAGNote } from '@/lib/persona.service';
+import prisma from '@db';
 import { Hono } from 'hono';
 
 // ---------- Mocks ----------
@@ -48,17 +58,6 @@ jest.mock('xlsx', () => ({
   utils: { sheet_to_csv: jest.fn() },
 }));
 
-import prisma from '@db';
-import {
-  ingestContribution,
-  listUserContributions,
-  getUserContribution,
-  updateContribution,
-  deleteContribution,
-} from '@/lib/ingestion';
-import { normalizeToRAGNote } from '@/lib/persona.service';
-import { rag } from '@/app/api/[[...route]]/rag';
-
 const mockPrisma = prisma as jest.Mocked<typeof prisma>;
 const mockIngest = ingestContribution as jest.Mock;
 const mockList = listUserContributions as jest.Mock;
@@ -79,21 +78,23 @@ function buildApp(jwtPayload?: { sub: number; role: string }) {
 
 // ---------- GET /contributions/check ----------
 
-describe('GET /api/rag/contributions/check', () => {
+describe('GET /api/rag/contributions/check - Cek Kontribusi', () => {
   afterEach(() => jest.clearAllMocks());
 
-  it('returns available=true when count > 0', async () => {
+  it('mengembalikan available=true ketika count > 0', async () => {
     (mockPrisma.rag_documents.count as jest.Mock).mockResolvedValue(5);
 
     const app = buildApp();
-    const res = await app.request('/api/rag/contributions/check?domain_key=tech&language_key=en');
+    const res = await app.request(
+      '/api/rag/contributions/check?domain_key=tech&language_key=en',
+    );
 
     expect(res.status).toBe(200);
     const json = await res.json();
     expect(json).toMatchObject({ status: true, available: true, count: 5 });
   });
 
-  it('returns available=false when count is 0', async () => {
+  it('mengembalikan available=false ketika count adalah 0', async () => {
     (mockPrisma.rag_documents.count as jest.Mock).mockResolvedValue(0);
 
     const app = buildApp();
@@ -107,10 +108,10 @@ describe('GET /api/rag/contributions/check', () => {
 
 // ---------- POST /contributions ----------
 
-describe('POST /api/rag/contributions', () => {
+describe('POST /api/rag/contributions - Tambah Kontribusi', () => {
   afterEach(() => jest.clearAllMocks());
 
-  it('ingests contribution and returns result', async () => {
+  it('mengingest kontribusi dan mengembalikan hasil', async () => {
     mockIngest.mockResolvedValue({ id: 1, chunks: 3 });
 
     const app = buildApp({ sub: 1, role: 'user' });
@@ -130,11 +131,15 @@ describe('POST /api/rag/contributions', () => {
     const json = await res.json();
     expect(json).toMatchObject({ status: true, result: { id: 1 } });
     expect(mockIngest).toHaveBeenCalledWith(
-      expect.objectContaining({ text: 'Sample survey text about user behavior', type: 'survey', author_id: 1 }),
+      expect.objectContaining({
+        text: 'Sample survey text about user behavior',
+        type: 'survey',
+        author_id: 1,
+      }),
     );
   });
 
-  it('returns 400 on invalid type', async () => {
+  it('mengembalikan 400 untuk tipe tidak valid', async () => {
     const app = buildApp({ sub: 1, role: 'user' });
     const res = await app.request('/api/rag/contributions', {
       method: 'POST',
@@ -145,7 +150,7 @@ describe('POST /api/rag/contributions', () => {
     expect(res.status).toBe(400);
   });
 
-  it('returns 400 when text is empty', async () => {
+  it('mengembalikan 400 ketika teks kosong', async () => {
     const app = buildApp({ sub: 1, role: 'user' });
     const res = await app.request('/api/rag/contributions', {
       method: 'POST',
@@ -159,10 +164,10 @@ describe('POST /api/rag/contributions', () => {
 
 // ---------- GET /contributions ----------
 
-describe('GET /api/rag/contributions', () => {
+describe('GET /api/rag/contributions - Daftar Kontribusi', () => {
   afterEach(() => jest.clearAllMocks());
 
-  it('returns user contributions list', async () => {
+  it('mengembalikan daftar kontribusi pengguna', async () => {
     mockList.mockResolvedValue({ data: [{ id: 1 }], total: 1 });
 
     const app = buildApp({ sub: 1, role: 'user' });
@@ -174,7 +179,7 @@ describe('GET /api/rag/contributions', () => {
     expect(mockList).toHaveBeenCalledWith(1, { limit: 10, offset: 0 });
   });
 
-  it('returns 401 when not authenticated', async () => {
+  it('mengembalikan 401 ketika tidak terautentikasi', async () => {
     const app = buildApp(); // no jwt
     const res = await app.request('/api/rag/contributions');
 
@@ -184,10 +189,10 @@ describe('GET /api/rag/contributions', () => {
 
 // ---------- GET /contributions/:id ----------
 
-describe('GET /api/rag/contributions/:id', () => {
+describe('GET /api/rag/contributions/:id - Detail Kontribusi', () => {
   afterEach(() => jest.clearAllMocks());
 
-  it('returns specific contribution when found', async () => {
+  it('mengembalikan kontribusi spesifik saat ditemukan', async () => {
     mockGet.mockResolvedValue({ id: 5, text: 'hello', type: 'doc' });
 
     const app = buildApp({ sub: 1, role: 'user' });
@@ -199,7 +204,7 @@ describe('GET /api/rag/contributions/:id', () => {
     expect(mockGet).toHaveBeenCalledWith(1, 5);
   });
 
-  it('returns 404 when contribution not found', async () => {
+  it('mengembalikan 404 ketika kontribusi tidak ditemukan', async () => {
     mockGet.mockResolvedValue(null);
 
     const app = buildApp({ sub: 1, role: 'user' });
@@ -213,10 +218,10 @@ describe('GET /api/rag/contributions/:id', () => {
 
 // ---------- PUT /contributions/:id ----------
 
-describe('PUT /api/rag/contributions/:id', () => {
+describe('PUT /api/rag/contributions/:id - Ubah Kontribusi', () => {
   afterEach(() => jest.clearAllMocks());
 
-  it('updates contribution and returns result', async () => {
+  it('memperbarui kontribusi dan mengembalikan hasil', async () => {
     mockUpdate.mockResolvedValue({ id: 1, text: 'updated text' });
 
     const app = buildApp({ sub: 1, role: 'user' });
@@ -231,7 +236,7 @@ describe('PUT /api/rag/contributions/:id', () => {
     expect(json).toMatchObject({ status: true });
   });
 
-  it('returns 404 when contribution not_found error thrown', async () => {
+  it('mengembalikan 404 ketika error not_found dilempar', async () => {
     mockUpdate.mockRejectedValue(new Error('not_found'));
 
     const app = buildApp({ sub: 1, role: 'user' });
@@ -249,14 +254,16 @@ describe('PUT /api/rag/contributions/:id', () => {
 
 // ---------- DELETE /contributions/:id ----------
 
-describe('DELETE /api/rag/contributions/:id', () => {
+describe('DELETE /api/rag/contributions/:id - Hapus Kontribusi', () => {
   afterEach(() => jest.clearAllMocks());
 
-  it('deletes contribution and returns result', async () => {
+  it('menghapus kontribusi dan mengembalikan hasil', async () => {
     mockDelete.mockResolvedValue({ deleted: true });
 
     const app = buildApp({ sub: 1, role: 'user' });
-    const res = await app.request('/api/rag/contributions/1', { method: 'DELETE' });
+    const res = await app.request('/api/rag/contributions/1', {
+      method: 'DELETE',
+    });
 
     expect(res.status).toBe(200);
     const json = await res.json();
@@ -264,18 +271,22 @@ describe('DELETE /api/rag/contributions/:id', () => {
     expect(mockDelete).toHaveBeenCalledWith(1, 1);
   });
 
-  it('returns 404 when not_found error thrown', async () => {
+  it('mengembalikan 404 ketika error not_found dilempar', async () => {
     mockDelete.mockRejectedValue(new Error('not_found'));
 
     const app = buildApp({ sub: 1, role: 'user' });
-    const res = await app.request('/api/rag/contributions/99', { method: 'DELETE' });
+    const res = await app.request('/api/rag/contributions/99', {
+      method: 'DELETE',
+    });
 
     expect(res.status).toBe(404);
   });
 
-  it('returns 401 when not authenticated', async () => {
+  it('mengembalikan 401 ketika tidak terautentikasi', async () => {
     const app = buildApp(); // no jwt
-    const res = await app.request('/api/rag/contributions/1', { method: 'DELETE' });
+    const res = await app.request('/api/rag/contributions/1', {
+      method: 'DELETE',
+    });
 
     expect(res.status).toBe(401);
   });
@@ -283,13 +294,16 @@ describe('DELETE /api/rag/contributions/:id', () => {
 
 // ---------- POST /contributions/upload ----------
 
-describe('POST /api/rag/contributions/upload', () => {
+describe('POST /api/rag/contributions/upload - Upload File', () => {
   afterEach(() => jest.clearAllMocks());
 
   it('returns 401 when not authenticated', async () => {
     const app = buildApp();
     const formData = new FormData();
-    formData.append('file', new File(['hello'], 'test.txt', { type: 'text/plain' }));
+    formData.append(
+      'file',
+      new File(['hello'], 'test.txt', { type: 'text/plain' }),
+    );
 
     const res = await app.request('/api/rag/contributions/upload', {
       method: 'POST',
@@ -299,7 +313,7 @@ describe('POST /api/rag/contributions/upload', () => {
     expect(res.status).toBe(401);
   });
 
-  it('returns 400 when no file is provided', async () => {
+  it('mengembalikan 400 ketika tidak ada file yang diupload', async () => {
     const app = buildApp({ sub: 1, role: 'user' });
     const formData = new FormData();
     formData.append('type', 'doc');
@@ -314,13 +328,18 @@ describe('POST /api/rag/contributions/upload', () => {
     expect(json).toMatchObject({ status: false, message: 'No file uploaded' });
   });
 
-  it('ingests .txt file and returns result', async () => {
+  it('mengingest file .txt dan mengembalikan hasil', async () => {
     mockNormalize.mockResolvedValue('normalized text content');
     mockIngest.mockResolvedValue({ id: 10 });
 
     const app = buildApp({ sub: 1, role: 'user' });
     const formData = new FormData();
-    formData.append('file', new File(['Hello world text content'], 'notes.txt', { type: 'text/plain' }));
+    formData.append(
+      'file',
+      new File(['Hello world text content'], 'notes.txt', {
+        type: 'text/plain',
+      }),
+    );
     formData.append('type', 'doc');
     formData.append('domain_key', 'tech');
     formData.append('language_key', 'en');
@@ -339,10 +358,13 @@ describe('POST /api/rag/contributions/upload', () => {
     );
   });
 
-  it('returns 400 on unsupported file type', async () => {
+  it('mengembalikan 400 untuk tipe file yang tidak didukung', async () => {
     const app = buildApp({ sub: 1, role: 'user' });
     const formData = new FormData();
-    formData.append('file', new File(['data'], 'image.png', { type: 'image/png' }));
+    formData.append(
+      'file',
+      new File(['data'], 'image.png', { type: 'image/png' }),
+    );
 
     const res = await app.request('/api/rag/contributions/upload', {
       method: 'POST',

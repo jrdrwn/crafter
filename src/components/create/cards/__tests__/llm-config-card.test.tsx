@@ -1,5 +1,6 @@
 import { render, waitFor } from '@testing-library/react';
 import { useForm } from 'react-hook-form';
+
 import LLMConfigCard from '../llm-config-card';
 
 // Mock fetch
@@ -21,7 +22,7 @@ function LLMConfigCardWrapper() {
   return <LLMConfigCard control={form.control} />;
 }
 
-describe('LLMConfigCard', () => {
+describe('Kartu Konfigurasi LLM', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     (fetch as jest.Mock).mockResolvedValue({
@@ -30,11 +31,14 @@ describe('LLMConfigCard', () => {
     });
   });
 
-  it('renders llm config card', async () => {
+  it('merender kartu konfigurasi llm', async () => {
     const { container } = render(<LLMConfigCardWrapper />);
 
     await waitFor(() => {
-      expect(container.querySelector('[class*="card"]') || container.querySelector('div')).toBeInTheDocument();
+      expect(
+        container.querySelector('[class*="card"]') ||
+          container.querySelector('div'),
+      ).toBeInTheDocument();
     });
   });
 });

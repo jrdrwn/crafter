@@ -53,8 +53,8 @@ jest.mock('@/components/ui/tabs', () => ({
   ),
 }));
 
-describe('Knowledge Base Page', () => {
-  it('should render all components', () => {
+describe('Halaman Basis Pengetahuan', () => {
+  it('harus merender semua komponen', () => {
     render(<KnowledgeBasePage />);
 
     expect(screen.getByTestId('header')).toBeInTheDocument();
@@ -64,14 +64,14 @@ describe('Knowledge Base Page', () => {
     expect(screen.getByTestId('footer')).toBeInTheDocument();
   });
 
-  it('should render tabs with contrib and contrib-list', () => {
+  it('harus merender tab dengan contrib dan contrib-list', () => {
     render(<KnowledgeBasePage />);
 
     expect(screen.getByTestId('contrib')).toBeInTheDocument();
     expect(screen.getByTestId('contrib-list')).toBeInTheDocument();
   });
 
-  it('should be a function component', () => {
+  it('harus berupa komponen fungsi', () => {
     expect(KnowledgeBasePage).toBeDefined();
     expect(typeof KnowledgeBasePage).toBe('function');
   });

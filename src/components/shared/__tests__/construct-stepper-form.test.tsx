@@ -42,20 +42,20 @@ function StepperFormWrapper() {
   );
 }
 
-describe('ConstructStepperForm', () => {
-  it('renders stepper form', () => {
+describe('Form Stepper Konstruksi', () => {
+  it('merender formulir stepper', () => {
     render(<StepperFormWrapper />);
     const section = document.querySelector('section');
     expect(section).toBeInTheDocument();
   });
 
-  it('renders stepper navigation', () => {
+  it('merender navigasi stepper', () => {
     render(<StepperFormWrapper />);
     const nav = document.querySelector('nav');
     expect(nav).toBeInTheDocument();
   });
 
-  it('renders step buttons', () => {
+  it('merender tombol langkah', () => {
     render(<StepperFormWrapper />);
     // Step buttons have role="tab", navigation buttons have role="button"
     const stepButtons = screen.getAllByRole('tab');
