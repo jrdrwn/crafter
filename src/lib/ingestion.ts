@@ -1,17 +1,35 @@
 import prisma from '@db';
 import { PGVectorStore } from '@langchain/community/vectorstores/pgvector';
 import { Document } from '@langchain/core/documents';
+
 import { GoogleGenerativeAIEmbeddings } from '@langchain/google-genai';
 import { RecursiveCharacterTextSplitter } from '@langchain/textsplitters';
 import type { Prisma } from '@prisma/client';
 import { Pool, PoolConfig } from 'pg';
 
+// @ts-expect-error: Override private method for embedding hack
+export const googleGenAIEmbeddings = class extends GoogleGenerativeAIEmbeddings {
+  // @ts-expect-error: override private method for embedding hack
+  _convertToContent(text) {
+    const cleanedText = this.stripNewLines ? text.replace(/\n/g, ' ') : text;
+    return {
+      content: {
+        role: 'user',
+        parts: [{ text: cleanedText }],
+      },
+      taskType: this.taskType,
+      title: this.title,
+      outputDimensionality: 768,
+    };
+  }
+};
+
 const DATABASE_URL = process.env.DATABASE_URL!;
 const GEMINI_API_KEY = process.env.GEMINI_API_KEY!;
 
-const embeddings = new GoogleGenerativeAIEmbeddings({
+const embeddings = new googleGenAIEmbeddings({
   apiKey: GEMINI_API_KEY,
-  model: 'text-embedding-004',
+  modelName: 'gemini-embedding-001',
 });
 
 let pool: Pool | null = null;
@@ -72,8 +90,8 @@ export async function ingestContribution(payload: ContributionPayload) {
 
   const extraObject =
     payload.extra &&
-    typeof payload.extra === 'object' &&
-    !Array.isArray(payload.extra)
+      typeof payload.extra === 'object' &&
+      !Array.isArray(payload.extra)
       ? (payload.extra as Record<string, unknown>)
       : {};
 
@@ -101,6 +119,7 @@ export async function ingestContribution(payload: ContributionPayload) {
   });
 
   const store = await getVectorStore();
+  console.log('Adding documents to vector store:', docs);
   await store.addDocuments(docs);
 
   return { id: doc.id, chunks: docs.length };
