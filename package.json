@@ -10,10 +10,10 @@
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "prisma:generate": "prisma generate",
-    "test:unit": "jest",
+    "test:unit": "jest --json --outputFile=unit.json",
     "test:unit:watch": "jest --watch",
     "test:unit:coverage": "jest --coverage",
-    "test:e2e": "playwright test",
+    "test:e2e": "playwright test --project=chromium --project=firefox --reporter=json > e2e.json",
     "prisma:migrate:diff": "npx prisma migrate diff --from-empty --to-schema-datamodel prisma/schema.prisma --script > prisma/migrations/0_init/migration.sql"
   },
   "dependencies": {
