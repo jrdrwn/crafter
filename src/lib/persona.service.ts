@@ -52,7 +52,24 @@ const PersonaOutputSchema = z.object({
 const API_KEY = process.env.GEMINI_API_KEY; // do not hardcode
 if (!API_KEY) throw new Error('Missing GEMINI_API_KEY in environment');
 
-const embeddings = new GoogleGenerativeAIEmbeddings({
+// @ts-expect-error: Override private method for embedding hack
+export const googleGenAIEmbeddings = class extends GoogleGenerativeAIEmbeddings {
+  // @ts-expect-error: override private method for embedding hack
+  _convertToContent(text) {
+    const cleanedText = this.stripNewLines ? text.replace(/\n/g, ' ') : text;
+    return {
+      content: {
+        role: 'user',
+        parts: [{ text: cleanedText }],
+      },
+      taskType: this.taskType,
+      title: this.title,
+      outputDimensionality: 768,
+    };
+  }
+};
+
+const embeddings = new googleGenAIEmbeddings({
   apiKey: API_KEY,
   model: 'gemini-embedding-001',
 });
