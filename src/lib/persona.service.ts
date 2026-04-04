@@ -54,7 +54,7 @@ if (!API_KEY) throw new Error('Missing GEMINI_API_KEY in environment');
 
 const embeddings = new GoogleGenerativeAIEmbeddings({
   apiKey: API_KEY,
-  model: 'text-embedding-004',
+  model: 'gemini-embedding-001',
 });
 
 const DATABASE_URL = process.env.DATABASE_URL!;
