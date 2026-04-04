@@ -63,7 +63,10 @@ const ContributionSchema = z.object({
     required_error: 'Type is required',
   }),
   visibility: z.enum(['public', 'private']).optional(),
-  domain_key: z.string().optional().or(z.literal('')),
+  domain_key: z
+    .string({ required_error: 'Domain is required' })
+    .trim()
+    .min(1, 'Domain is required'),
   language_key: z.enum(['en', 'id']).optional(),
   source: z.string().optional().or(z.literal('')),
 
@@ -273,6 +276,8 @@ export default function Contrib() {
   const TOKEN_LIMIT = Number(process.env.NEXT_PUBLIC_RAG_TOKEN_LIMIT ?? 40000);
 
   const rawText = (textValue ?? '').trim();
+  const domainValue = watch('domain_key');
+  const hasDomain = (domainValue ?? '').trim().length > 0;
   const textTokens = Math.ceil((rawText.length || 0) / 4);
   const fileTokens = file ? Math.ceil(file.size / 4) : 0;
   const activeTokens =
@@ -281,6 +286,7 @@ export default function Contrib() {
   const hasText = rawText.length > 0;
   const canSubmit =
     ((showText && hasText) || (showFile && !!file)) &&
+    hasDomain &&
     activeTokens <= TOKEN_LIMIT;
 
   function addMetaPair() {
