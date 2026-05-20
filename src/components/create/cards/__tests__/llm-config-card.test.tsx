@@ -19,7 +19,7 @@ function LLMConfigCardWrapper() {
       useRAG: false,
     },
   });
-  return <LLMConfigCard control={form.control} />;
+  return <LLMConfigCard form={form} />;
 }
 
 describe('Kartu Konfigurasi LLM', () => {

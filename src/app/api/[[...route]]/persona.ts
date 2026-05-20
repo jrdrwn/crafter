@@ -6,9 +6,61 @@ import { Hono } from 'hono';
 import YAML from 'yaml';
 import z from 'zod';
 
+import { DEFAULT_LLM_MODELS } from '@/lib/llm-seed-data';
 import { JWTPayload } from './types';
 
 export const persona = new Hono().basePath('/persona');
+
+// DEFAULT_LLM_MODELS imported from src/lib/llm-seed-data
+
+async function ensureDefaultLlmModels(provider?: string) {
+  const normalizedProvider = provider?.toLowerCase();
+  const seedData = normalizedProvider
+    ? DEFAULT_LLM_MODELS.filter((m) => m.category === normalizedProvider)
+    : DEFAULT_LLM_MODELS;
+
+  if (seedData.length === 0) return;
+
+  await prisma.llm.createMany({
+    data: seedData,
+    skipDuplicates: true,
+  });
+}
+
+function unwrapPersonaOutput(res: unknown) {
+  // Try common shapes from LLM clients
+  type AnyRes = { result?: unknown; output?: { result?: unknown }; content?: unknown };
+  const anyRes = res as AnyRes | undefined;
+  if (!anyRes) return null;
+  if (anyRes.result) return anyRes.result;
+  if (anyRes.output && anyRes.output.result) return anyRes.output.result;
+  if (anyRes.content) {
+    // content may be string or array of parts
+    const c = anyRes.content;
+    if (typeof c === 'string') {
+      try {
+        const parsed = JSON.parse(c);
+        if (parsed && typeof parsed === 'object' && 'result' in (parsed as object)) return (parsed as AnyRes).result;
+      } catch (_e) {
+        // ignore
+      }
+    }
+    if (Array.isArray(c)) {
+      for (const part of c) {
+        if (part && typeof part === 'object' && 'result' in (part as object)) return (part as AnyRes).result;
+        if (typeof part === 'string') {
+          try {
+            const parsed = JSON.parse(part);
+            if (parsed && typeof parsed === 'object' && 'result' in (parsed as object)) return (parsed as AnyRes).result;
+          } catch (_e) {
+            // ignore
+          }
+        }
+      }
+    }
+  }
+  return null;
+}
 
 persona.post(
   '/generate/guest',
@@ -197,10 +249,13 @@ persona.post(
       where: { key: json.llmModel.key },
     });
 
+    const personaResult = unwrapPersonaOutput(result);
+    if (!personaResult) throw new Error('Failed to parse LLM persona output');
+
     const newPersona = await prisma.persona.create({
       data: {
         owner_id: jwtPayload.sub,
-        result: result.result,
+        result: personaResult,
         content_length_range: json.contentLengthRange,
         detail: json.detail,
         domain_id: domain.id,
@@ -367,11 +422,14 @@ persona.put(
       where: { key: json.llmModel.key },
     });
 
+    const personaResult = unwrapPersonaOutput(result);
+    if (!personaResult) throw new Error('Failed to parse LLM persona output');
+
     const updatedPersona = await prisma.persona.update({
       where: { id: Number(id) },
       data: {
         owner_id: jwtPayload.sub,
-        result: result.result,
+        result: personaResult,
         content_length_range: json.contentLengthRange,
         detail: json.detail,
         domain_id: domain!.id,
@@ -727,6 +785,43 @@ persona.get('/helper/language', async (c) => {
 });
 
 persona.get('/helper/llm', async (c) => {
-  const llmModels = await prisma.llm.findMany();
+  const provider = (c.req.query('provider') as string | undefined)?.toLowerCase();
+  const providerDefaults = provider
+    ? DEFAULT_LLM_MODELS.filter((m) => m.category === provider)
+    : [];
+  const providerDefaultKeys = providerDefaults.map((m) => m.key);
+  const where = provider
+    ? providerDefaultKeys.length > 0
+      ? {
+          OR: [
+            { category: { equals: provider, mode: 'insensitive' as const } },
+            { key: { in: providerDefaultKeys } },
+          ],
+        }
+      : { category: { equals: provider, mode: 'insensitive' as const } }
+    : undefined;
+
+  let llmModels = await prisma.llm.findMany({
+    where,
+    orderBy: { label: 'asc' },
+  });
+
+  if (llmModels.length === 0) {
+    await ensureDefaultLlmModels(provider);
+    llmModels = await prisma.llm.findMany({
+      where,
+      orderBy: { label: 'asc' },
+    });
+  }
+
   return c.json({ status: true, data: llmModels });
+});
+
+persona.get('/helper/providers', async (c) => {
+  // report which providers are available based on environment
+  const providers: { key: string; label: string; available: boolean }[] = [
+    { key: 'gemini', label: 'Gemini', available: Boolean(process.env.GEMINI_API_KEY) },
+    { key: 'openai', label: 'OpenAI', available: Boolean(process.env.OPENAI_API_KEY) },
+  ];
+  return c.json({ status: true, data: providers });
 });

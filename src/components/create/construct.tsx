@@ -13,18 +13,18 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { defineStepper } from '@stepperize/react';
 import { getCookie } from 'cookies-next/client';
 import {
-  Building2,
-  CheckCircle2,
-  Cpu,
-  Database,
-  FileText,
-  Languages,
-  Layers,
-  LucideMessageSquareWarning,
-  Ruler,
-  SlidersHorizontal,
-  Sparkles,
-  StickyNote,
+    Building2,
+    CheckCircle2,
+    Cpu,
+    Database,
+    FileText,
+    Languages,
+    Layers,
+    LucideMessageSquareWarning,
+    Ruler,
+    SlidersHorizontal,
+    Sparkles,
+    StickyNote,
 } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { useRouter } from 'next/navigation';
@@ -316,7 +316,7 @@ export default function Design() {
                   <ContentLengthCard control={form.control} />
                 </div>
                 <div>
-                  <LLMConfigCard control={form.control} />
+                  <LLMConfigCard form={form} />
                 </div>
                 <div className="md:col-span-2 lg:col-span-1">
                   <AdditionalDetailsCard control={form.control} />

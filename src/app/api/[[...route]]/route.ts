@@ -26,6 +26,7 @@ app.use(
       '*/*/helper/domain',
       '*/*/helper/attribute',
       '*/*/helper/language',
+      '*/*/helper/providers',
       '*/*/helper/llm',
       '*/*/contributions/check',
     ],

@@ -1,15 +1,29 @@
 'use client';
 
+import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
+import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+} from '@/components/ui/command';
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from '@/components/ui/popover';
 import { Skeleton } from '@/components/ui/skeleton';
 import { ErrorMessageButtonRetry } from '@/helpers/error-retry';
 import { cn } from '@/lib/utils';
 import { language, llm } from '@prisma/client';
 import * as SelectPrimitive from '@radix-ui/react-select';
-import { Bot, CheckIcon } from 'lucide-react';
+import { Bot, Check, CheckIcon, ChevronsUpDown } from 'lucide-react';
 import { useTranslations } from 'next-intl';
-import { useEffect, useState } from 'react';
-import { Control, Controller } from 'react-hook-form';
+import { useCallback, useEffect, useState } from 'react';
+import { Controller, UseFormReturn } from 'react-hook-form';
 
 import {
   Card,
@@ -30,23 +44,27 @@ import {
 import { TCreateForm } from '../construct';
 
 type Props = {
-  control: Control<TCreateForm>;
+  form: UseFormReturn<TCreateForm>;
 };
 
-export default function LLMConfigCard({ control }: Props) {
+export default function LLMConfigCard({ form }: Props) {
+  const [providerOpen, setProviderOpen] = useState<boolean>(false);
   const [loadingLlmModels, setLoadingLlmModels] = useState<boolean>(false);
   const [errorLlmModels, setErrorLlmModels] = useState<string | null>(null);
+  const [providers, setProviders] = useState<{ key: string; label: string; available: boolean }[]>([]);
+  const [selectedProvider, setSelectedProvider] = useState<string>('gemini');
   const [loadingLanguages, setLoadingLanguages] = useState<boolean>(false);
   const [errorLanguages, setErrorLanguages] = useState<string | null>(null);
   const [languages, setLanguages] = useState<language[]>([]);
   const [llmModels, setLlmModels] = useState<llm[]>([]);
   const [ragAvailable, setRagAvailable] = useState<boolean>(false);
   const t = useTranslations('create');
+  const selectedProviderData = providers.find((p) => p.key === selectedProvider);
 
   async function fetchLlmModels() {
     setErrorLlmModels(null);
     setLoadingLlmModels(true);
-    const response = await fetch('/api/persona/helper/llm');
+    const response = await fetch(`/api/persona/helper/llm${selectedProvider ? `?provider=${selectedProvider}` : ''}`);
     setLoadingLlmModels(false);
     if (!response.ok) {
       setErrorLlmModels('Failed to fetch LLM models');
@@ -56,6 +74,7 @@ export default function LLMConfigCard({ control }: Props) {
     setLlmModels(json.data);
     setErrorLlmModels(null);
   }
+
 
   async function fetchLanguages() {
     setErrorLanguages(null);
@@ -70,15 +89,53 @@ export default function LLMConfigCard({ control }: Props) {
     setLanguages(json.data);
   }
 
+  async function fetchProviders() {
+    try {
+      const res = await fetch('/api/persona/helper/providers');
+      if (!res.ok) return;
+      const j = await res.json();
+      setProviders(j.data || []);
+      const firstAvailable = (j.data || []).find(
+        (p: { key: string; label: string; available: boolean }) => p.available,
+      )?.key;
+      if (firstAvailable) setSelectedProvider(firstAvailable);
+    } catch (_e) {
+      // ignore
+    }
+  }
+
   useEffect(() => {
     fetchLanguages();
-    fetchLlmModels();
+    fetchProviders();
   }, []);
 
+  useEffect(() => {
+    fetchLlmModels();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedProvider]);
+
+  useEffect(() => {
+    if (llmModels.length === 0) return;
+
+    const current = form.getValues('llmModel');
+    const hasCurrent = llmModels.some((model) => model.key === current?.key);
+
+    if (!hasCurrent) {
+      form.setValue(
+        'llmModel',
+        {
+          key: llmModels[0].key,
+          label: llmModels[0].label,
+        },
+        { shouldDirty: false, shouldTouch: false },
+      );
+    }
+  }, [form, llmModels]);
+
   // for check avaibility rag based on language selection and domain key
-  async function checkRagAvailability() {
-    const selectedLanguageKey = control._formValues.language?.key;
-    const domainKey = control._formValues.domain?.key || null;
+  const checkRagAvailability = useCallback(async () => {
+    const selectedLanguageKey = form.getValues('language')?.key;
+    const domainKey = form.getValues('domain')?.key || null;
     if (!selectedLanguageKey) return false;
 
     const response = await fetch(
@@ -90,13 +147,13 @@ export default function LLMConfigCard({ control }: Props) {
       setRagAvailable(true);
     } else {
       setRagAvailable(false);
-      control._formValues.useRAG = false;
+      form.setValue('useRAG', false, { shouldDirty: true });
     }
-  }
+  }, [form]);
 
   useEffect(() => {
     checkRagAvailability();
-  }, [languages]);
+  }, [checkRagAvailability, languages]);
 
   return (
     <div className="space-y-3 sm:space-y-4">
@@ -122,53 +179,121 @@ export default function LLMConfigCard({ control }: Props) {
           {!loadingLlmModels && !errorLlmModels && (
             <Controller
               name="llmModel"
-              control={control}
+              control={form.control}
               render={({ field, fieldState }) => (
                 <Field data-invalid={fieldState.invalid}>
-                  <Select
-                    name={field.name}
-                    value={
-                      (field.value.key as string) ?? 'gemini-2.5-flash-lite'
-                    }
-                    onValueChange={(val) =>
-                      field.onChange({
-                        key: val,
-                        label:
-                          llmModels.find((model) => model.key === val)?.label ||
-                          val,
-                      })
-                    }
-                  >
-                    <SelectTrigger
-                      className="w-full border-primary"
-                      aria-invalid={fieldState.invalid}
-                    >
-                      <SelectValue
-                        placeholder={t('llm-config-select-placeholder')}
-                      />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {llmModels.map((model) => (
-                        <LLMSelectItem
-                          key={model.key}
-                          value={model.key}
-                          className="max-w-109 flex-col items-start"
-                        >
-                          <p>
-                            <SelectPrimitive.ItemText>
-                              {model.label}
-                            </SelectPrimitive.ItemText>{' '}
-                            <span className="text-xs text-muted-foreground">
-                              ({model.category})
+                  <div className="mb-2 grid grid-cols-1 gap-2 sm:grid-cols-12">
+                    <div className="sm:col-span-4">
+                      <p className="mb-1 text-xs text-muted-foreground">
+                        {t('llm-config-provider-label')}
+                      </p>
+                      <Popover open={providerOpen} onOpenChange={setProviderOpen}>
+                        <PopoverTrigger asChild>
+                          <Button
+                            variant="outline"
+                            role="combobox"
+                            aria-expanded={providerOpen}
+                            className="w-full justify-between border-primary"
+                          >
+                            <span className="truncate text-left">
+                              {selectedProviderData?.label ||
+                                t('llm-config-provider-placeholder')}
                             </span>
-                          </p>
-                          <p className="text-xs text-muted-foreground">
-                            {model.description}
-                          </p>
-                        </LLMSelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+                            <ChevronsUpDown className="ml-2 size-4 shrink-0 opacity-60" />
+                          </Button>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-[var(--radix-popover-trigger-width)] p-0">
+                          <Command>
+                            <CommandInput
+                              placeholder={t('llm-config-provider-search-placeholder')}
+                              className="h-9"
+                            />
+                            <CommandList>
+                              <CommandEmpty>
+                                {t('llm-config-provider-empty')}
+                              </CommandEmpty>
+                              <CommandGroup>
+                                {providers.map((p) => (
+                                  <CommandItem
+                                    key={p.key}
+                                    value={`${p.key} ${p.label}`}
+                                    disabled={!p.available}
+                                    onSelect={() => {
+                                      setSelectedProvider(p.key);
+                                      setProviderOpen(false);
+                                    }}
+                                  >
+                                    <Check
+                                      className={cn(
+                                        'mr-2 size-4',
+                                        selectedProvider === p.key
+                                          ? 'opacity-100'
+                                          : 'opacity-0',
+                                      )}
+                                    />
+                                    <span>{p.label}</span>
+                                    {!p.available && (
+                                      <span className="ml-2 text-xs text-muted-foreground">
+                                        ({t('llm-config-provider-unavailable')})
+                                      </span>
+                                    )}
+                                  </CommandItem>
+                                ))}
+                              </CommandGroup>
+                            </CommandList>
+                          </Command>
+                        </PopoverContent>
+                      </Popover>
+                    </div>
+
+                    <div className="sm:col-span-8">
+                      <p className="mb-1 text-xs text-muted-foreground">
+                        {t('construct-model')}
+                      </p>
+                      <Select
+                        name={field.name}
+                        value={field.value?.key || ''}
+                        onValueChange={(val) =>
+                          field.onChange({
+                            key: val,
+                            label:
+                              llmModels.find((model) => model.key === val)
+                                ?.label || val,
+                          })
+                        }
+                      >
+                        <SelectTrigger
+                          className="w-full border-primary"
+                          aria-invalid={fieldState.invalid}
+                        >
+                          <SelectValue
+                            placeholder={t('llm-config-select-placeholder')}
+                          />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {llmModels.map((model) => (
+                            <LLMSelectItem
+                              key={model.key}
+                              value={model.key}
+                              className="max-w-109 flex-col items-start"
+                            >
+                              <p>
+                                <SelectPrimitive.ItemText>
+                                  {model.label}
+                                </SelectPrimitive.ItemText>{' '}
+                                <span className="text-xs text-muted-foreground">
+                                  ({model.category})
+                                </span>
+                              </p>
+                              <p className="text-xs text-muted-foreground">
+                                {model.description}
+                              </p>
+                            </LLMSelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  </div>
                 </Field>
               )}
             />
@@ -184,7 +309,7 @@ export default function LLMConfigCard({ control }: Props) {
         <CardFooter className="flex flex-col items-stretch gap-2 border-t border-dashed px-1.5 pb-1 sm:flex-row sm:items-center sm:justify-between sm:px-2">
           <Controller
             name="useRAG"
-            control={control}
+            control={form.control}
             render={({ field, fieldState }) => (
               <Field data-invalid={fieldState.invalid}>
                 <FieldLabel className="flex items-center">
@@ -219,7 +344,7 @@ export default function LLMConfigCard({ control }: Props) {
           {!loadingLanguages && !errorLanguages && (
             <Controller
               name="language"
-              control={control}
+              control={form.control}
               render={({ field, fieldState }) => {
                 return (
                   <Field

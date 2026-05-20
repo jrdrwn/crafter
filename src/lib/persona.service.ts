@@ -4,12 +4,10 @@ import path from 'path';
 import { PGVectorStore } from '@langchain/community/vectorstores/pgvector';
 import { Document } from '@langchain/core/documents';
 import { HumanMessage, SystemMessage } from '@langchain/core/messages';
-import {
-  ChatGoogleGenerativeAI,
-  GoogleGenerativeAIEmbeddings,
-} from '@langchain/google-genai';
+import { ChatGoogleGenerativeAI } from '@langchain/google-genai';
 import { PoolConfig } from 'pg';
 import { z } from 'zod';
+import { createChatClient, createEmbeddingsClient } from './llm';
 
 const PersonaResultSchema = z.object({
   narative: z.string(),
@@ -48,31 +46,7 @@ const PersonaOutputSchema = z.object({
   taxonomy: PersonaTaxonomySchema,
 });
 
-// ===== Config =====
-const API_KEY = process.env.GEMINI_API_KEY; // do not hardcode
-if (!API_KEY) throw new Error('Missing GEMINI_API_KEY in environment');
-
-// @ts-expect-error: Override private method for embedding hack
-export const googleGenAIEmbeddings = class extends GoogleGenerativeAIEmbeddings {
-  // @ts-expect-error: override private method for embedding hack
-  _convertToContent(text) {
-    const cleanedText = this.stripNewLines ? text.replace(/\n/g, ' ') : text;
-    return {
-      content: {
-        role: 'user',
-        parts: [{ text: cleanedText }],
-      },
-      taskType: this.taskType,
-      title: this.title,
-      outputDimensionality: 768,
-    };
-  }
-};
-
-const embeddings = new googleGenAIEmbeddings({
-  apiKey: API_KEY,
-  model: 'gemini-embedding-001',
-});
+// Provider-aware clients: prefer OpenAI when model name looks like a GPT model or when explicitly prefixed
 
 const DATABASE_URL = process.env.DATABASE_URL!;
 let store: PGVectorStore | null = null;
@@ -81,7 +55,8 @@ let store: PGVectorStore | null = null;
 
 async function ensureStore() {
   if (store) return store;
-  store = await PGVectorStore.initialize(embeddings, {
+  const embClient = await createEmbeddingsClient();
+  store = await PGVectorStore.initialize(embClient, {
     postgresConnectionOptions: { connectionString: DATABASE_URL } as PoolConfig,
     tableName: 'rag_embeddings',
     columns: {
@@ -300,10 +275,9 @@ export async function runPersonaRAG(
     new HumanMessage(`${contructTitle}\n\n${construct}`),
   ];
 
-  const llm = new ChatGoogleGenerativeAI({
-    model,
-    apiKey: API_KEY,
-    cache: true,
-  });
-  return llm.withStructuredOutput(PersonaOutputSchema).invoke(finalPrompt);
+  const client = await createChatClient(model);
+  if (typeof client.withStructuredOutput === 'function') {
+    return client.withStructuredOutput(PersonaOutputSchema).invoke(finalPrompt);
+  }
+  return client.invoke(finalPrompt);
 }

@@ -12,18 +12,18 @@ import { ConstructStepperForm } from '@/components/shared/construct-stepper-form
 import { zodResolver } from '@hookform/resolvers/zod';
 import { defineStepper } from '@stepperize/react';
 import {
-  Building2,
-  CheckCircle2,
-  Cpu,
-  Database,
-  FileText,
-  Languages,
-  Layers,
-  LucideMessageSquareWarning,
-  Ruler,
-  SlidersHorizontal,
-  Sparkles,
-  StickyNote,
+    Building2,
+    CheckCircle2,
+    Cpu,
+    Database,
+    FileText,
+    Languages,
+    Layers,
+    LucideMessageSquareWarning,
+    Ruler,
+    SlidersHorizontal,
+    Sparkles,
+    StickyNote,
 } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { useRouter } from 'next/navigation';
@@ -274,7 +274,7 @@ export default function Design({ persona }: { persona: PersonaData | null }) {
                   <ContentLengthCard control={form.control} />
                 </div>
                 <div>
-                  <LLMConfigCard control={form.control} />
+                  <LLMConfigCard form={form} />
                 </div>
                 <div>
                   <AdditionalDetailsCard control={form.control} />
