@@ -38,5 +38,5 @@ export async function createEmbeddingsClient(provider?: 'gemini' | 'openai') {
     if (!OpenAIEmbeddings) throw new Error('OpenAI embeddings not found in @langchain/openai');
     return new OpenAIEmbeddings({ apiKey: process.env.OPENAI_API_KEY, modelName: 'text-embedding-3-large' });
   }
-  return new GeminiEmbeddings({ apiKey: process.env.GEMINI_API_KEY, modelName: 'gemini-embedding-001' });
+  return new GeminiEmbeddings({ apiKey: process.env.GEMINI_API_KEY, modelName: 'gemini-embedding-2' });
 }
