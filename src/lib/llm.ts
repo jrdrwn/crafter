@@ -1,6 +1,8 @@
 import { ChatGoogleGenerativeAI, GoogleGenerativeAIEmbeddings } from '@langchain/google-genai';
 
+// @ts-expect-error: no typings for this class since it's a custom override of the GoogleGenerativeAIEmbeddings
 export class GeminiEmbeddings extends GoogleGenerativeAIEmbeddings {
+
   // @ts-expect-error: override private method for embedding hack
   _convertToContent(text) {
     const cleanedText = this.stripNewLines ? text.replace(/\n/g, ' ') : text;
