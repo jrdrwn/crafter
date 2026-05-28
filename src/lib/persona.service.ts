@@ -46,7 +46,7 @@ const PersonaOutputSchema = z.object({
   taxonomy: PersonaTaxonomySchema,
 });
 
-// Provider-aware clients: prefer OpenAI when model name looks like a GPT model or when explicitly prefixed
+// Chat generation can still use either provider, but RAG embeddings stay on Gemini to match the stored vectors.
 
 const DATABASE_URL = process.env.DATABASE_URL!;
 let store: PGVectorStore | null = null;
@@ -55,7 +55,7 @@ let store: PGVectorStore | null = null;
 
 async function ensureStore() {
   if (store) return store;
-  const embClient = await createEmbeddingsClient();
+  const embClient = await createEmbeddingsClient('gemini');
   store = await PGVectorStore.initialize(embClient, {
     postgresConnectionOptions: { connectionString: DATABASE_URL } as PoolConfig,
     tableName: 'rag_embeddings',

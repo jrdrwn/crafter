@@ -1,34 +1,14 @@
 import prisma from '@db';
 import { PGVectorStore } from '@langchain/community/vectorstores/pgvector';
 import { Document } from '@langchain/core/documents';
-
-import { GoogleGenerativeAIEmbeddings } from '@langchain/google-genai';
 import { RecursiveCharacterTextSplitter } from '@langchain/textsplitters';
 import type { Prisma } from '@prisma/client';
 import { Pool, PoolConfig } from 'pg';
 import { createEmbeddingsClient } from './llm';
 
-// @ts-expect-error: Override private method for embedding hack
-// Preserve the custom override used previously for Gemini embeddings
-export const googleGenAIEmbeddings = class extends GoogleGenerativeAIEmbeddings {
-  // @ts-expect-error: override private method for embedding hack
-  _convertToContent(text) {
-    const cleanedText = this.stripNewLines ? text.replace(/\n/g, ' ') : text;
-    return {
-      content: {
-        role: 'user',
-        parts: [{ text: cleanedText }],
-      },
-      taskType: this.taskType,
-      title: this.title,
-      outputDimensionality: 768,
-    };
-  }
-};
-
 const DATABASE_URL = process.env.DATABASE_URL!;
 
-// embeddings client will be created on demand to support dynamic providers
+// This vector store is backed by Gemini embeddings to match the existing rag_embeddings table.
 
 let pool: Pool | null = null;
 function getPg() {
@@ -37,10 +17,7 @@ function getPg() {
 }
 
 async function getVectorStore() {
-  const provider = (process.env.EMBEDDING_PROVIDER as 'gemini' | 'openai') ?? undefined;
-  const embClient = provider === 'gemini'
-    ? new googleGenAIEmbeddings({ apiKey: process.env.GEMINI_API_KEY!, modelName: 'gemini-embedding-001' })
-    : await createEmbeddingsClient(provider);
+  const embClient = await createEmbeddingsClient('gemini');
   return PGVectorStore.initialize(embClient, {
     postgresConnectionOptions: {
       connectionString: DATABASE_URL,
