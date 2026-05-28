@@ -1,21 +1,5 @@
 import { ChatGoogleGenerativeAI, GoogleGenerativeAIEmbeddings } from '@langchain/google-genai';
 
-export class GeminiEmbeddings extends GoogleGenerativeAIEmbeddings {
-  // @ts-expect-error: override private method for embedding hack
-  _convertToContent(text) {
-    const cleanedText = this.stripNewLines ? text.replace(/\n/g, ' ') : text;
-    return {
-      content: {
-        role: 'user',
-        parts: [{ text: cleanedText }],
-      },
-      taskType: this.taskType,
-      title: this.title,
-      outputDimensionality: 768,
-    };
-  }
-}
-
 export async function createChatClient(model: string) {
   const lowered = model?.toLowerCase?.() ?? '';
   const isOpenAI = lowered.startsWith('openai:') || lowered.startsWith('gpt') || lowered.includes('gpt-');
@@ -38,5 +22,5 @@ export async function createEmbeddingsClient(provider?: 'gemini' | 'openai') {
     if (!OpenAIEmbeddings) throw new Error('OpenAI embeddings not found in @langchain/openai');
     return new OpenAIEmbeddings({ apiKey: process.env.OPENAI_API_KEY, modelName: 'text-embedding-3-large' });
   }
-  return new GeminiEmbeddings({ apiKey: process.env.GEMINI_API_KEY, modelName: 'gemini-embedding-001' });
+  return new GoogleGenerativeAIEmbeddings({ apiKey: process.env.GEMINI_API_KEY, modelName: 'embedding-001' });
 }
