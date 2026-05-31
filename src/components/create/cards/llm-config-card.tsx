@@ -3,17 +3,17 @@
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import {
-  Command,
-  CommandEmpty,
-  CommandGroup,
-  CommandInput,
-  CommandItem,
-  CommandList,
+    Command,
+    CommandEmpty,
+    CommandGroup,
+    CommandInput,
+    CommandItem,
+    CommandList,
 } from '@/components/ui/command';
 import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
+    Popover,
+    PopoverContent,
+    PopoverTrigger,
 } from '@/components/ui/popover';
 import { Skeleton } from '@/components/ui/skeleton';
 import { ErrorMessageButtonRetry } from '@/helpers/error-retry';
@@ -26,20 +26,20 @@ import { useCallback, useEffect, useState } from 'react';
 import { Controller, UseFormReturn } from 'react-hook-form';
 
 import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
+    Card,
+    CardContent,
+    CardDescription,
+    CardFooter,
+    CardHeader,
+    CardTitle,
 } from '../../ui/card';
 import { Field, FieldLabel } from '../../ui/field';
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
 } from '../../ui/select';
 import { TCreateForm } from '../construct';
 
@@ -182,8 +182,8 @@ export default function LLMConfigCard({ form }: Props) {
               control={form.control}
               render={({ field, fieldState }) => (
                 <Field data-invalid={fieldState.invalid}>
-                  <div className="mb-2 grid grid-cols-1 gap-2 sm:grid-cols-12">
-                    <div className="sm:col-span-4">
+                  <div className="mb-2 grid grid-cols-1 gap-2 sm:grid-cols-12 items-end">
+                    <div className="sm:col-span-3">
                       <p className="mb-1 text-xs text-muted-foreground">
                         {t('llm-config-provider-label')}
                       </p>
@@ -246,7 +246,7 @@ export default function LLMConfigCard({ form }: Props) {
                       </Popover>
                     </div>
 
-                    <div className="sm:col-span-8">
+                    <div className="sm:col-span-5">
                       <p className="mb-1 text-xs text-muted-foreground">
                         {t('construct-model')}
                       </p>
@@ -293,6 +293,44 @@ export default function LLMConfigCard({ form }: Props) {
                         </SelectContent>
                       </Select>
                     </div>
+
+                    <div className="sm:col-span-4">
+                      <p className="mb-1 text-xs text-muted-foreground">
+                        {t('construct-response-mode')}
+                      </p>
+                      <Controller
+                        name="llmResponseMode"
+                        control={form.control}
+                        render={({ field: modeField, fieldState: modeState }) => (
+                          <Field data-invalid={modeState.invalid} className="w-full">
+                            <Select
+                              name={modeField.name}
+                              value={modeField.value}
+                              onValueChange={modeField.onChange}
+                            >
+                              <SelectTrigger className="w-full border-primary" aria-invalid={modeState.invalid}>
+                                <SelectValue
+                                  placeholder={t('llm-config-response-mode-placeholder')}
+                                />
+                              </SelectTrigger>
+                              <SelectContent>
+                                <SelectItem value="default">
+                                  {t('llm-config-response-mode-default')}
+                                </SelectItem>
+                                <SelectItem value="thinking">
+                                  {t('llm-config-response-mode-thinking')}
+                                </SelectItem>
+                                <SelectItem value="instant">
+                                  {t('llm-config-response-mode-instant')}
+                                </SelectItem>
+                              </SelectContent>
+                            </Select>
+                          </Field>
+                        )}
+                      />
+                    </div>
+
+
                   </div>
                 </Field>
               )}
@@ -342,46 +380,45 @@ export default function LLMConfigCard({ form }: Props) {
             </div>
           )}
           {!loadingLanguages && !errorLanguages && (
-            <Controller
-              name="language"
-              control={form.control}
-              render={({ field, fieldState }) => {
-                return (
-                  <Field
-                    data-invalid={fieldState.invalid}
-                    className="w-full sm:w-42"
-                  >
-                    <Select
-                      name={field.name}
-                      value={field.value.key}
-                      onValueChange={(value) => {
-                        field.onChange({
-                          key: value,
-                          label:
-                            languages.find((lang) => lang.key === value)
-                              ?.label || value,
-                        });
-                        checkRagAvailability();
-                      }}
-                    >
-                      <SelectTrigger className="w-full border-primary sm:w-42">
-                        <SelectValue
-                          placeholder={t('llm-config-language-placeholder')}
-                          aria-invalid={fieldState.invalid}
-                        />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {languages.map((language) => (
-                          <SelectItem key={language.key} value={language.key}>
-                            {language.label}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </Field>
-                );
-              }}
-            />
+            <div className="w-full sm:w-42">
+              <Controller
+                name="language"
+                control={form.control}
+                render={({ field, fieldState }) => {
+                  return (
+                    <Field data-invalid={fieldState.invalid} className="w-full">
+                      <Select
+                        name={field.name}
+                        value={field.value.key}
+                        onValueChange={(value) => {
+                          field.onChange({
+                            key: value,
+                            label:
+                              languages.find((lang) => lang.key === value)
+                                ?.label || value,
+                          });
+                          checkRagAvailability();
+                        }}
+                      >
+                        <SelectTrigger className="w-full border-primary sm:w-42">
+                          <SelectValue
+                            placeholder={t('llm-config-language-placeholder')}
+                            aria-invalid={fieldState.invalid}
+                          />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {languages.map((language) => (
+                            <SelectItem key={language.key} value={language.key}>
+                              {language.label}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </Field>
+                  );
+                }}
+              />
+            </div>
           )}
           {errorLanguages && (
             <ErrorMessageButtonRetry

@@ -91,6 +91,7 @@ persona.post(
       language: z
         .object({ key: z.enum(['en', 'id']), label: z.string() })
         .required(),
+      llmResponseMode: z.enum(['default', 'thinking', 'instant']).optional(),
       useRAG: z.boolean(),
       detail: z.string().optional(),
     }),
@@ -140,6 +141,7 @@ persona.post(
       },
       queryTerms,
       contentLengthRange: json.contentLengthRange,
+      responseMode: json.llmResponseMode,
     });
 
     return c.json(result);
@@ -175,6 +177,7 @@ persona.post(
       language: z
         .object({ key: z.enum(['en', 'id']), label: z.string() })
         .required(),
+      llmResponseMode: z.enum(['default', 'thinking', 'instant']).optional(),
       useRAG: z.boolean(),
       detail: z.string().optional(),
     }),
@@ -226,6 +229,7 @@ persona.post(
       },
       queryTerms,
       contentLengthRange: json.contentLengthRange,
+      responseMode: json.llmResponseMode,
     });
 
     let domain = await prisma.domain.findUnique({
@@ -343,6 +347,7 @@ persona.put(
       language: z
         .object({ key: z.enum(['en', 'id']), label: z.string() })
         .required(),
+      llmResponseMode: z.enum(['default', 'thinking', 'instant']).optional(),
       useRAG: z.boolean(),
       detail: z.string().optional(),
     }),
@@ -399,6 +404,7 @@ persona.put(
       },
       queryTerms,
       contentLengthRange: json.contentLengthRange,
+      responseMode: json.llmResponseMode,
     });
 
     const domain = await prisma.domain.findUnique({

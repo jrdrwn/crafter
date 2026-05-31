@@ -65,6 +65,7 @@ const formSchema = (t: (key: string) => string) =>
       .min(1, t('select-external-factor')),
     contentLengthRange: z.array(z.number()).length(2),
     llmModel: z.object({ key: z.string(), label: z.string() }).required(),
+    llmResponseMode: z.enum(['default', 'thinking', 'instant']),
     language: z
       .object({
         key: z.string(),
@@ -125,6 +126,7 @@ export default function Design({ persona }: { persona: PersonaData | null }) {
         key: 'gemini-2.5-flash-lite',
         label: 'Gemini 2.5 Flash Lite',
       },
+      llmResponseMode: persona?.request?.llmResponseMode ?? 'default',
       language:
         persona?.request?.language ??
         ({ key: 'en', label: 'English' } as const),
@@ -141,6 +143,7 @@ export default function Design({ persona }: { persona: PersonaData | null }) {
       additional: [
         'contentLengthRange',
         'llmModel',
+        'llmResponseMode',
         'language',
         'useRAG',
         'detail',
@@ -325,6 +328,17 @@ export default function Design({ persona }: { persona: PersonaData | null }) {
                         {tCreate('construct-language')}
                       </span>
                       <span>{form.getValues('language')?.label}</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Cpu className="h-4 w-4 text-muted-foreground" />
+                      <span className="font-medium">
+                        {tCreate('construct-response-mode')}
+                      </span>
+                      <span>
+                        {tCreate(
+                          `llm-config-response-mode-${form.getValues('llmResponseMode')}`,
+                        )}
+                      </span>
                     </div>
                     <div className="flex gap-2">
                       <LucideMessageSquareWarning className="h-4 w-4 text-muted-foreground" />

@@ -43,9 +43,9 @@ jest.mock('@langchain/google-genai', () => ({
 }));
 
 // ─── Import setelah mocking ───────────────────────────────────────────────────
-import fs from 'fs/promises';
-import { PGVectorStore } from '@langchain/community/vectorstores/pgvector';
 import { normalizeToRAGNote, runPersonaRAG } from '@/lib/persona.service';
+import { PGVectorStore } from '@langchain/community/vectorstores/pgvector';
+import fs from 'fs/promises';
 
 const mockReadFile = fs.readFile as jest.Mock;
 const mockVSInitialize = PGVectorStore.initialize as jest.Mock;
@@ -128,6 +128,34 @@ describe('runPersonaRAG — missing prompt files', () => {
 // ════════════════════════════════════════════════════════════════════════════
 describe('runPersonaRAG — LLM errors', () => {
   beforeEach(setupPromptFiles);
+
+  it('retry tanpa reasoning saat provider menolak parameter reasoning', async () => {
+    stableInvoke
+      .mockRejectedValueOnce(new Error("400 Unknown parameter: 'reasoning'."))
+      .mockResolvedValueOnce({
+        result: {
+          narative: 'n',
+          bullets: 'b',
+          mixed: 'm',
+          quote: 'q',
+          full_name: 'N',
+        },
+        taxonomy: {
+          domain: { key: 'k', label: 'L' },
+          detail: '',
+          internal: [],
+          external: [],
+        },
+      });
+
+    const result = await runPersonaRAG('gemini-2.5-flash', 'Persona', {
+      filters: { language_key: 'en' },
+      responseMode: 'thinking',
+    });
+
+    expect(stableInvoke).toHaveBeenCalledTimes(2);
+    expect(result).toHaveProperty('result.full_name', 'N');
+  });
 
   it('melempar error saat LLM mengembalikan 429 Too Many Requests', async () => {
     const rateLimitError = new Error('429 Too Many Requests');

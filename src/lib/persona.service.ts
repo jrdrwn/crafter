@@ -7,6 +7,7 @@ import { HumanMessage, SystemMessage } from '@langchain/core/messages';
 import { ChatGoogleGenerativeAI } from '@langchain/google-genai';
 import { PoolConfig } from 'pg';
 import { z } from 'zod';
+import type { ResponseMode } from './llm';
 import { createChatClient, createEmbeddingsClient } from './llm';
 
 const PersonaResultSchema = z.object({
@@ -76,6 +77,26 @@ function joinDocs(docs: Document[]) {
         `[#${i + 1}] ${d.metadata?.source ?? d.metadata?.type ?? 'rag'}\n${d.pageContent}`,
     )
     .join('\n\n');
+}
+
+function isUnsupportedReasoningParamError(error: unknown) {
+  if (!error || typeof error !== 'object' || !('message' in error)) return false;
+  const message = String((error as { message?: unknown }).message ?? '').toLowerCase();
+  return (
+    message.includes("unknown parameter: 'reasoning'") ||
+    message.includes('unknown parameter: "reasoning"') ||
+    message.includes('unknown parameter: reasoning') ||
+    message.includes("unknown parameter: 'reasoning_effort'") ||
+    message.includes('unknown parameter: "reasoning_effort"') ||
+    message.includes('unknown parameter: reasoning_effort')
+  );
+}
+
+async function invokePersonaClient(client: Awaited<ReturnType<typeof createChatClient>>, finalPrompt: (SystemMessage | HumanMessage)[]) {
+  if (typeof client.withStructuredOutput === 'function') {
+    return client.withStructuredOutput(PersonaOutputSchema).invoke(finalPrompt);
+  }
+  return client.invoke(finalPrompt);
 }
 
 export type RagFilters = {
@@ -183,6 +204,7 @@ export async function runPersonaRAG(
     queryTerms?: string[];
     skipRAG?: boolean;
     contentLengthRange?: number[];
+    responseMode?: ResponseMode;
   },
 ) {
   const vs = await ensureStore();
@@ -275,9 +297,12 @@ export async function runPersonaRAG(
     new HumanMessage(`${contructTitle}\n\n${construct}`),
   ];
 
-  const client = await createChatClient(model);
-  if (typeof client.withStructuredOutput === 'function') {
-    return client.withStructuredOutput(PersonaOutputSchema).invoke(finalPrompt);
+  const client = await createChatClient(model, opts?.responseMode);
+  try {
+    return await invokePersonaClient(client, finalPrompt);
+  } catch (error) {
+    if (!isUnsupportedReasoningParamError(error)) throw error;
+    const fallbackClient = await createChatClient(model, 'default');
+    return invokePersonaClient(fallbackClient, finalPrompt);
   }
-  return client.invoke(finalPrompt);
 }

@@ -70,6 +70,7 @@ export const formSchema = z.object({
       label: z.string(),
     })
     .required(),
+  llmResponseMode: z.enum(['default', 'thinking', 'instant']),
   language: z
     .object({
       key: z.string(),
@@ -137,6 +138,7 @@ export default function Design() {
         key: 'gemini-2.5-flash-lite',
         label: 'Gemini 2.5 Flash Lite',
       },
+      llmResponseMode: 'default',
       language: {
         key: 'en',
         label: 'English',
@@ -262,6 +264,7 @@ export default function Design() {
       additional: [
         'contentLengthRange',
         'llmModel',
+        'llmResponseMode',
         'language',
         'useRAG',
         'detail',
@@ -367,6 +370,17 @@ export default function Design() {
                         {t('construct-language')}
                       </span>
                       <span>{form.getValues('language')?.label}</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Cpu className="h-4 w-4 text-muted-foreground" />
+                      <span className="font-medium">
+                        {t('construct-response-mode')}
+                      </span>
+                      <span>
+                        {t(
+                          `llm-config-response-mode-${form.getValues('llmResponseMode')}`,
+                        )}
+                      </span>
                     </div>
                     <div className="flex gap-2">
                       <LucideMessageSquareWarning className="h-4 w-4 text-muted-foreground" />
